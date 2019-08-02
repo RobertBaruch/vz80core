@@ -1,0 +1,24 @@
+[tasks]
+bmc
+cover
+
+[options]
+bmc: mode bmc
+cover: mode cover
+depth 20
+
+[engines]
+smtbmc boolector
+
+[script]
+verilog_defines -D SEQUENCER_FORMAL=1
+verilog_defines -D Z80_FORMAL=1
+read -formal -sv sequencer.sv
+prep -top sequencer
+
+[files]
+z80.vh
+z80fi.vh
+sequencer.sv
+registers.sv
+instr_decoder.sv

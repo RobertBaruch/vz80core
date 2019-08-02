@@ -1,0 +1,19 @@
+[options]
+mode cover
+depth 100
+
+[engines]
+smtbmc
+
+[script]
+read_verilog -sv -formal z80fi_cover.sv
+prep -nordff -top testbench
+
+[files]
+z80fi_cover.sv
+z80fi.vh
+z80.v
+z80.vh
+sequencer.sv
+registers.sv
+instr_decoder.sv

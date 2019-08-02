@@ -1,0 +1,29 @@
+# DO NOT EDIT -- auto-generated from z80fi_generate.py
+
+[options]
+mode bmc
+depth 1
+
+[engines]
+smtbmc yices
+
+[script]
+verilog_defines -D Z80_FORMAL
+read_verilog -sv -formal z80fi_coverage.sv
+prep -flatten -top coverage
+
+[files]
+z80fi.vh
+z80fi_coverage.sv
+z80fi_isa_coverage.sv
+z80.vh
+z80fi_insn_spec_ld_hl_reg.sv
+z80fi_insn_spec_ld_dd_extaddr.sv
+z80fi_insn_spec_ld_bcde_a.sv
+z80fi_insn_spec_ld_a_extaddr.sv
+z80fi_insn_spec_ld_reg_immed.sv
+z80fi_insn_spec_ld_extaddr_a.sv
+z80fi_insn_spec_ld_dd_immed.sv
+z80fi_insn_spec_ld_hl_immed.sv
+z80fi_insn_spec_ld_reg_ixiy.sv
+z80fi_insn_spec_ld_reg_reg.sv

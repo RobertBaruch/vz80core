@@ -1,0 +1,22 @@
+[tasks]
+bmc
+prove
+cover
+
+[options]
+bmc: mode bmc
+prove: mode prove
+cover: mode cover
+depth 10
+
+[engines]
+smtbmc boolector
+
+[script]
+verilog_defines -D REGISTERS_FORMAL=1
+read -formal -sv registers.sv
+prep -top registers
+
+[files]
+z80.vh
+registers.sv
