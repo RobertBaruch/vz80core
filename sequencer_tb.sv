@@ -35,8 +35,8 @@ sequencer sequencer(
 always #1 clk=~clk;
 
 always @(*) begin
-    if (addr == 0) mem_data = 8'hED;
-    else if (addr == 1) mem_data = 8'h7B;
+    if (addr == 0) mem_data = 8'hDD;
+    else if (addr == 1) mem_data = 8'h36;
     else if (addr == 2) mem_data = 8'hAA;
     else if (addr == 3) mem_data = 8'hBB;
     else if (addr == 4) mem_data = 8'hCC;
@@ -46,7 +46,6 @@ end
 
 initial begin
     $dumpfile("sequencer_tb.vcd");
-// TODO: Change dumpvars if desired
     $dumpvars;
 
     #2

@@ -47,11 +47,20 @@ always @(*) begin
         case (instr[15:0])
             16'h4BED, 16'h5BED, 16'h6BED, 16'h7BED:
                 group <= `INSN_GROUP_LD_DD_EXTADDR;
+            16'h43ED, 16'h53ED, 16'h63ED, 16'h73ED:
+                group <= `INSN_GROUP_LD_EXTADDR_DD;
             16'h46DD, 16'h4EDD, 16'h56DD, 16'h5EDD,
             16'h66DD, 16'h6EDD, 16'h7EDD,
             16'h46FD, 16'h4EFD, 16'h56FD, 16'h5EFD,
             16'h66FD, 16'h6EFD, 16'h7EFD:
                 group <= `INSN_GROUP_LD_REG_IXIY;
+            16'h70DD, 16'h71DD, 16'h72DD, 16'h73DD,
+            16'h74DD, 16'h75DD, 16'h77DD,
+            16'h70FD, 16'h71FD, 16'h72FD, 16'h73FD,
+            16'h74FD, 16'h75FD, 16'h77FD:
+                group <= `INSN_GROUP_LD_IXIY_REG;
+            16'h36DD, 16'h36FD:
+                group <= `INSN_GROUP_LD_IXIY_IMMED;
             default:
                 group <= `INSN_GROUP_ILLEGAL_INSTR;
         endcase

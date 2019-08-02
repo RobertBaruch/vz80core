@@ -28,18 +28,22 @@ assign spec_valid = z80fi_valid &&
 
 // Once spec_valid, what is supposed to happen?
 assign spec_reg1_rd = 1;
-assign spec_reg1_rnum = iy ? `REG_IY : `REG_IX;
+assign spec_reg2_rd = 0;
 assign spec_reg_wr = 1;
-assign spec_reg_wnum = {1'b0, r};
-assign spec_reg_wdata = z80fi_mem_rdata;
 assign spec_mem_rd = 1;
-assign spec_mem_addr = z80fi_reg1_rdata + {8'b0, d};
-assign spec_mem_rdata = z80fi_mem_rdata;
-assign spec_pc_wdata = z80fi_pc_rdata + z80fi_insn_len;
-
-// default assignments
 assign spec_mem_rd2 = 0;
 assign spec_mem_wr = 0;
-assign spec_reg2_rd = 0;
+assign spec_mem_wr2 = 0;
+
+// Data for 1's above.
+assign spec_reg1_rnum = iy ? `REG_IY : `REG_IX;
+
+assign spec_reg_wnum = {1'b0, r};
+assign spec_reg_wdata = z80fi_mem_rdata;
+
+assign spec_mem_raddr = z80fi_reg1_rdata + {8'b0, d};
+assign spec_mem_rdata = z80fi_mem_rdata;
+
+assign spec_pc_wdata = z80fi_pc_rdata + 3;
 
 endmodule

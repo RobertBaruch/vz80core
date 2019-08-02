@@ -159,7 +159,7 @@ begin
     next_read_mem = 1;                     
     `ifdef Z80_FORMAL                      
         next_z80fi_mem_rd = 1;             
-        next_z80fi_mem_addr = local_addr;   
+        next_z80fi_mem_raddr = local_addr;   
     `endif                                 
 end
 endtask
@@ -185,7 +185,7 @@ begin
     next_read_mem = 1;                     
     `ifdef Z80_FORMAL                      
         next_z80fi_mem_rd2 = 1;             
-        next_z80fi_mem_addr2 = local_addr;   
+        next_z80fi_mem_raddr2 = local_addr;   
     `endif                                 
 end
 endtask
@@ -200,7 +200,7 @@ end
 endtask
 
 // Use task_write_mem to write data at an address. On the next
-// state be sure to call task_done_write_mem. Do not read from
+// state be sure to call task_write_mem_done. Do not read from
 // memory in the same state you are writing in!
 task task_write_mem;
     input [15:0] local_addr;
@@ -212,13 +212,39 @@ begin
     next_write_data = local_data;          
     `ifdef Z80_FORMAL                
         next_z80fi_mem_wr = 1;       
-        next_z80fi_mem_addr = local_addr;  
+        next_z80fi_mem_waddr = local_addr;  
         next_z80fi_mem_wdata = local_data; 
     `endif                                 
 end
 endtask
 
 task task_write_mem_done;
+begin
+    next_write_mem = 0;
+end
+endtask
+
+// Use task_write_mem2 to write data at an address for the
+// second write of an instruction. On the next state be sure
+// to call task_write_mem2_done. Do not read from
+// memory in the same state you are writing in!
+task task_write_mem2;
+    input [15:0] local_addr;
+    input [7:0] local_data;
+begin
+    next_addr = local_addr;  
+    next_read_mem = 0;              
+    next_write_mem = 1;              
+    next_write_data = local_data;          
+    `ifdef Z80_FORMAL                
+        next_z80fi_mem_wr2 = 1;       
+        next_z80fi_mem_waddr2 = local_addr;  
+        next_z80fi_mem_wdata2 = local_data; 
+    `endif                                 
+end
+endtask
+
+task task_write_mem2_done;
 begin
     next_write_mem = 0;
 end
@@ -270,6 +296,8 @@ begin
 end
 endtask
 
+// This should always be paired with task_read_next_insn_byte()
+// except for the very last one in the instruction.
 task task_append_insn_byte;
 begin
     `ifdef Z80_FORMAL      
@@ -367,7 +395,7 @@ always @(*) begin
                 task_append_insn_byte();
                 task_read_next_insn_byte();
             end
-            
+
             `INSN_GROUP_LD_REG_REG:  // LD r, r'
                 case (state)
                     0: begin
@@ -556,6 +584,38 @@ always @(*) begin
                     end
                 endcase
 
+            `INSN_GROUP_LD_EXTADDR_DD: // LD dd, (nn)
+                case (state)
+                    0: begin
+                        task_append_insn_byte(); // dd
+                        task_read_next_insn_byte();
+                        next_state = 1;
+                    end
+                    1: begin
+                        task_append_insn_byte(); // nn
+                        next_scratch_data = {8'h00, mem_data};
+                        task_read_next_insn_byte();
+                        next_state = 2;
+                        end
+                    2: begin
+                        task_append_insn_byte(); // nn
+                        task_save_addr(addr + 1);
+                        task_read_reg1({2'b10, use_instr[13:12]});
+                        next_scratch_data = {mem_data, scratch_data[7:0]} + 1;
+                        task_write_mem({mem_data, scratch_data[7:0]}, regs_out1[7:0]);
+                        next_state = 3;
+                    end
+                    3: begin
+                        task_write_mem_done();
+                        task_write_mem2(scratch_data, regs_out1[15:8]);
+                        next_state = 4;
+                    end
+                    4: begin
+                        task_write_mem2_done();
+                        task_done(scratch_addr);
+                    end
+                endcase
+
             `INSN_GROUP_LD_REG_IXIY:  // LD r, (IX/IY + d)
                 case (state)
                     0: begin
@@ -564,7 +624,7 @@ always @(*) begin
                         next_state = 1;
                     end
                     1: begin
-                        task_append_insn_byte();
+                        task_append_insn_byte(); // d
                         task_read_reg1(use_instr[5] ? `REG_IY : `REG_IX);
                         task_save_addr(addr + 1);
                         task_read_mem1(regs_out1 + {8'b0, mem_data});
@@ -573,6 +633,53 @@ always @(*) begin
                     2: begin
                         task_read_mem1_result(mem_data);
                         task_write_reg({1'b0, use_instr[13:11]}, mem_data);
+                        task_done(scratch_addr);
+                    end
+                endcase
+
+            `INSN_GROUP_LD_IXIY_IMMED:  // LD (IX/IY + d), n
+                case (state)
+                    0: begin
+                        task_append_insn_byte();
+                        task_read_next_insn_byte();
+                        next_state = 1;
+                    end
+                    1: begin
+                        task_append_insn_byte(); // d
+                        task_read_next_insn_byte();
+                        task_read_reg1(use_instr[5] ? `REG_IY : `REG_IX);
+                        task_save_addr(regs_out1 + {8'b0, mem_data});
+                        next_state = 2;
+                    end
+                    2: begin
+                        task_append_insn_byte(); // n
+                        task_write_mem(scratch_addr, mem_data);
+                        task_save_addr(addr + 1);
+                        next_state = 3;
+                    end
+                    3: begin
+                        task_write_mem_done();
+                        task_done(scratch_addr);
+                    end
+                endcase
+
+            `INSN_GROUP_LD_IXIY_REG:  // LD (IX/IY + d), r
+                case (state)
+                    0: begin
+                        task_append_insn_byte();
+                        task_read_next_insn_byte();
+                        next_state = 1;
+                    end
+                    1: begin
+                        task_append_insn_byte(); // d
+                        task_read_reg1(use_instr[5] ? `REG_IY : `REG_IX);
+                        task_read_reg2({1'b0, use_instr[10:8]});
+                        task_write_mem(regs_out1 + {8'b0, mem_data}, regs_out2[7:0]);
+                        task_save_addr(addr + 1);
+                        next_state = 2;
+                    end
+                    2: begin
+                        task_write_mem_done();
                         task_done(scratch_addr);
                     end
                 endcase

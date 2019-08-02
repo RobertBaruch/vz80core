@@ -48,7 +48,7 @@
 //   after (z80fi_pc_wdata) the instruction executes. That is, z80fi_pc_rdata is the
 //   address of the instruction just executed, and z80fi_pc_wdata is the address of
 //   the next instructino to execute.
-// z80fi_mem_addr(2), z80fi_mem_rd(2), z80fi_mem_wr, z80fi_mem_rdata(2), z80fi_mem_wdata:
+// z80fi_mem_(r/w)addr(2), z80fi_mem_rd(2), z80fi_mem_wr(2), z80fi_mem_rdata(2), z80fi_mem_wdata(2):
 //   If the instruction did not read from memory (ignoring reads of instruction data)
 //   then z80fi_mem_rd is zero. If the instruction did not write memory, z80fi_mem_wr
 //   is zero. If memory was read or written, z80fi_mem_addr is the address location
@@ -86,14 +86,18 @@ input [15 : 0] z80fi_reg2_rdata, \
 input [0  : 0] z80fi_reg_wr,     \
 input [3  : 0] z80fi_reg_wnum,   \
 input [15 : 0] z80fi_reg_wdata,  \
-input [15 : 0] z80fi_mem_addr,   \
-input [15 : 0] z80fi_mem_addr2,  \
 input [0  : 0] z80fi_mem_rd,     \
+input [15 : 0] z80fi_mem_raddr,  \
 input [7  : 0] z80fi_mem_rdata,  \
 input [0  : 0] z80fi_mem_rd2,    \
+input [15 : 0] z80fi_mem_raddr2, \
 input [7  : 0] z80fi_mem_rdata2, \
 input [0  : 0] z80fi_mem_wr,     \
-input [7  : 0] z80fi_mem_wdata
+input [15 : 0] z80fi_mem_waddr,  \
+input [7  : 0] z80fi_mem_wdata,  \
+input [0  : 0] z80fi_mem_wr2,    \
+input [15 : 0] z80fi_mem_waddr2, \
+input [7  : 0] z80fi_mem_wdata2
 
 `define Z80FI_OUTPUTS \
 output logic [0  : 0] z80fi_valid,      \
@@ -110,14 +114,18 @@ output logic [15 : 0] z80fi_reg2_rdata, \
 output logic [0  : 0] z80fi_reg_wr,     \
 output logic [3  : 0] z80fi_reg_wnum,   \
 output logic [15 : 0] z80fi_reg_wdata,  \
-output logic [15 : 0] z80fi_mem_addr,   \
-output logic [15 : 0] z80fi_mem_addr2,  \
 output logic [0  : 0] z80fi_mem_rd,     \
+output logic [15 : 0] z80fi_mem_raddr,  \
 output logic [7  : 0] z80fi_mem_rdata,  \
 output logic [0  : 0] z80fi_mem_rd2,    \
+output logic [15 : 0] z80fi_mem_raddr2, \
 output logic [7  : 0] z80fi_mem_rdata2, \
 output logic [0  : 0] z80fi_mem_wr,     \
-output logic [7  : 0] z80fi_mem_wdata
+output logic [15 : 0] z80fi_mem_waddr,  \
+output logic [7  : 0] z80fi_mem_wdata,  \
+output logic [0  : 0] z80fi_mem_wr2,    \
+output logic [15 : 0] z80fi_mem_waddr2, \
+output logic [7  : 0] z80fi_mem_wdata2
 
 `define Z80FI_WIRES \
 wire [0  : 0] z80fi_valid;      \
@@ -134,14 +142,18 @@ wire [15 : 0] z80fi_reg2_rdata; \
 wire [0  : 0] z80fi_reg_wr;     \
 wire [3  : 0] z80fi_reg_wnum;   \
 wire [15 : 0] z80fi_reg_wdata;  \
-wire [15 : 0] z80fi_mem_addr;   \
-wire [15 : 0] z80fi_mem_addr2;  \
 wire [0  : 0] z80fi_mem_rd;     \
+wire [15 : 0] z80fi_mem_raddr;  \
 wire [7  : 0] z80fi_mem_rdata;  \
 wire [0  : 0] z80fi_mem_rd2;    \
+wire [15 : 0] z80fi_mem_raddr2; \
 wire [7  : 0] z80fi_mem_rdata2; \
 wire [0  : 0] z80fi_mem_wr;     \
-wire [7  : 0] z80fi_mem_wdata;
+wire [15 : 0] z80fi_mem_waddr;  \
+wire [7  : 0] z80fi_mem_wdata;  \
+wire [0  : 0] z80fi_mem_wr2;    \
+wire [15 : 0] z80fi_mem_waddr2; \
+wire [7  : 0] z80fi_mem_wdata2;
 
 `define Z80FI_NEXT_STATE \
 logic [0  : 0] next_z80fi_valid;      \
@@ -158,14 +170,18 @@ logic [15 : 0] next_z80fi_reg2_rdata; \
 logic [0  : 0] next_z80fi_reg_wr;     \
 logic [3  : 0] next_z80fi_reg_wnum;   \
 logic [15 : 0] next_z80fi_reg_wdata;  \
-logic [15 : 0] next_z80fi_mem_addr;   \
-logic [15 : 0] next_z80fi_mem_addr2;  \
 logic [0  : 0] next_z80fi_mem_rd;     \
+logic [15 : 0] next_z80fi_mem_raddr;  \
 logic [7  : 0] next_z80fi_mem_rdata;  \
 logic [0  : 0] next_z80fi_mem_rd2;    \
+logic [15 : 0] next_z80fi_mem_raddr2; \
 logic [7  : 0] next_z80fi_mem_rdata2; \
 logic [0  : 0] next_z80fi_mem_wr;     \
-logic [7  : 0] next_z80fi_mem_wdata;
+logic [15 : 0] next_z80fi_mem_waddr;  \
+logic [7  : 0] next_z80fi_mem_wdata;  \
+logic [0  : 0] next_z80fi_mem_wr2;    \
+logic [15 : 0] next_z80fi_mem_waddr2; \
+logic [7  : 0] next_z80fi_mem_wdata2;
 
 `define Z80FI_RESET_STATE \
 z80fi_valid <= 0;      \
@@ -182,14 +198,18 @@ z80fi_reg2_rdata <= 0; \
 z80fi_reg_wr <= 0;     \
 z80fi_reg_wnum <= 0;   \
 z80fi_reg_wdata <= 0;  \
-z80fi_mem_addr <= 0;   \
-z80fi_mem_addr2 <= 0;  \
 z80fi_mem_rd <= 0;     \
+z80fi_mem_raddr <= 0;  \
 z80fi_mem_rdata <= 0;  \
 z80fi_mem_rd2 <= 0;    \
+z80fi_mem_raddr2 <= 0; \
 z80fi_mem_rdata2 <= 0; \
 z80fi_mem_wr <= 0;     \
-z80fi_mem_wdata <= 0;
+z80fi_mem_waddr <= 0;  \
+z80fi_mem_wdata <= 0;  \
+z80fi_mem_wr2 <= 0;    \
+z80fi_mem_waddr2 <= 0; \
+z80fi_mem_wdata2 <= 0;
 
 `define Z80FI_LOAD_NEXT_STATE \
 z80fi_valid <= next_z80fi_valid;           \
@@ -206,14 +226,18 @@ z80fi_reg2_rdata <= next_z80fi_reg2_rdata; \
 z80fi_reg_wr <= next_z80fi_reg_wr;         \
 z80fi_reg_wnum <= next_z80fi_reg_wnum;     \
 z80fi_reg_wdata <= next_z80fi_reg_wdata;   \
-z80fi_mem_addr <= next_z80fi_mem_addr;     \
-z80fi_mem_addr2 <= next_z80fi_mem_addr2;   \
 z80fi_mem_rd <= next_z80fi_mem_rd;         \
+z80fi_mem_raddr <= next_z80fi_mem_raddr;   \
 z80fi_mem_rdata <= next_z80fi_mem_rdata;   \
 z80fi_mem_rd2 <= next_z80fi_mem_rd2;       \
+z80fi_mem_raddr2 <= next_z80fi_mem_raddr2; \
 z80fi_mem_rdata2 <= next_z80fi_mem_rdata2; \
 z80fi_mem_wr <= next_z80fi_mem_wr;         \
-z80fi_mem_wdata <= next_z80fi_mem_wdata;
+z80fi_mem_waddr <= next_z80fi_mem_waddr;   \
+z80fi_mem_wdata <= next_z80fi_mem_wdata;   \
+z80fi_mem_wr2 <= next_z80fi_mem_wr2;       \
+z80fi_mem_waddr2 <= next_z80fi_mem_waddr2; \
+z80fi_mem_wdata2 <= next_z80fi_mem_wdata2;
 
 `define Z80FI_RETAIN_NEXT_STATE \
 next_z80fi_valid = 0;                     \
@@ -230,14 +254,18 @@ next_z80fi_reg2_rdata = z80fi_reg2_rdata; \
 next_z80fi_reg_wr = z80fi_reg_wr;         \
 next_z80fi_reg_wnum = z80fi_reg_wnum;     \
 next_z80fi_reg_wdata = z80fi_reg_wdata;   \
-next_z80fi_mem_addr = z80fi_mem_addr;     \
-next_z80fi_mem_addr2 = z80fi_mem_addr2;   \
 next_z80fi_mem_rd = z80fi_mem_rd;         \
+next_z80fi_mem_raddr = z80fi_mem_raddr;   \
 next_z80fi_mem_rdata = z80fi_mem_rdata;   \
 next_z80fi_mem_rd2 = z80fi_mem_rd2;       \
+next_z80fi_mem_raddr2 = z80fi_mem_raddr2; \
 next_z80fi_mem_rdata2 = z80fi_mem_rdata2; \
 next_z80fi_mem_wr = z80fi_mem_wr;         \
-next_z80fi_mem_wdata = z80fi_mem_wdata;
+next_z80fi_mem_waddr = z80fi_mem_waddr;   \
+next_z80fi_mem_wdata = z80fi_mem_wdata;   \
+next_z80fi_mem_wr2 = z80fi_mem_wr2;       \
+next_z80fi_mem_waddr2 = z80fi_mem_waddr2; \
+next_z80fi_mem_wdata2 = z80fi_mem_wdata2;
 
 `define Z80FI_INIT_NEXT_STATE \
 next_z80fi_valid = 0;      \
@@ -254,14 +282,18 @@ next_z80fi_reg2_rdata = 0; \
 next_z80fi_reg_wr = 0;     \
 next_z80fi_reg_wnum = 0;   \
 next_z80fi_reg_wdata = 0;  \
-next_z80fi_mem_addr = 0;   \
-next_z80fi_mem_addr2 = 0;  \
 next_z80fi_mem_rd = 0;     \
+next_z80fi_mem_raddr = 0;  \
 next_z80fi_mem_rdata = 0;  \
 next_z80fi_mem_rd2 = 0;    \
+next_z80fi_mem_raddr2 = 0; \
 next_z80fi_mem_rdata2 = 0; \
 next_z80fi_mem_wr = 0;     \
-next_z80fi_mem_wdata = 0;
+next_z80fi_mem_waddr = 0;  \
+next_z80fi_mem_wdata = 0;  \
+next_z80fi_mem_wr2 = 0;    \
+next_z80fi_mem_waddr2 = 0; \
+next_z80fi_mem_wdata2 = 0;
 
 `define Z80FI_CONN \
 .z80fi_valid      (z80fi_valid),      \
@@ -278,41 +310,49 @@ next_z80fi_mem_wdata = 0;
 .z80fi_reg_wr     (z80fi_reg_wr),     \
 .z80fi_reg_wnum   (z80fi_reg_wnum),   \
 .z80fi_reg_wdata  (z80fi_reg_wdata),  \
-.z80fi_mem_addr   (z80fi_mem_addr),   \
-.z80fi_mem_addr2  (z80fi_mem_addr2),  \
 .z80fi_mem_rd     (z80fi_mem_rd),     \
+.z80fi_mem_raddr  (z80fi_mem_raddr),  \
 .z80fi_mem_rdata  (z80fi_mem_rdata),  \
 .z80fi_mem_rd2    (z80fi_mem_rd2),    \
+.z80fi_mem_raddr2 (z80fi_mem_raddr2), \
 .z80fi_mem_rdata2 (z80fi_mem_rdata2), \
 .z80fi_mem_wr     (z80fi_mem_wr),     \
-.z80fi_mem_wdata  (z80fi_mem_wdata)
+.z80fi_mem_waddr  (z80fi_mem_waddr),  \
+.z80fi_mem_wdata  (z80fi_mem_wdata),  \
+.z80fi_mem_wr2    (z80fi_mem_wr2),    \
+.z80fi_mem_waddr2 (z80fi_mem_waddr2), \
+.z80fi_mem_wdata2 (z80fi_mem_wdata2)
 
 // Used as the module i/o for z80fi_insn_* modules
 
 `define Z80FI_INSN_SPEC_IO \
-input z80fi_valid,                 \
-input [31:0] z80fi_insn,           \
-input [2:0] z80fi_insn_len,        \
-input [15:0] z80fi_pc_rdata,       \
-input [15:0] z80fi_reg1_rdata,     \
-input [15:0] z80fi_reg2_rdata,     \
-input [7:0] z80fi_mem_rdata,      \
-input [7:0] z80fi_mem_rdata2,     \
+input  [0  : 0] z80fi_valid,       \
+input  [31 : 0] z80fi_insn,        \
+input  [2  : 0] z80fi_insn_len,    \
+input  [15 : 0] z80fi_pc_rdata,    \
+input  [15 : 0] z80fi_reg1_rdata,  \
+input  [15 : 0] z80fi_reg2_rdata,  \
+input  [7  : 0] z80fi_mem_rdata,   \
+input  [7  : 0] z80fi_mem_rdata2,  \
                                    \
-output spec_valid,                 \
-output spec_reg1_rd,               \
+output [0  : 0] spec_valid,        \
+output [0  : 0] spec_reg1_rd,      \
 output `reg_select spec_reg1_rnum, \
-output spec_reg2_rd,               \
+output [0  : 0] spec_reg2_rd,      \
 output `reg_select spec_reg2_rnum, \
-output spec_reg_wr,                \
+output [0  : 0] spec_reg_wr,       \
 output `reg_select spec_reg_wnum,  \
 output [15:0] spec_reg_wdata,      \
 output [15:0] spec_pc_wdata,       \
-output [15:0] spec_mem_addr,       \
-output [15:0] spec_mem_addr2,      \
-output spec_mem_rd,                \
-output spec_mem_rd2,               \
-output spec_mem_wr,                \
-output [7:0] spec_mem_wdata
+output [0  : 0] spec_mem_rd,       \
+output [15 : 0] spec_mem_raddr,    \
+output [0  : 0] spec_mem_rd2,      \
+output [15 : 0] spec_mem_raddr2,   \
+output [0  : 0] spec_mem_wr,       \
+output [15 : 0] spec_mem_waddr,    \
+output [7  : 0] spec_mem_wdata,    \
+output [0  : 0] spec_mem_wr2,      \
+output [15 : 0] spec_mem_waddr2,   \
+output [7  : 0] spec_mem_wdata2
 
 `endif // _z80fi_vh_
