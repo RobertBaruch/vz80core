@@ -162,6 +162,7 @@ for spec in specs:
             | z80.v
             | sequencer.sv
             | registers.sv
+            | ir_registers.sv
             | instr_decoder.sv
             """,
             file=f)
