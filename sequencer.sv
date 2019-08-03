@@ -7,6 +7,7 @@
 `include "z80.vh"
 `include "z80fi.vh"
 `include "registers.sv"
+`include "ir_registers.sv"
 `include "instr_decoder.sv"
 
 module sequencer(
@@ -35,10 +36,18 @@ logic [15:0] regs_in;
 logic [15:0] regs_out1;
 logic [15:0] regs_out2;
 logic write_regs;
-logic [7:0] flags_out;
+logic [7:0] reg_f;
 logic [7:0] flags_in;
-logic write_flags;
+logic f_wr;
+
 logic [7:0] group;
+
+logic i_wr;
+logic [7:0] i_in;
+logic r_wr;
+logic [7:0] r_in;
+logic [7:0] reg_i;
+logic [7:0] reg_r;
 
 logic [3:0] state;
 logic [15:0] scratch_addr;
@@ -79,14 +88,27 @@ registers registers(
     .src2(regs_read_from2),
     .out2(regs_out2),
 
-    .f_out(flags_out),
+    .reg_f(reg_f),
     .f_in(flags_in),
-    .write_flags_en(write_flags)
+    .f_wr(f_wr)
 
 `ifdef Z80_FORMAL
     ,
     `Z80_REGS_CONN
 `endif
+);
+
+ir_registers ir_registers(
+    .reset(reset),
+    .clk(clk),
+
+    .i_wr(i_wr),
+    .i_in(i_in),
+    .r_wr(r_wr),
+    .r_in(r_in),
+
+    .reg_i(reg_i),
+    .reg_r(reg_r)
 );
 
 logic [15:0] use_instr;
@@ -250,6 +272,45 @@ begin
 end
 endtask
 
+task task_read_i;
+begin
+    `ifdef Z80_FORMAL                      
+        next_z80fi_i_rd = 1;
+        next_z80fi_i_rdata = reg_i;
+    `endif
+end
+endtask
+
+task task_write_i;
+    input [7:0] local_data;
+begin
+    i_wr = 1;
+    i_in = local_data;
+    `ifdef Z80_FORMAL
+        next_z80fi_i_wr = 1;
+        next_z80fi_i_wdata = local_data;
+    `endif
+end
+endtask
+
+task task_read_r;
+begin
+    `ifdef Z80_FORMAL                      
+        next_z80fi_r_rd = 1;
+        next_z80fi_r_rdata = reg_r;
+    `endif
+end
+endtask
+
+task task_read_f;
+begin
+    `ifdef Z80_FORMAL                      
+        next_z80fi_f_rd = 1;
+        next_z80fi_f_rdata = reg_f;
+    `endif
+end
+endtask
+
 task task_save_addr;
     input [15:0] local_addr;
 begin
@@ -369,8 +430,10 @@ always @(*) begin
     regs_read_from1 = 0;
     regs_read_from2 = 0;
     flags_in = 0;
-    write_flags = 0;
+    f_wr = 0;
     regs_in = 0;
+    i_wr = 0;
+    r_wr = 0;
 
     // if we have no instruction, or need another byte,
     // add the byte to the instruction and try it.

@@ -16,4 +16,5 @@ z80.v
 z80.vh
 sequencer.sv
 registers.sv
+ir_registers.sv
 instr_decoder.sv

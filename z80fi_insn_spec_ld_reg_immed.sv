@@ -28,6 +28,12 @@ assign spec_mem_rd = 0;
 assign spec_mem_rd2 = 0;
 assign spec_mem_wr = 0;
 assign spec_mem_wr2 = 0;
+assign spec_i_rd = 0;
+assign spec_i_wr = 0;
+assign spec_r_rd = 0;
+assign spec_r_wr = 0;
+assign spec_f_rd = 0;
+assign spec_f_wr = 0;
 
 // Data for 1's above.
 assign spec_reg_wnum = {1'b0, r};

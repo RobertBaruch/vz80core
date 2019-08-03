@@ -25,9 +25,9 @@ module registers(
     // Flags are always output, and may be
     // written to. This is ignored if writing
     // to AF.
-    output logic [7:0] f_out,
+    output logic [7:0] reg_f,
     input logic [7:0] f_in,
-    input logic write_flags_en
+    input logic f_wr
 
 `ifdef Z80_FORMAL
     ,
@@ -71,9 +71,9 @@ logic [15:0] _sp;
   assign z80_reg_sp = _sp;
 `endif // Z80_FORMAL
 
-logic write_flags_en2;
-assign write_flags_en2 = write_flags_en && !(write_en && (dest == `REG_AF));
-assign f_out = _af[7:0];
+logic f_wr2;
+assign f_wr2 = f_wr && !(write_en && (dest == `REG_AF));
+assign reg_f = _af[7:0];
 
 always @(*) begin
     out1[15:0] = 0;
@@ -126,7 +126,7 @@ always @(posedge clk or posedge reset) begin
     _iy <= 0;
     _sp <= 0;
   end else begin
-    _af[7:0] <= (write_en && dest == `REG_AF) ? in[7:0] : (write_flags_en2 ? f_in : _af[7:0]);
+    _af[7:0] <= (write_en && dest == `REG_AF) ? in[7:0] : (f_wr2 ? f_in : _af[7:0]);
     if (write_en) begin
       case (dest)
         `REG_A: _af[15:8] <= in[7:0];
@@ -163,8 +163,8 @@ function is_16bit(input `reg_select x);
   is_16bit = (x >= `REG_FIRST16 && x <= `REG_LAST16);
 endfunction
 
-`define wrote $past(!reset && write_en && !write_flags_en) && !reset
-`define wrote_flags $past(!reset && write_flags_en2) && !reset
+`define wrote $past(!reset && write_en && !f_wr) && !reset
+`define wrote_flags $past(!reset && f_wr2) && !reset
 
 always @(posedge clk) begin
   if (past_valid) begin
@@ -177,10 +177,10 @@ always @(posedge clk) begin
     if (`wrote && $past(dest) == src2 && is_16bit(src2))
       assert(out2[15:0] == $past(in[15:0]));
     if (`wrote_flags)
-      assert(f_out == $past(f_in));
+      assert(reg_f == $past(f_in));
   end
   cover(_bc == 16'h1234 && _ix == 16'h1234 && out1[15:0] == 16'h5678 && out2[15:0] == 16'h0098);
-  cover($past(_af) == 16'hFFFF && f_out == 0 && `wrote_flags);
+  cover($past(_af) == 16'hFFFF && reg_f == 0 && `wrote_flags);
 end
 `endif
 

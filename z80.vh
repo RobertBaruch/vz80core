@@ -49,6 +49,7 @@
 `define INSN_GROUP_LD_EXTADDR_HL 13
 `define INSN_GROUP_LD_EXTADDR_IXIY 14
 `define INSN_GROUP_LD_A_BCDE 15
+`define INSN_GROUP_LD_AI_IA 16
 
 `define Z80_REGS_OUTPUTS \
 output [7:0] z80_reg_a, \
@@ -69,7 +70,8 @@ output [7:0] z80_reg_h2, \
 output [7:0] z80_reg_l2, \
 output [15:0] z80_reg_ix, \
 output [15:0] z80_reg_iy, \
-output [15:0] z80_reg_sp
+output [15:0] z80_reg_sp, \
+output [7:0] z80_reg_i
 
 `define Z80_REGS_WIRES \
 wire [7:0] z80_reg_a; \
@@ -90,7 +92,8 @@ wire [7:0] z80_reg_h2; \
 wire [7:0] z80_reg_l2; \
 wire [15:0] z80_reg_ix; \
 wire [15:0] z80_reg_iy; \
-wire [15:0] z80_reg_sp;
+wire [15:0] z80_reg_sp; \
+wire [7:0] z80_reg_i;
 
 `define Z80_REGS_CONN \
 .z80_reg_a(z80_reg_a), \
@@ -111,6 +114,7 @@ wire [15:0] z80_reg_sp;
 .z80_reg_l2(z80_reg_l2), \
 .z80_reg_ix(z80_reg_ix), \
 .z80_reg_iy(z80_reg_iy), \
-.z80_reg_sp(z80_reg_sp)
+.z80_reg_sp(z80_reg_sp), \
+.z80_reg_i(z80_reg_i)
 
 `endif // _z80_vh_

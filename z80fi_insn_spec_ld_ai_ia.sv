@@ -1,11 +1,11 @@
-// Covers the 8-bit load group LD r, r' instructions.
-// This must read register r' and write its value to
-// register r.
+// Covers the LD A, I and LD I, A instructions.
+// The first copies I into A, and the second copies
+// A into I.
 
 `include "z80.vh"
 `include "z80fi.vh"
 
-module z80fi_insn_spec_ld_reg_reg(
+module z80fi_insn_spec_ld_ai_ia(
     `Z80FI_INSN_SPEC_IO
 );
 
