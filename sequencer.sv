@@ -406,7 +406,7 @@ always @(*) begin
                     end
                 endcase
 
-            `INSN_GROUP_LD_BCDE_A:  // LD (BC), A / LD (DE), A
+            `INSN_GROUP_LD_BCDE_A:  // LD (BC/DE), A
                 case (state)
                     0: begin
                         task_append_insn_byte();
@@ -418,6 +418,22 @@ always @(*) begin
                     end
                     1: begin
                         task_write_mem_done();
+                        task_done(scratch_addr);
+                    end
+                endcase
+
+            `INSN_GROUP_LD_A_BCDE:  // LD A, (BC/DE)
+                case (state)
+                    0: begin
+                        task_append_insn_byte();
+                        task_read_reg1(use_instr[4] ? `REG_DE : `REG_BC);
+                        task_read_mem1(regs_out1);
+                        task_save_addr(addr + 1);
+                        next_state = 1;
+                    end
+                    1: begin
+                        task_read_mem1_result(mem_data);
+                        task_write_reg(`REG_A, mem_data);
                         task_done(scratch_addr);
                     end
                 endcase
@@ -475,18 +491,18 @@ always @(*) begin
             `INSN_GROUP_LD_DD_IMMED:  // LD dd, nn
                 case (state)
                     0: begin
-                        task_append_insn_byte();
+                        task_append_insn_byte();  // op
                         task_read_next_insn_byte();
                         next_state = 1;
                     end
                     1: begin
-                        task_append_insn_byte();
+                        task_append_insn_byte();  // nn
                         task_read_next_insn_byte();
                         next_scratch_data = {8'b0, mem_data};
                         next_state = 2;
                     end
                     2: begin
-                        task_append_insn_byte();
+                        task_append_insn_byte();  // nn
                         next_scratch_data[15:8] = mem_data;
                         task_write_reg({2'b10, use_instr[5:4]}, next_scratch_data);
                         task_done(addr + 1);
@@ -525,7 +541,7 @@ always @(*) begin
                         task_append_insn_byte();
                         task_read_next_insn_byte();
                         next_state = 1;
-                        end
+                    end
                     1: begin
                         task_append_insn_byte();
                         next_scratch_addr = {8'h00, mem_data};
@@ -557,26 +573,20 @@ always @(*) begin
                         next_scratch_data = {8'h00, mem_data};
                         task_read_next_insn_byte();
                         next_state = 2;
-                        end
+                    end
                     2: begin
                         task_append_insn_byte();
                         task_save_addr(addr + 1);
-                        // Set up the addr to read data from
                         task_read_mem1({mem_data, scratch_data[7:0]});
                         next_state = 3;
                     end
                     3: begin
-                        // Put the mem data in the low byte of scratch data,
-                        // read the next byte in memory.
                         task_read_mem1_result(mem_data);
                         task_read_mem2(addr + 1);
                         next_scratch_data = {8'b0, mem_data};
                         next_state = 4;
                     end
                     4: begin
-                        // Put the mem data in the high byte of scratch data.
-                        // Write it to the 16-bit register.
-                        // Jump to the scratch addr.
                         task_read_mem2_result(mem_data);
                         next_scratch_data = {mem_data, scratch_data[7:0]};
                         task_write_reg({2'b10, use_instr[13:12]}, next_scratch_data);
@@ -584,23 +594,88 @@ always @(*) begin
                     end
                 endcase
 
-            `INSN_GROUP_LD_EXTADDR_DD: // LD dd, (nn)
+            `INSN_GROUP_LD_EXTADDR_DD: // LD (nn), dd
                 case (state)
                     0: begin
-                        task_append_insn_byte(); // dd
+                        task_append_insn_byte();  // dd
                         task_read_next_insn_byte();
                         next_state = 1;
                     end
                     1: begin
-                        task_append_insn_byte(); // nn
+                        task_append_insn_byte();  // nn
+                        task_read_next_insn_byte();
                         next_scratch_data = {8'h00, mem_data};
                         task_read_next_insn_byte();
                         next_state = 2;
-                        end
+                    end
                     2: begin
-                        task_append_insn_byte(); // nn
+                        task_append_insn_byte();  // nn
                         task_save_addr(addr + 1);
                         task_read_reg1({2'b10, use_instr[13:12]});
+                        next_scratch_data = {mem_data, scratch_data[7:0]} + 1;
+                        task_write_mem({mem_data, scratch_data[7:0]}, regs_out1[7:0]);
+                        next_state = 3;
+                    end
+                    3: begin
+                        task_write_mem_done();
+                        task_write_mem2(scratch_data, regs_out1[15:8]);
+                        next_state = 4;
+                    end
+                    4: begin
+                        task_write_mem2_done();
+                        task_done(scratch_addr);
+                    end
+                endcase
+
+            `INSN_GROUP_LD_EXTADDR_HL: // LD (nn), HL
+                case (state)
+                    0: begin
+                        task_append_insn_byte();  // instr
+                        task_read_next_insn_byte();
+                        next_state = 1;
+                    end
+                    1: begin
+                        task_append_insn_byte();  // nn
+                        task_read_next_insn_byte();
+                        next_scratch_data = {8'h00, mem_data};
+                        next_state = 2;
+                    end
+                    2: begin
+                        task_append_insn_byte();  // nn
+                        task_save_addr(addr + 1);
+                        task_read_reg1(`REG_HL);
+                        next_scratch_data = {mem_data, scratch_data[7:0]} + 1;
+                        task_write_mem({mem_data, scratch_data[7:0]}, regs_out1[7:0]);
+                        next_state = 3;
+                    end
+                    3: begin
+                        task_write_mem_done();
+                        task_write_mem2(scratch_data, regs_out1[15:8]);
+                        next_state = 4;
+                    end
+                    4: begin
+                        task_write_mem2_done();
+                        task_done(scratch_addr);
+                    end
+                endcase
+
+            `INSN_GROUP_LD_EXTADDR_IXIY: // LD (nn), IX/IY
+                case (state)
+                    0: begin
+                        task_append_insn_byte();  // IX/IY
+                        task_read_next_insn_byte();
+                        next_state = 1;
+                    end
+                    1: begin
+                        task_append_insn_byte();  // nn
+                        task_read_next_insn_byte();
+                        next_scratch_data = {8'h00, mem_data};
+                        next_state = 2;
+                    end
+                    2: begin
+                        task_append_insn_byte();  // nn
+                        task_save_addr(addr + 1);
+                        task_read_reg1(use_instr[5] ? `REG_IY : `REG_IX);
                         next_scratch_data = {mem_data, scratch_data[7:0]} + 1;
                         task_write_mem({mem_data, scratch_data[7:0]}, regs_out1[7:0]);
                         next_state = 3;

@@ -35,8 +35,8 @@ sequencer sequencer(
 always #1 clk=~clk;
 
 always @(*) begin
-    if (addr == 0) mem_data = 8'hDD;
-    else if (addr == 1) mem_data = 8'h36;
+    if (addr == 0) mem_data = 8'h22;
+    else if (addr == 1) mem_data = 8'h99;
     else if (addr == 2) mem_data = 8'hAA;
     else if (addr == 3) mem_data = 8'hBB;
     else if (addr == 4) mem_data = 8'hCC;
