@@ -2,6 +2,8 @@
 // This must write the contents of the memory address at IX + d
 // with the contents of register r. d is zero-exteded to 16 bits.
 
+`default_nettype none
+
 `include "z80.vh"
 `include "z80fi.vh"
 
@@ -22,6 +24,9 @@ assign spec_valid = z80fi_valid &&
     insn_fixed2 == 2'b11 &&
     insn_fixed3 == 5'b11101;
 
+// `Z80FI_SPEC_SIGNALS
+// assign spec_signals = `SPEC_REG1_RD | `SPEC_REG2_RD | `SPEC_MEM_WR;
+
 // Once spec_valid, what is supposed to happen?
 assign spec_reg1_rd = 1; // addr
 assign spec_reg2_rd = 1; // data
@@ -41,7 +46,7 @@ assign spec_f_wr = 0;
 assign spec_reg1_rnum = iy ? `REG_IY : `REG_IX;
 assign spec_reg2_rnum = {1'b0, r};
 
-assign spec_mem_addr = z80fi_reg1_rdata + {8'b0, d};
+assign spec_mem_waddr = z80fi_reg1_rdata + {8'b0, d};
 assign spec_mem_wdata = z80fi_reg2_rdata[7:0];
 
 assign spec_pc_wdata = z80fi_pc_rdata + 3;

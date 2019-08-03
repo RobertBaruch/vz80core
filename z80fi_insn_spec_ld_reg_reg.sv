@@ -2,6 +2,8 @@
 // This must read register r' and write its value to
 // register r.
 
+`default_nettype none
+
 `include "z80.vh"
 `include "z80fi.vh"
 
@@ -14,26 +16,14 @@ wire [2:0] insn_rreg = z80fi_insn[2:0];
 wire [2:0] insn_wreg = z80fi_insn[5:3];
 
 // LD r, r' instruction
-assign spec_valid = z80fi_valid && 
-    z80fi_insn_len == 1 && 
-    insn_fixed == 2'b01 && 
-    insn_rreg != 3'b110 && 
+assign spec_valid = z80fi_valid &&
+    z80fi_insn_len == 1 &&
+    insn_fixed == 2'b01 &&
+    insn_rreg != 3'b110 &&
     insn_wreg != 3'b110;
 
-// Once spec_valid, what is supposed to happen?
-assign spec_reg1_rd = 1;
-assign spec_reg2_rd = 0;
-assign spec_reg_wr = 1;
-assign spec_mem_rd = 0;
-assign spec_mem_rd2 = 0;
-assign spec_mem_wr = 0;
-assign spec_mem_wr2 = 0;
-assign spec_i_rd = 0;
-assign spec_i_wr = 0;
-assign spec_r_rd = 0;
-assign spec_r_wr = 0;
-assign spec_f_rd = 0;
-assign spec_f_wr = 0;
+`Z80FI_SPEC_SIGNALS
+assign spec_signals = `SPEC_REG1_RD | `SPEC_REG_WR;
 
 // Data for 1's above.
 assign spec_reg1_rnum = insn_rreg;

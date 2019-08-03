@@ -45,7 +45,7 @@ sequencer sequencer(
 `ifdef Z80_FORMAL
     ,
     `Z80FI_CONN
-`endif 
+`endif
 );
 
 `ifdef FORMAL

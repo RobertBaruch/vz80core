@@ -5,7 +5,7 @@
 module z80fi_wrapper(
     input         clk,
 	input         reset,
-	`Z80FI_OUTPUTS    
+	`Z80FI_OUTPUTS
 );
 
 `z80formal_rand_reg [7:0] mem_rdata;

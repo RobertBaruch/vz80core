@@ -177,21 +177,21 @@ endtask
 task task_read_mem1;
     input [15:0] local_addr;
 begin
-    next_addr = local_addr;                      
-    next_read_mem = 1;                     
-    `ifdef Z80_FORMAL                      
-        next_z80fi_mem_rd = 1;             
-        next_z80fi_mem_raddr = local_addr;   
-    `endif                                 
+    next_addr = local_addr;
+    next_read_mem = 1;
+    `ifdef Z80_FORMAL
+        next_z80fi_mem_rd = 1;
+        next_z80fi_mem_raddr = local_addr;
+    `endif
 end
 endtask
 
 task task_read_mem1_result;
     input [7:0] local_data;
 begin
-    `ifdef Z80_FORMAL                  
-        next_z80fi_mem_rdata = local_data;   
-    `endif                                 
+    `ifdef Z80_FORMAL
+        next_z80fi_mem_rdata = local_data;
+    `endif
 end
 endtask
 
@@ -203,21 +203,21 @@ endtask
 task task_read_mem2;
     input [15:0] local_addr;
 begin
-    next_addr = local_addr;                      
-    next_read_mem = 1;                     
-    `ifdef Z80_FORMAL                      
-        next_z80fi_mem_rd2 = 1;             
-        next_z80fi_mem_raddr2 = local_addr;   
-    `endif                                 
+    next_addr = local_addr;
+    next_read_mem = 1;
+    `ifdef Z80_FORMAL
+        next_z80fi_mem_rd2 = 1;
+        next_z80fi_mem_raddr2 = local_addr;
+    `endif
 end
 endtask
 
 task task_read_mem2_result;
     input [7:0] local_data;
 begin
-    `ifdef Z80_FORMAL                  
-        next_z80fi_mem_rdata2 = local_data;   
-    `endif                                 
+    `ifdef Z80_FORMAL
+        next_z80fi_mem_rdata2 = local_data;
+    `endif
 end
 endtask
 
@@ -228,15 +228,15 @@ task task_write_mem;
     input [15:0] local_addr;
     input [7:0] local_data;
 begin
-    next_addr = local_addr;  
-    next_read_mem = 0;              
-    next_write_mem = 1;              
-    next_write_data = local_data;          
-    `ifdef Z80_FORMAL                
-        next_z80fi_mem_wr = 1;       
-        next_z80fi_mem_waddr = local_addr;  
-        next_z80fi_mem_wdata = local_data; 
-    `endif                                 
+    next_addr = local_addr;
+    next_read_mem = 0;
+    next_write_mem = 1;
+    next_write_data = local_data;
+    `ifdef Z80_FORMAL
+        next_z80fi_mem_wr = 1;
+        next_z80fi_mem_waddr = local_addr;
+        next_z80fi_mem_wdata = local_data;
+    `endif
 end
 endtask
 
@@ -254,15 +254,15 @@ task task_write_mem2;
     input [15:0] local_addr;
     input [7:0] local_data;
 begin
-    next_addr = local_addr;  
-    next_read_mem = 0;              
-    next_write_mem = 1;              
-    next_write_data = local_data;          
-    `ifdef Z80_FORMAL                
-        next_z80fi_mem_wr2 = 1;       
-        next_z80fi_mem_waddr2 = local_addr;  
-        next_z80fi_mem_wdata2 = local_data; 
-    `endif                                 
+    next_addr = local_addr;
+    next_read_mem = 0;
+    next_write_mem = 1;
+    next_write_data = local_data;
+    `ifdef Z80_FORMAL
+        next_z80fi_mem_wr2 = 1;
+        next_z80fi_mem_waddr2 = local_addr;
+        next_z80fi_mem_wdata2 = local_data;
+    `endif
 end
 endtask
 
@@ -274,7 +274,7 @@ endtask
 
 task task_read_i;
 begin
-    `ifdef Z80_FORMAL                      
+    `ifdef Z80_FORMAL
         next_z80fi_i_rd = 1;
         next_z80fi_i_rdata = reg_i;
     `endif
@@ -295,7 +295,7 @@ endtask
 
 task task_read_r;
 begin
-    `ifdef Z80_FORMAL                      
+    `ifdef Z80_FORMAL
         next_z80fi_r_rd = 1;
         next_z80fi_r_rdata = reg_r;
     `endif
@@ -316,7 +316,7 @@ endtask
 
 task task_read_f;
 begin
-    `ifdef Z80_FORMAL                      
+    `ifdef Z80_FORMAL
         next_z80fi_f_rd = 1;
         next_z80fi_f_rdata = reg_f;
     `endif
@@ -345,24 +345,24 @@ endtask
 task task_read_reg1;
     input `reg_select local_reg;
 begin
-    regs_read_from1 = local_reg;                 
-    `ifdef Z80_FORMAL                      
-        next_z80fi_reg1_rd = 1;            
-        next_z80fi_reg1_rnum = local_reg;        
-        next_z80fi_reg1_rdata = regs_out1; 
-    `endif                                 
+    regs_read_from1 = local_reg;
+    `ifdef Z80_FORMAL
+        next_z80fi_reg1_rd = 1;
+        next_z80fi_reg1_rnum = local_reg;
+        next_z80fi_reg1_rdata = regs_out1;
+    `endif
 end
 endtask
 
 task task_read_reg2;
     input `reg_select local_reg;
 begin
-    regs_read_from2 = local_reg;                 
-    `ifdef Z80_FORMAL                      
-        next_z80fi_reg2_rd = 1;            
-        next_z80fi_reg2_rnum = local_reg;        
-        next_z80fi_reg2_rdata = regs_out2; 
-    `endif                                 
+    regs_read_from2 = local_reg;
+    `ifdef Z80_FORMAL
+        next_z80fi_reg2_rd = 1;
+        next_z80fi_reg2_rnum = local_reg;
+        next_z80fi_reg2_rdata = regs_out2;
+    `endif
 end
 endtask
 
@@ -370,13 +370,13 @@ task task_write_reg;
     input `reg_select local_reg;
     input [15:0] local_data;
 begin
-    regs_write_to = local_reg;             
-    write_regs = 1;                  
-    regs_in = local_data;                  
-    `ifdef Z80_FORMAL                
-        next_z80fi_reg_wr = 1;       
-        next_z80fi_reg_wnum = local_reg;   
-        next_z80fi_reg_wdata = local_data; 
+    regs_write_to = local_reg;
+    write_regs = 1;
+    regs_in = local_data;
+    `ifdef Z80_FORMAL
+        next_z80fi_reg_wr = 1;
+        next_z80fi_reg_wnum = local_reg;
+        next_z80fi_reg_wdata = local_data;
     `endif
 end
 endtask
@@ -385,7 +385,7 @@ endtask
 // except for the very last one in the instruction.
 task task_append_insn_byte;
 begin
-    `ifdef Z80_FORMAL      
+    `ifdef Z80_FORMAL
         // We use next_z80fi_insn_len here instead of
         // z80fi_insn_len because on the done signal,
         // z80fi_valid goes high and z80fi_insn_len
@@ -406,7 +406,7 @@ begin
             default: ;
         endcase
         next_z80fi_insn_len = next_z80fi_insn_len + 1;
-    `endif    
+    `endif
 end
 endtask
 
@@ -419,13 +419,13 @@ task task_done;
 begin
     next_done = 1;
     next_state = 0;
-    next_read_mem = 1;                   
-    next_read_next_instr_byte = 1;       
-    next_instr_len = 0;                  
-    next_addr = local_addr;                    
-    `ifdef Z80_FORMAL                    
-        next_z80fi_valid = 1;            
-        next_z80fi_pc_wdata = local_addr; 
+    next_read_mem = 1;
+    next_read_next_instr_byte = 1;
+    next_instr_len = 0;
+    next_addr = local_addr;
+    `ifdef Z80_FORMAL
+        next_z80fi_valid = 1;
+        next_z80fi_pc_wdata = local_addr;
     `endif
 end
 endtask
@@ -503,7 +503,7 @@ always @(*) begin
                         task_write_f(
                             (reg_f & (`FLAG_5_BIT | `FLAG_3_BIT | `FLAG_C_BIT)) |
                             ((reg_i == 0) ? `FLAG_Z_BIT : 0) |
-                            (reg_i[7] & `FLAG_S_BIT));
+                            (reg_i[7] == 1 ? `FLAG_S_BIT : 0));
                         task_write_reg(`REG_A, {8'b0, reg_i});
                         task_done(addr + 1);
                     end

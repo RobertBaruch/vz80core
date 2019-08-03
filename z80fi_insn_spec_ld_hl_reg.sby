@@ -29,6 +29,7 @@ chformal -early
 
 [files]
 z80fi.vh
+z80fi_signals.vh
 z80fi_testbench.sv
 z80fi_insn_check.sv
 z80fi_insn_spec_ld_hl_reg.sv

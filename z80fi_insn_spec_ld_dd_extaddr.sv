@@ -4,6 +4,8 @@
 // is also little-endian, so for example the byte at memory location nn
 // for writing to BC would go in C.
 
+`default_nettype none
+
 `include "z80.vh"
 `include "z80fi.vh"
 
@@ -24,20 +26,8 @@ assign spec_valid = z80fi_valid &&
     insn_fixed2 == 4'b1011 &&
     insn_fixed3 == 8'hED;
 
-// Once spec_valid, what is supposed to happen?
-assign spec_reg1_rd = 0;
-assign spec_reg2_rd = 0;
-assign spec_reg_wr = 1;
-assign spec_mem_rd = 1;
-assign spec_mem_rd2 = 1;
-assign spec_mem_wr = 0;
-assign spec_mem_wr2 = 0;
-assign spec_i_rd = 0;
-assign spec_i_wr = 0;
-assign spec_r_rd = 0;
-assign spec_r_wr = 0;
-assign spec_f_rd = 0;
-assign spec_f_wr = 0;
+`Z80FI_SPEC_SIGNALS
+assign spec_signals = `SPEC_REG_WR | `SPEC_MEM_RD | `SPEC_MEM_RD2;
 
 // Data for 1's above.
 assign spec_reg_wnum = {2'b10, dd};
