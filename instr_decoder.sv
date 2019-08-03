@@ -67,6 +67,10 @@ always @(*) begin
                 group <= `INSN_GROUP_LD_IXIY_IMMED;
             16'h22DD, 16'h22FD:
                 group <= `INSN_GROUP_LD_EXTADDR_IXIY;
+            16'h47ED:
+                group <= `INSN_GROUP_LD_I_A;
+            16'h57ED:
+                group <= `INSN_GROUP_LD_A_I;
             default:
                 group <= `INSN_GROUP_ILLEGAL_INSTR;
         endcase

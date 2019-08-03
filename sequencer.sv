@@ -457,6 +457,7 @@ always @(*) begin
     f_wr = 0;
     regs_in = 0;
     i_wr = 0;
+    i_in = 0;
     r_wr = 0;
 
     // if we have no instruction, or need another byte,
@@ -489,6 +490,31 @@ always @(*) begin
                         task_append_insn_byte();
                         task_read_reg1({1'b0, use_instr[2:0]});
                         task_write_reg({1'b0, use_instr[5:3]}, {8'b0, regs_out1[7:0]});
+                        task_done(addr + 1);
+                    end
+                endcase
+
+            `INSN_GROUP_LD_A_I:  // LD A, I
+                case (state)
+                    0: begin
+                        task_append_insn_byte();
+                        task_read_i();
+                        task_read_f();
+                        task_write_f(
+                            (reg_f & (`FLAG_5_BIT | `FLAG_3_BIT | `FLAG_C_BIT)) |
+                            ((reg_i == 0) ? `FLAG_Z_BIT : 0) |
+                            (reg_i[7] & `FLAG_S_BIT));
+                        task_write_reg(`REG_A, {8'b0, reg_i});
+                        task_done(addr + 1);
+                    end
+                endcase
+
+            `INSN_GROUP_LD_I_A:  // LD I, A
+                case (state)
+                    0: begin
+                        task_append_insn_byte();
+                        task_read_reg1(`REG_A);
+                        task_write_i(regs_out1[7:0]);
                         task_done(addr + 1);
                     end
                 endcase
