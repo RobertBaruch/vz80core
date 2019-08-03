@@ -302,11 +302,35 @@ begin
 end
 endtask
 
+task task_write_r;
+    input [7:0] local_data;
+begin
+    r_wr = 1;
+    r_in = local_data;
+    `ifdef Z80_FORMAL
+        next_z80fi_r_wr = 1;
+        next_z80fi_r_wdata = local_data;
+    `endif
+end
+endtask
+
 task task_read_f;
 begin
     `ifdef Z80_FORMAL                      
         next_z80fi_f_rd = 1;
         next_z80fi_f_rdata = reg_f;
+    `endif
+end
+endtask
+
+task task_write_f;
+    input [7:0] local_data;
+begin
+    f_wr = 1;
+    flags_in = local_data;
+    `ifdef Z80_FORMAL
+        next_z80fi_f_wr = 1;
+        next_z80fi_f_wdata = local_data;
     `endif
 end
 endtask
