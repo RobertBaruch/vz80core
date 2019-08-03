@@ -40,16 +40,26 @@ z80fi_signals = [("valid", 1), ("insn", 32), ("insn_len", 3), ("pc_rdata", 16),
                  ("mem_wdata2", 8), ("i_rd", 1), ("i_wr", 1), ("i_rdata", 8),
                  ("i_wdata", 8), ("r_rd", 1), ("r_wr", 1), ("r_rdata", 8),
                  ("r_wdata", 8), ("f_rd", 1), ("f_wr", 1), ("f_rdata", 8),
-                 ("f_wdata", 8), ("iff2_rd", 1), ("iff2_rdata", 1)]
+                 ("f_wdata", 8), ("iff1_rd", 1), ("iff1_rdata", 1),
+                 ("iff2_rd", 1), ("iff2_rdata", 1)]
 
+# In addition to valid, insn, and insn_len, all _rdata signals need to
+# be listed here.
 z80fi_spec_inputs = [
     "valid", "insn", "insn_len", "pc_rdata", "reg1_rdata", "reg2_rdata",
-    "mem_rdata", "mem_rdata2", "i_rdata", "r_rdata", "f_rdata", "iff2_rdata"
+    "mem_rdata", "mem_rdata2", "i_rdata", "r_rdata", "f_rdata", "iff1_rdata",
+    "iff2_rdata"
+]
+z80fi_spec_outputs = [
+    s[0] for s in z80fi_signals if s[0] not in z80fi_spec_inputs
 ]
 
+# These signals are generally single-bit signals indicating whether the
+# corresponding data (e.g. _rdata, _wdata, _raddr, etc) are modified/need
+# to be checked.
 z80fi_action_signals = [
     "reg1_rd", "reg2_rd", "reg_wr", "mem_rd", "mem_rd2", "mem_wr", "mem_wr2",
-    "i_rd", "i_wr", "r_rd", "r_wr", "f_rd", "f_wr"
+    "i_rd", "i_wr", "r_rd", "r_wr", "f_rd", "f_wr", "iff1_rd", "iff2_rd"
 ]
 
 z80fi_spec_signals = "\n".join([
@@ -60,6 +70,29 @@ z80fi_action_assignments = "; \\\n".join([
     f"| assign spec_{s} = spec_signals[{i}]"
     for i, s in enumerate(z80fi_action_signals)
 ]) + ";"
+
+z80fi_spec_wires = "| wire [0:0] valid = !reset && z80fi_valid; \\\n"
+# Skip valid, which we already added above.
+z80fi_spec_wires += " \\\n".join([
+    f"| wire [{s[1]-1}:0] {s[0]} = z80fi_{s[0]};"
+    for s in z80fi_signals[1:] if s[0] in z80fi_spec_inputs
+]) + " \\\n| \\\n"
+z80fi_spec_wires += " \\\n".join([
+    f"| wire [{s[1]-1}:0] {s[0]} = z80fi_{s[0]};"
+    for s in z80fi_signals if s[0] in z80fi_spec_outputs
+]) + " \\\n| \\\n"
+# Add valid, which outputs doesn't have.
+z80fi_spec_wires += "| wire [0:0] spec_valid; \\\n"
+z80fi_spec_wires += " \\\n".join([
+    f"| wire [{s[1]-1}:0] spec_{s[0]};" for s in z80fi_signals
+    if s[0] in z80fi_spec_outputs
+])
+
+z80fi_spec_conns = ", \\\n".join(
+    [f"| .z80fi_{s} ({s})" for s in z80fi_spec_inputs]) + ", \\\n"
+z80fi_spec_conns += "| .spec_valid (spec_valid), \\\n"
+z80fi_spec_conns += ", \\\n".join(
+    [f"| .spec_{s} (spec_{s})" for s in z80fi_spec_outputs])
 
 z80fi_inputs = ", \\\n".join(
     [f"| input [{s[1]-1}:0] z80fi_{s[0]}" for s in z80fi_signals])
@@ -130,6 +163,12 @@ with open("z80fi_signals.vh", "w") as f:
         | `define Z80FI_SPEC_SIGNALS \\
         | wire [{len(z80fi_action_signals)-1}:0] spec_signals; \\
         {z80fi_action_assignments}
+        |
+        | `define Z80FI_SPEC_WIRES \\
+        {z80fi_spec_wires}
+        |
+        | `define Z80FI_SPEC_CONNS \\
+        {z80fi_spec_conns}
         """,
         file=f)
 
@@ -223,9 +262,6 @@ with open("z80fi_isa_coverage.sv", "w") as f:
             |     .z80fi_valid(1'b1),
             |     .z80fi_insn(insn),
             |     .z80fi_insn_len(insn_len),
-            |     .z80fi_pc_rdata(16'h0000),
-            |     .z80fi_reg1_rdata(16'h0000),
-            |     .z80fi_reg2_rdata(16'h0000),
             |     .spec_valid(valid[{i}])
             | );
             """,

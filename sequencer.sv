@@ -48,6 +48,8 @@ logic r_wr;
 logic [7:0] r_in;
 logic [7:0] reg_i;
 logic [7:0] reg_r;
+logic iff1;
+logic iff2;
 
 logic [3:0] state;
 logic [15:0] scratch_addr;
@@ -108,7 +110,10 @@ ir_registers ir_registers(
     .r_in(r_in),
 
     .reg_i(reg_i),
-    .reg_r(reg_r)
+    .reg_r(reg_r),
+
+    .iff1(iff1),
+    .iff2(iff2)
 );
 
 logic [15:0] use_instr;
@@ -292,6 +297,16 @@ begin
     `endif
 end
 endtask
+
+task task_read_iff2;
+begin
+    `ifdef Z80_FORMAL
+        next_z80fi_iff2_rd = 1;
+        next_z80fi_iff2_rdata = iff2;
+    `endif
+end
+endtask
+
 
 task task_read_r;
 begin
@@ -500,10 +515,12 @@ always @(*) begin
                         task_append_insn_byte();
                         task_read_i();
                         task_read_f();
+                        task_read_iff2();
                         task_write_f(
                             (reg_f & (`FLAG_5_BIT | `FLAG_3_BIT | `FLAG_C_BIT)) |
                             ((reg_i == 0) ? `FLAG_Z_BIT : 0) |
-                            (reg_i[7] == 1 ? `FLAG_S_BIT : 0));
+                            (reg_i[7] == 1 ? `FLAG_S_BIT : 0) |
+                            (iff2 == 1 ? `FLAG_PV_BIT : 0));
                         task_write_reg(`REG_A, {8'b0, reg_i});
                         task_done(addr + 1);
                     end
