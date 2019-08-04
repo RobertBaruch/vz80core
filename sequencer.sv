@@ -526,6 +526,23 @@ always @(*) begin
                     end
                 endcase
 
+            `INSN_GROUP_LD_A_R:  // LD A, R
+                case (state)
+                    0: begin
+                        task_append_insn_byte();
+                        task_read_r();
+                        task_read_f();
+                        task_read_iff2();
+                        task_write_f(
+                            (reg_f & (`FLAG_5_BIT | `FLAG_3_BIT | `FLAG_C_BIT)) |
+                            ((reg_r == 0) ? `FLAG_Z_BIT : 0) |
+                            (reg_r[7] == 1 ? `FLAG_S_BIT : 0) |
+                            (iff2 == 1 ? `FLAG_PV_BIT : 0));
+                        task_write_reg(`REG_A, {8'b0, reg_r});
+                        task_done(addr + 1);
+                    end
+                endcase
+
             `INSN_GROUP_LD_I_A:  // LD I, A
                 case (state)
                     0: begin
@@ -760,7 +777,7 @@ always @(*) begin
             `INSN_GROUP_LD_EXTADDR_HL: // LD (nn), HL
                 case (state)
                     0: begin
-                        task_append_insn_byte();  // instr
+                        task_append_insn_byte();  // op
                         task_read_next_insn_byte();
                         next_state = 1;
                     end
@@ -785,6 +802,38 @@ always @(*) begin
                     end
                     4: begin
                         task_write_mem2_done();
+                        task_done(scratch_addr);
+                    end
+                endcase
+
+            `INSN_GROUP_LD_HL_EXTADDR: // LD HL, (nn)
+                case (state)
+                    0: begin
+                        task_append_insn_byte();  // op
+                        task_read_next_insn_byte();
+                        next_state = 1;
+                    end
+                    1: begin
+                        task_append_insn_byte();  // nn
+                        task_read_next_insn_byte();
+                        next_scratch_data = {8'h00, mem_data};
+                        next_state = 2;
+                    end
+                    2: begin
+                        task_append_insn_byte();  // nn
+                        task_save_addr(addr + 1);
+                        task_read_mem1({mem_data, scratch_data[7:0]});
+                        next_state = 3;
+                    end
+                    3: begin
+                        task_read_mem1_result(mem_data);
+                        task_read_mem2(addr + 1);
+                        next_scratch_data = {8'b0, mem_data};
+                        next_state = 4;
+                    end
+                    4: begin
+                        task_read_mem2_result(mem_data);
+                        task_write_reg(`REG_HL, {mem_data, scratch_data[7:0]});
                         task_done(scratch_addr);
                     end
                 endcase
@@ -817,6 +866,58 @@ always @(*) begin
                     end
                     4: begin
                         task_write_mem2_done();
+                        task_done(scratch_addr);
+                    end
+                endcase
+
+            `INSN_GROUP_LD_IXIY_NN: // LD IX/IY, nn
+                case (state)
+                    0: begin
+                        task_append_insn_byte();  // 2nd byte
+                        task_read_next_insn_byte();
+                        next_state = 1;
+                    end
+                    1: begin
+                        task_append_insn_byte();  // 3rd byte: nn
+                        task_read_next_insn_byte();
+                        next_scratch_data = {8'h00, mem_data};
+                        next_state = 2;
+                    end
+                    2: begin
+                        task_append_insn_byte();  // 4th byte: nn
+                        task_write_reg(use_instr[5] ? `REG_IY : `REG_IX, {mem_data, scratch_data[7:0]});
+                        task_done(addr + 1);
+                    end
+                endcase
+
+            `INSN_GROUP_LD_IXIY_MM: // LD IX/IY, (mm)
+                case (state)
+                    0: begin
+                        task_append_insn_byte();  // 2nd byte
+                        task_read_next_insn_byte();
+                        next_state = 1;
+                    end
+                    1: begin
+                        task_append_insn_byte();  // 3rd byte: mm
+                        task_read_next_insn_byte();
+                        next_scratch_data = {8'h00, mem_data};
+                        next_state = 2;
+                    end
+                    2: begin
+                        task_append_insn_byte();  // 4th byte: mm
+                        task_save_addr(addr + 1);
+                        task_read_mem1({mem_data, scratch_data[7:0]});
+                        next_state = 3;
+                    end
+                    3: begin
+                        task_read_mem1_result(mem_data);
+                        next_scratch_data = {8'h00, mem_data};
+                        task_read_mem2(addr + 1);
+                        next_state = 4;
+                    end
+                    4: begin
+                        task_read_mem2_result(mem_data);
+                        task_write_reg(use_instr[5] ? `REG_IY : `REG_IX, {mem_data, scratch_data[7:0]});
                         task_done(scratch_addr);
                     end
                 endcase

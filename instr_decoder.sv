@@ -26,6 +26,8 @@ always @(*) begin
                 group <= `INSN_GROUP_LD_REG_IMMED;
             8'h22:
                 group <= `INSN_GROUP_LD_EXTADDR_HL;
+            8'h2A:
+                group <= `INSN_GROUP_LD_HL_EXTADDR;
             8'h36:
                 group <= `INSN_GROUP_LD_HL_IMMED;
             8'h7F, 8'h78, 8'h79, 8'h7A, 8'h7B, 8'h7C, 8'h7D,
@@ -63,6 +65,10 @@ always @(*) begin
             16'h70FD, 16'h71FD, 16'h72FD, 16'h73FD,
             16'h74FD, 16'h75FD, 16'h77FD:
                 group <= `INSN_GROUP_LD_IXIY_REG;
+            16'h21DD, 16'h21FD:
+                group <= `INSN_GROUP_LD_IXIY_NN;
+            16'h2ADD, 16'h2AFD:
+                group <= `INSN_GROUP_LD_IXIY_MM;
             16'h36DD, 16'h36FD:
                 group <= `INSN_GROUP_LD_IXIY_IMMED;
             16'h22DD, 16'h22FD:
@@ -71,6 +77,8 @@ always @(*) begin
                 group <= `INSN_GROUP_LD_I_A;
             16'h57ED:
                 group <= `INSN_GROUP_LD_A_I;
+            16'h5FED:
+                group <= `INSN_GROUP_LD_A_R;
             default:
                 group <= `INSN_GROUP_ILLEGAL_INSTR;
         endcase

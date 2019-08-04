@@ -68,6 +68,10 @@
 `define INSN_GROUP_LD_A_BCDE 15
 `define INSN_GROUP_LD_A_I 16
 `define INSN_GROUP_LD_I_A 17
+`define INSN_GROUP_LD_A_R 18
+`define INSN_GROUP_LD_HL_EXTADDR 19
+`define INSN_GROUP_LD_IXIY_NN 20
+`define INSN_GROUP_LD_IXIY_MM 21
 
 `define Z80_REGS_OUTPUTS \
 output [7:0] z80_reg_a, \
