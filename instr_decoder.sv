@@ -71,6 +71,10 @@ always @(*) begin
                 group <= `INSN_GROUP_LD_IND_HL_REG;
                 len <= 1;
             end
+            8'hF9: begin
+                group <= `INSN_GROUP_LD_SP_HL;
+                len <= 1;
+            end
             8'hCB, 8'hDD, 8'hED, 8'hFD: begin
                 group <= `INSN_GROUP_NEED_MORE_BYTES;
                 len <= 2;
@@ -124,12 +128,24 @@ always @(*) begin
                 group <= `INSN_GROUP_LD_I_A;
                 len <= 2;
             end
+            16'h4FED: begin
+                group <= `INSN_GROUP_LD_R_A;
+                len <= 2;
+            end
             16'h57ED: begin
                 group <= `INSN_GROUP_LD_A_I;
                 len <= 2;
             end
             16'h5FED: begin
                 group <= `INSN_GROUP_LD_A_R;
+                len <= 2;
+            end
+            16'hF9DD, 16'hF9FD: begin
+                group <= `INSN_GROUP_LD_SP_IXIY;
+                len <= 2;
+            end
+            16'hA8ED: begin
+                group <= `INSN_GROUP_LDD;
                 len <= 2;
             end
             default: begin

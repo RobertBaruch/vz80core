@@ -445,6 +445,12 @@ always @(*) begin
                 task_done();
             end
 
+            `INSN_GROUP_LD_R_A: begin  /* LD  R, A         */
+                task_read_reg8(1, `REG_A);
+                task_write_r(reg1_rdata);
+                task_done();
+            end
+
             `INSN_GROUP_LD_REG_N: begin  /* LD  r, n */
                 task_write_reg8(instr_for_decoder[5:3], insn_operand[7:0]);
                 task_done();
@@ -560,6 +566,18 @@ always @(*) begin
                         task_done();
                     end
                 endcase
+
+            `INSN_GROUP_LD_SP_HL: begin  /* LD  SP, HL       */
+                task_read_reg16(1, `REG_HL);
+                task_write_reg16(`REG_SP, reg1_rdata);
+                task_done();
+            end
+
+            `INSN_GROUP_LD_SP_IXIY: begin  /* LD  SP, IX/IY    */
+                task_read_reg16(1, instr_for_decoder[5] ? `REG_IY : `REG_IX);
+                task_write_reg16(`REG_SP, reg1_rdata);
+                task_done();
+            end
 
             `INSN_GROUP_LD_IND_NN_IXIY:  /* LD  (nn), IX/IY  */
                 case (state)

@@ -76,6 +76,10 @@
 `define INSN_GROUP_LD_IXIY_NN 20       /* LD  IX/IY, nn    */
 `define INSN_GROUP_LD_IXIY_IND_NN 21   /* LD  IX/IY, (nn)  */
 `define INSN_GROUP_NOP 22              /* NOP              */
+`define INSN_GROUP_LD_R_A 23           /* LD  R, A         */
+`define INSN_GROUP_LD_SP_HL 24         /* LD  SP, HL       */
+`define INSN_GROUP_LD_SP_IXIY 25       /* LD  SP, IX/IY    */
+`define INSN_GROUP_LDD 26              /* LDD              */
 
 `define Z80_REGS_OUTPUTS \
 output [7:0] z80_reg_a, \
