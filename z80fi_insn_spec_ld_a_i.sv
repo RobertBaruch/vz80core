@@ -1,4 +1,5 @@
-// Covers the LD A, I instruction.
+// LD A, I
+//
 // Copies I into A, with some flags set.
 
 `default_nettype none

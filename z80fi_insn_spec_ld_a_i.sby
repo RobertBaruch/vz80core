@@ -37,6 +37,7 @@ z80fi_wrapper.sv
 z80.vh
 z80.v
 sequencer.sv
+sequencer_tasks.vh
 registers.sv
 ir_registers.sv
 instr_decoder.sv

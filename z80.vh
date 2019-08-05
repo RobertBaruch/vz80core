@@ -1,6 +1,9 @@
 `ifndef _z80_vh_
 `define _z80_vh_
 
+`default_nettype none
+`timescale 1us/1us
+
 `define Z80_FORMAL 1
 
 `define reg_select [3:0]
@@ -50,28 +53,29 @@
 
 `define INSN_GROUP_NEED_MORE_BYTES 254
 `define INSN_GROUP_ILLEGAL_INSTR 255
-`define INSN_GROUP_LD_REG_REG 0
-`define INSN_GROUP_LD_DD_IMMED 1
-`define INSN_GROUP_LD_DD_EXTADDR 2
-`define INSN_GROUP_LD_BCDE_A 3
-`define INSN_GROUP_LD_A_EXTADDR 4
-`define INSN_GROUP_LD_EXTADDR_A 5
-`define INSN_GROUP_LD_REG_IMMED 6
-`define INSN_GROUP_LD_HL_IMMED 7
-`define INSN_GROUP_LD_HL_REG 8
-`define INSN_GROUP_LD_REG_IXIY 9
-`define INSN_GROUP_LD_IXIY_IMMED 10
-`define INSN_GROUP_LD_IXIY_REG 11
-`define INSN_GROUP_LD_EXTADDR_DD 12
-`define INSN_GROUP_LD_EXTADDR_HL 13
-`define INSN_GROUP_LD_EXTADDR_IXIY 14
-`define INSN_GROUP_LD_A_BCDE 15
-`define INSN_GROUP_LD_A_I 16
-`define INSN_GROUP_LD_I_A 17
-`define INSN_GROUP_LD_A_R 18
-`define INSN_GROUP_LD_HL_EXTADDR 19
-`define INSN_GROUP_LD_IXIY_NN 20
-`define INSN_GROUP_LD_IXIY_MM 21
+`define INSN_GROUP_LD_REG_REG 0        /* LD  r, r'        */
+`define INSN_GROUP_LD_DD_NN 1          /* LD  dd, nn       */
+`define INSN_GROUP_LD_DD_IND_NN 2      /* LD  dd, (nn)     */
+`define INSN_GROUP_LD_IND_BCDE_A 3     /* LD  (BC/DE), A   */
+`define INSN_GROUP_LD_A_IND_NN 4       /* LD  A, (nn)      */
+`define INSN_GROUP_LD_IND_NN_A 5       /* LD  (nn), A      */
+`define INSN_GROUP_LD_REG_N 6          /* LD  r, n         */
+`define INSN_GROUP_LD_IND_HL_N 7       /* LD  (HL), n      */
+`define INSN_GROUP_LD_IND_HL_REG 8     /* LD  (HL), r      */
+`define INSN_GROUP_LD_REG_IDX_IXIY 9   /* LD  r, (IX/IY+d) */
+`define INSN_GROUP_LD_IDX_IXIY_N 10    /* LD  (IX/IY+d), n */
+`define INSN_GROUP_LD_IDX_IXIY_REG 11  /* LD  (IX/IY+d), r */
+`define INSN_GROUP_LD_IND_NN_DD 12     /* LD  (nn), dd     */
+`define INSN_GROUP_LD_IND_NN_HL 13     /* LD  (nn), HL     */
+`define INSN_GROUP_LD_IND_NN_IXIY 14   /* LD  (nn), IX/IY  */
+`define INSN_GROUP_LD_A_IND_BCDE 15    /* LD  A, (BC/DE)   */
+`define INSN_GROUP_LD_A_I 16           /* LD  A, I         */
+`define INSN_GROUP_LD_I_A 17           /* LD  I, A         */
+`define INSN_GROUP_LD_A_R 18           /* LD  A, R         */
+`define INSN_GROUP_LD_HL_IND_NN 19     /* LD  HL, (nn)     */
+`define INSN_GROUP_LD_IXIY_NN 20       /* LD  IX/IY, nn    */
+`define INSN_GROUP_LD_IXIY_IND_NN 21   /* LD  IX/IY, (nn)  */
+`define INSN_GROUP_NOP 22              /* NOP              */
 
 `define Z80_REGS_OUTPUTS \
 output [7:0] z80_reg_a, \

@@ -89,48 +89,48 @@ output logic [0:0] z80fi_iff2_rd, \
 output logic [0:0] z80fi_iff2_rdata
 
 `define Z80FI_WIRES \
-wire [0:0] z80fi_valid; \
-wire [31:0] z80fi_insn; \
-wire [2:0] z80fi_insn_len; \
-wire [15:0] z80fi_pc_rdata; \
-wire [15:0] z80fi_pc_wdata; \
-wire [0:0] z80fi_reg1_rd; \
-wire [3:0] z80fi_reg1_rnum; \
-wire [3:0] z80fi_reg2_rnum; \
-wire [15:0] z80fi_reg1_rdata; \
-wire [0:0] z80fi_reg2_rd; \
-wire [15:0] z80fi_reg2_rdata; \
-wire [0:0] z80fi_reg_wr; \
-wire [3:0] z80fi_reg_wnum; \
-wire [15:0] z80fi_reg_wdata; \
-wire [0:0] z80fi_mem_rd; \
-wire [15:0] z80fi_mem_raddr; \
-wire [7:0] z80fi_mem_rdata; \
-wire [0:0] z80fi_mem_rd2; \
-wire [15:0] z80fi_mem_raddr2; \
-wire [7:0] z80fi_mem_rdata2; \
-wire [0:0] z80fi_mem_wr; \
-wire [15:0] z80fi_mem_waddr; \
-wire [7:0] z80fi_mem_wdata; \
-wire [0:0] z80fi_mem_wr2; \
-wire [15:0] z80fi_mem_waddr2; \
-wire [7:0] z80fi_mem_wdata2; \
-wire [0:0] z80fi_i_rd; \
-wire [0:0] z80fi_i_wr; \
-wire [7:0] z80fi_i_rdata; \
-wire [7:0] z80fi_i_wdata; \
-wire [0:0] z80fi_r_rd; \
-wire [0:0] z80fi_r_wr; \
-wire [7:0] z80fi_r_rdata; \
-wire [7:0] z80fi_r_wdata; \
-wire [0:0] z80fi_f_rd; \
-wire [0:0] z80fi_f_wr; \
-wire [7:0] z80fi_f_rdata; \
-wire [7:0] z80fi_f_wdata; \
-wire [0:0] z80fi_iff1_rd; \
-wire [0:0] z80fi_iff1_rdata; \
-wire [0:0] z80fi_iff2_rd; \
-wire [0:0] z80fi_iff2_rdata;
+logic [0:0] z80fi_valid; \
+logic [31:0] z80fi_insn; \
+logic [2:0] z80fi_insn_len; \
+logic [15:0] z80fi_pc_rdata; \
+logic [15:0] z80fi_pc_wdata; \
+logic [0:0] z80fi_reg1_rd; \
+logic [3:0] z80fi_reg1_rnum; \
+logic [3:0] z80fi_reg2_rnum; \
+logic [15:0] z80fi_reg1_rdata; \
+logic [0:0] z80fi_reg2_rd; \
+logic [15:0] z80fi_reg2_rdata; \
+logic [0:0] z80fi_reg_wr; \
+logic [3:0] z80fi_reg_wnum; \
+logic [15:0] z80fi_reg_wdata; \
+logic [0:0] z80fi_mem_rd; \
+logic [15:0] z80fi_mem_raddr; \
+logic [7:0] z80fi_mem_rdata; \
+logic [0:0] z80fi_mem_rd2; \
+logic [15:0] z80fi_mem_raddr2; \
+logic [7:0] z80fi_mem_rdata2; \
+logic [0:0] z80fi_mem_wr; \
+logic [15:0] z80fi_mem_waddr; \
+logic [7:0] z80fi_mem_wdata; \
+logic [0:0] z80fi_mem_wr2; \
+logic [15:0] z80fi_mem_waddr2; \
+logic [7:0] z80fi_mem_wdata2; \
+logic [0:0] z80fi_i_rd; \
+logic [0:0] z80fi_i_wr; \
+logic [7:0] z80fi_i_rdata; \
+logic [7:0] z80fi_i_wdata; \
+logic [0:0] z80fi_r_rd; \
+logic [0:0] z80fi_r_wr; \
+logic [7:0] z80fi_r_rdata; \
+logic [7:0] z80fi_r_wdata; \
+logic [0:0] z80fi_f_rd; \
+logic [0:0] z80fi_f_wr; \
+logic [7:0] z80fi_f_rdata; \
+logic [7:0] z80fi_f_wdata; \
+logic [0:0] z80fi_iff1_rd; \
+logic [0:0] z80fi_iff1_rdata; \
+logic [0:0] z80fi_iff2_rd; \
+logic [0:0] z80fi_iff2_rdata;
 
 `define Z80FI_NEXT_STATE \
 logic [0:0] next_z80fi_valid; \
@@ -397,48 +397,48 @@ next_z80fi_iff2_rdata = 0;
 .z80fi_iff2_rdata (z80fi_iff2_rdata)
 
 `define Z80FI_INSN_SPEC_IO \
-output [0:0] spec_valid, \
+output logic [0:0] spec_valid, \
 input [0:0] z80fi_valid, \
 input [31:0] z80fi_insn, \
 input [2:0] z80fi_insn_len, \
 input [15:0] z80fi_pc_rdata, \
-output [15:0] spec_pc_wdata, \
-output [0:0] spec_reg1_rd, \
-output [3:0] spec_reg1_rnum, \
-output [3:0] spec_reg2_rnum, \
+output logic [15:0] spec_pc_wdata, \
+output logic [0:0] spec_reg1_rd, \
+output logic [3:0] spec_reg1_rnum, \
+output logic [3:0] spec_reg2_rnum, \
 input [15:0] z80fi_reg1_rdata, \
-output [0:0] spec_reg2_rd, \
+output logic [0:0] spec_reg2_rd, \
 input [15:0] z80fi_reg2_rdata, \
-output [0:0] spec_reg_wr, \
-output [3:0] spec_reg_wnum, \
-output [15:0] spec_reg_wdata, \
-output [0:0] spec_mem_rd, \
-output [15:0] spec_mem_raddr, \
+output logic [0:0] spec_reg_wr, \
+output logic [3:0] spec_reg_wnum, \
+output logic [15:0] spec_reg_wdata, \
+output logic [0:0] spec_mem_rd, \
+output logic [15:0] spec_mem_raddr, \
 input [7:0] z80fi_mem_rdata, \
-output [0:0] spec_mem_rd2, \
-output [15:0] spec_mem_raddr2, \
+output logic [0:0] spec_mem_rd2, \
+output logic [15:0] spec_mem_raddr2, \
 input [7:0] z80fi_mem_rdata2, \
-output [0:0] spec_mem_wr, \
-output [15:0] spec_mem_waddr, \
-output [7:0] spec_mem_wdata, \
-output [0:0] spec_mem_wr2, \
-output [15:0] spec_mem_waddr2, \
-output [7:0] spec_mem_wdata2, \
-output [0:0] spec_i_rd, \
-output [0:0] spec_i_wr, \
+output logic [0:0] spec_mem_wr, \
+output logic [15:0] spec_mem_waddr, \
+output logic [7:0] spec_mem_wdata, \
+output logic [0:0] spec_mem_wr2, \
+output logic [15:0] spec_mem_waddr2, \
+output logic [7:0] spec_mem_wdata2, \
+output logic [0:0] spec_i_rd, \
+output logic [0:0] spec_i_wr, \
 input [7:0] z80fi_i_rdata, \
-output [7:0] spec_i_wdata, \
-output [0:0] spec_r_rd, \
-output [0:0] spec_r_wr, \
+output logic [7:0] spec_i_wdata, \
+output logic [0:0] spec_r_rd, \
+output logic [0:0] spec_r_wr, \
 input [7:0] z80fi_r_rdata, \
-output [7:0] spec_r_wdata, \
-output [0:0] spec_f_rd, \
-output [0:0] spec_f_wr, \
+output logic [7:0] spec_r_wdata, \
+output logic [0:0] spec_f_rd, \
+output logic [0:0] spec_f_wr, \
 input [7:0] z80fi_f_rdata, \
-output [7:0] spec_f_wdata, \
-output [0:0] spec_iff1_rd, \
+output logic [7:0] spec_f_wdata, \
+output logic [0:0] spec_iff1_rd, \
 input [0:0] z80fi_iff1_rdata, \
-output [0:0] spec_iff2_rd, \
+output logic [0:0] spec_iff2_rd, \
 input [0:0] z80fi_iff2_rdata
 
 `define SPEC_REG1_RD 15'b000000000000001
@@ -458,7 +458,7 @@ input [0:0] z80fi_iff2_rdata
 `define SPEC_IFF2_RD 15'b100000000000000
 
 `define Z80FI_SPEC_SIGNALS \
-wire [14:0] spec_signals; \
+logic [14:0] spec_signals; \
 assign spec_reg1_rd = spec_signals[0]; \
 assign spec_reg2_rd = spec_signals[1]; \
 assign spec_reg_wr = spec_signals[2]; \
@@ -476,80 +476,80 @@ assign spec_iff1_rd = spec_signals[13]; \
 assign spec_iff2_rd = spec_signals[14];
 
 `define Z80FI_SPEC_WIRES \
-wire [0:0] valid = !reset && z80fi_valid; \
-wire [31:0] insn = z80fi_insn; \
-wire [2:0] insn_len = z80fi_insn_len; \
-wire [15:0] pc_rdata = z80fi_pc_rdata; \
-wire [15:0] reg1_rdata = z80fi_reg1_rdata; \
-wire [15:0] reg2_rdata = z80fi_reg2_rdata; \
-wire [7:0] mem_rdata = z80fi_mem_rdata; \
-wire [7:0] mem_rdata2 = z80fi_mem_rdata2; \
-wire [7:0] i_rdata = z80fi_i_rdata; \
-wire [7:0] r_rdata = z80fi_r_rdata; \
-wire [7:0] f_rdata = z80fi_f_rdata; \
-wire [0:0] iff1_rdata = z80fi_iff1_rdata; \
-wire [0:0] iff2_rdata = z80fi_iff2_rdata; \
+logic [0:0] valid = !reset && z80fi_valid; \
+logic [31:0] insn = z80fi_insn; \
+logic [2:0] insn_len = z80fi_insn_len; \
+logic [15:0] pc_rdata = z80fi_pc_rdata; \
+logic [15:0] reg1_rdata = z80fi_reg1_rdata; \
+logic [15:0] reg2_rdata = z80fi_reg2_rdata; \
+logic [7:0] mem_rdata = z80fi_mem_rdata; \
+logic [7:0] mem_rdata2 = z80fi_mem_rdata2; \
+logic [7:0] i_rdata = z80fi_i_rdata; \
+logic [7:0] r_rdata = z80fi_r_rdata; \
+logic [7:0] f_rdata = z80fi_f_rdata; \
+logic [0:0] iff1_rdata = z80fi_iff1_rdata; \
+logic [0:0] iff2_rdata = z80fi_iff2_rdata; \
 \
-wire [15:0] pc_wdata = z80fi_pc_wdata; \
-wire [0:0] reg1_rd = z80fi_reg1_rd; \
-wire [3:0] reg1_rnum = z80fi_reg1_rnum; \
-wire [3:0] reg2_rnum = z80fi_reg2_rnum; \
-wire [0:0] reg2_rd = z80fi_reg2_rd; \
-wire [0:0] reg_wr = z80fi_reg_wr; \
-wire [3:0] reg_wnum = z80fi_reg_wnum; \
-wire [15:0] reg_wdata = z80fi_reg_wdata; \
-wire [0:0] mem_rd = z80fi_mem_rd; \
-wire [15:0] mem_raddr = z80fi_mem_raddr; \
-wire [0:0] mem_rd2 = z80fi_mem_rd2; \
-wire [15:0] mem_raddr2 = z80fi_mem_raddr2; \
-wire [0:0] mem_wr = z80fi_mem_wr; \
-wire [15:0] mem_waddr = z80fi_mem_waddr; \
-wire [7:0] mem_wdata = z80fi_mem_wdata; \
-wire [0:0] mem_wr2 = z80fi_mem_wr2; \
-wire [15:0] mem_waddr2 = z80fi_mem_waddr2; \
-wire [7:0] mem_wdata2 = z80fi_mem_wdata2; \
-wire [0:0] i_rd = z80fi_i_rd; \
-wire [0:0] i_wr = z80fi_i_wr; \
-wire [7:0] i_wdata = z80fi_i_wdata; \
-wire [0:0] r_rd = z80fi_r_rd; \
-wire [0:0] r_wr = z80fi_r_wr; \
-wire [7:0] r_wdata = z80fi_r_wdata; \
-wire [0:0] f_rd = z80fi_f_rd; \
-wire [0:0] f_wr = z80fi_f_wr; \
-wire [7:0] f_wdata = z80fi_f_wdata; \
-wire [0:0] iff1_rd = z80fi_iff1_rd; \
-wire [0:0] iff2_rd = z80fi_iff2_rd; \
+logic [15:0] pc_wdata = z80fi_pc_wdata; \
+logic [0:0] reg1_rd = z80fi_reg1_rd; \
+logic [3:0] reg1_rnum = z80fi_reg1_rnum; \
+logic [3:0] reg2_rnum = z80fi_reg2_rnum; \
+logic [0:0] reg2_rd = z80fi_reg2_rd; \
+logic [0:0] reg_wr = z80fi_reg_wr; \
+logic [3:0] reg_wnum = z80fi_reg_wnum; \
+logic [15:0] reg_wdata = z80fi_reg_wdata; \
+logic [0:0] mem_rd = z80fi_mem_rd; \
+logic [15:0] mem_raddr = z80fi_mem_raddr; \
+logic [0:0] mem_rd2 = z80fi_mem_rd2; \
+logic [15:0] mem_raddr2 = z80fi_mem_raddr2; \
+logic [0:0] mem_wr = z80fi_mem_wr; \
+logic [15:0] mem_waddr = z80fi_mem_waddr; \
+logic [7:0] mem_wdata = z80fi_mem_wdata; \
+logic [0:0] mem_wr2 = z80fi_mem_wr2; \
+logic [15:0] mem_waddr2 = z80fi_mem_waddr2; \
+logic [7:0] mem_wdata2 = z80fi_mem_wdata2; \
+logic [0:0] i_rd = z80fi_i_rd; \
+logic [0:0] i_wr = z80fi_i_wr; \
+logic [7:0] i_wdata = z80fi_i_wdata; \
+logic [0:0] r_rd = z80fi_r_rd; \
+logic [0:0] r_wr = z80fi_r_wr; \
+logic [7:0] r_wdata = z80fi_r_wdata; \
+logic [0:0] f_rd = z80fi_f_rd; \
+logic [0:0] f_wr = z80fi_f_wr; \
+logic [7:0] f_wdata = z80fi_f_wdata; \
+logic [0:0] iff1_rd = z80fi_iff1_rd; \
+logic [0:0] iff2_rd = z80fi_iff2_rd; \
 \
-wire [0:0] spec_valid; \
-wire [15:0] spec_pc_wdata; \
-wire [0:0] spec_reg1_rd; \
-wire [3:0] spec_reg1_rnum; \
-wire [3:0] spec_reg2_rnum; \
-wire [0:0] spec_reg2_rd; \
-wire [0:0] spec_reg_wr; \
-wire [3:0] spec_reg_wnum; \
-wire [15:0] spec_reg_wdata; \
-wire [0:0] spec_mem_rd; \
-wire [15:0] spec_mem_raddr; \
-wire [0:0] spec_mem_rd2; \
-wire [15:0] spec_mem_raddr2; \
-wire [0:0] spec_mem_wr; \
-wire [15:0] spec_mem_waddr; \
-wire [7:0] spec_mem_wdata; \
-wire [0:0] spec_mem_wr2; \
-wire [15:0] spec_mem_waddr2; \
-wire [7:0] spec_mem_wdata2; \
-wire [0:0] spec_i_rd; \
-wire [0:0] spec_i_wr; \
-wire [7:0] spec_i_wdata; \
-wire [0:0] spec_r_rd; \
-wire [0:0] spec_r_wr; \
-wire [7:0] spec_r_wdata; \
-wire [0:0] spec_f_rd; \
-wire [0:0] spec_f_wr; \
-wire [7:0] spec_f_wdata; \
-wire [0:0] spec_iff1_rd; \
-wire [0:0] spec_iff2_rd;
+logic [0:0] spec_valid; \
+logic [15:0] spec_pc_wdata; \
+logic [0:0] spec_reg1_rd; \
+logic [3:0] spec_reg1_rnum; \
+logic [3:0] spec_reg2_rnum; \
+logic [0:0] spec_reg2_rd; \
+logic [0:0] spec_reg_wr; \
+logic [3:0] spec_reg_wnum; \
+logic [15:0] spec_reg_wdata; \
+logic [0:0] spec_mem_rd; \
+logic [15:0] spec_mem_raddr; \
+logic [0:0] spec_mem_rd2; \
+logic [15:0] spec_mem_raddr2; \
+logic [0:0] spec_mem_wr; \
+logic [15:0] spec_mem_waddr; \
+logic [7:0] spec_mem_wdata; \
+logic [0:0] spec_mem_wr2; \
+logic [15:0] spec_mem_waddr2; \
+logic [7:0] spec_mem_wdata2; \
+logic [0:0] spec_i_rd; \
+logic [0:0] spec_i_wr; \
+logic [7:0] spec_i_wdata; \
+logic [0:0] spec_r_rd; \
+logic [0:0] spec_r_wr; \
+logic [7:0] spec_r_wdata; \
+logic [0:0] spec_f_rd; \
+logic [0:0] spec_f_wr; \
+logic [7:0] spec_f_wdata; \
+logic [0:0] spec_iff1_rd; \
+logic [0:0] spec_iff2_rd;
 
 `define Z80FI_SPEC_CONNS \
 .z80fi_valid (valid), \

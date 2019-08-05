@@ -1,9 +1,6 @@
 `ifndef _ir_registers_sv_
 `define _ir_registers_sv_
 
-`default_nettype none
-`timescale 1us/100 ns
-
 `include "z80.vh"
 
 module ir_registers(

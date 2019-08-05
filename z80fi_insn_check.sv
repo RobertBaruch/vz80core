@@ -62,7 +62,7 @@ always @(*) begin
         end
         if (spec_mem_wr2) begin
             assert(spec_mem_waddr2 == mem_waddr2);
-            assert(spec_mem_wdata == mem_wdata);
+            assert(spec_mem_wdata2 == mem_wdata2);
         end
 
         if (spec_i_wr) assert(spec_i_wdata == i_wdata);

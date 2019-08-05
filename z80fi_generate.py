@@ -71,20 +71,20 @@ z80fi_action_assignments = "; \\\n".join([
     for i, s in enumerate(z80fi_action_signals)
 ]) + ";"
 
-z80fi_spec_wires = "| wire [0:0] valid = !reset && z80fi_valid; \\\n"
+z80fi_spec_wires = "| logic [0:0] valid = !reset && z80fi_valid; \\\n"  # WIRE
 # Skip valid, which we already added above.
 z80fi_spec_wires += " \\\n".join([
-    f"| wire [{s[1]-1}:0] {s[0]} = z80fi_{s[0]};"
+    f"| logic [{s[1]-1}:0] {s[0]} = z80fi_{s[0]};"  # WIRE
     for s in z80fi_signals[1:] if s[0] in z80fi_spec_inputs
 ]) + " \\\n| \\\n"
 z80fi_spec_wires += " \\\n".join([
-    f"| wire [{s[1]-1}:0] {s[0]} = z80fi_{s[0]};"
+    f"| logic [{s[1]-1}:0] {s[0]} = z80fi_{s[0]};"  # WIRE
     for s in z80fi_signals if s[0] in z80fi_spec_outputs
 ]) + " \\\n| \\\n"
 # Add valid, which outputs doesn't have.
-z80fi_spec_wires += "| wire [0:0] spec_valid; \\\n"
+z80fi_spec_wires += "| logic [0:0] spec_valid; \\\n"
 z80fi_spec_wires += " \\\n".join([
-    f"| wire [{s[1]-1}:0] spec_{s[0]};" for s in z80fi_signals
+    f"| logic [{s[1]-1}:0] spec_{s[0]};" for s in z80fi_signals
     if s[0] in z80fi_spec_outputs
 ])
 
@@ -99,7 +99,7 @@ z80fi_inputs = ", \\\n".join(
 z80fi_outputs = ", \\\n".join(
     [f"| output logic [{s[1]-1}:0] z80fi_{s[0]}" for s in z80fi_signals])
 z80fi_wires = "; \\\n".join(
-    [f"| wire [{s[1]-1}:0] z80fi_{s[0]}" for s in z80fi_signals]) + ";"
+    [f"| logic [{s[1]-1}:0] z80fi_{s[0]}" for s in z80fi_signals]) + ";"
 
 z80fi_next_state = "; \\\n".join(
     [f"| logic [{s[1]-1}:0] next_z80fi_{s[0]}" for s in z80fi_signals]) + ";"
@@ -117,9 +117,8 @@ z80fi_init_next_state = "; \\\n".join(
 z80fi_conn = ", \\\n".join(
     [f"| .z80fi_{s[0]} (z80fi_{s[0]})" for s in z80fi_signals])
 z80fi_spec_io = ", \\\n".join([
-    f"| input [{s[1]-1}:0] z80fi_{s[0]}"
-    if s[0] in z80fi_spec_inputs else f"| output [{s[1]-1}:0] spec_{s[0]}"
-    for s in z80fi_signals
+    f"| input [{s[1]-1}:0] z80fi_{s[0]}" if s[0] in z80fi_spec_inputs else
+    f"| output logic [{s[1]-1}:0] spec_{s[0]}" for s in z80fi_signals
 ])
 
 with open("z80fi_signals.vh", "w") as f:
@@ -155,13 +154,13 @@ with open("z80fi_signals.vh", "w") as f:
         {z80fi_conn}
         |
         | `define Z80FI_INSN_SPEC_IO \\
-        | output [0:0] spec_valid, \\
+        | output logic [0:0] spec_valid, \\
         {z80fi_spec_io}
         |
         {z80fi_spec_signals}
         |
         | `define Z80FI_SPEC_SIGNALS \\
-        | wire [{len(z80fi_action_signals)-1}:0] spec_signals; \\
+        | logic [{len(z80fi_action_signals)-1}:0] spec_signals; \\
         {z80fi_action_assignments}
         |
         | `define Z80FI_SPEC_WIRES \\
@@ -312,6 +311,7 @@ for spec in specs:
             | z80.vh
             | z80.v
             | sequencer.sv
+            | sequencer_tasks.vh
             | registers.sv
             | ir_registers.sv
             | instr_decoder.sv
