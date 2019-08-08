@@ -29,27 +29,26 @@
 `define REG_DE 9
 `define REG_HL 10
 `define REG_SP 11
-`define REG_AF 12
-`define REG_IX 13
-`define REG_IY 14
-`define REG_LAST16 14
+`define REG_IX 12
+`define REG_IY 13
+`define REG_LAST16 13
 
 `define FLAG_S_BIT  8'b10000000
-`define FLAG_S_MASK (~FLAG_S_BIT)
+`define FLAG_S_MASK (~`FLAG_S_BIT)
 `define FLAG_Z_BIT  8'b01000000
-`define FLAG_Z_MASK (~FLAG_Z_BIT)
+`define FLAG_Z_MASK (~`FLAG_Z_BIT)
 `define FLAG_5_BIT  8'b00100000
-`define FLAG_5_MASK (~FLAG_5_BIT)
+`define FLAG_5_MASK (~`FLAG_5_BIT)
 `define FLAG_H_BIT  8'b00010000
-`define FLAG_H_MASK (~FLAG_H_BIT)
+`define FLAG_H_MASK (~`FLAG_H_BIT)
 `define FLAG_3_BIT  8'b00001000
-`define FLAG_3_MASK (~FLAG_3_BIT)
+`define FLAG_3_MASK (~`FLAG_3_BIT)
 `define FLAG_PV_BIT  8'b00000100
-`define FLAG_PV_MASK (~FLAG_PV_BIT)
+`define FLAG_PV_MASK (~`FLAG_PV_BIT)
 `define FLAG_N_BIT  8'b00000010
-`define FLAG_N_MASK (~FLAG_N_BIT)
+`define FLAG_N_MASK (~`FLAG_N_BIT)
 `define FLAG_C_BIT  8'b00000001
-`define FLAG_C_MASK (~FLAG_C_BIT)
+`define FLAG_C_MASK (~`FLAG_C_BIT)
 
 `define INSN_GROUP_NEED_MORE_BYTES 254
 `define INSN_GROUP_ILLEGAL_INSTR 255
@@ -100,8 +99,7 @@ output [7:0] z80_reg_h2, \
 output [7:0] z80_reg_l2, \
 output [15:0] z80_reg_ix, \
 output [15:0] z80_reg_iy, \
-output [15:0] z80_reg_sp, \
-output [7:0] z80_reg_i
+output [15:0] z80_reg_sp
 
 `define Z80_REGS_WIRES \
 wire [7:0] z80_reg_a; \
@@ -122,8 +120,7 @@ wire [7:0] z80_reg_h2; \
 wire [7:0] z80_reg_l2; \
 wire [15:0] z80_reg_ix; \
 wire [15:0] z80_reg_iy; \
-wire [15:0] z80_reg_sp; \
-wire [7:0] z80_reg_i;
+wire [15:0] z80_reg_sp;
 
 `define Z80_REGS_CONN \
 .z80_reg_a(z80_reg_a), \
@@ -144,7 +141,6 @@ wire [7:0] z80_reg_i;
 .z80_reg_l2(z80_reg_l2), \
 .z80_reg_ix(z80_reg_ix), \
 .z80_reg_iy(z80_reg_iy), \
-.z80_reg_sp(z80_reg_sp), \
-.z80_reg_i(z80_reg_i)
+.z80_reg_sp(z80_reg_sp)
 
 `endif // _z80_vh_

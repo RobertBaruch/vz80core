@@ -31,7 +31,7 @@ def bit(i: int, l: int) -> str:
 # Define all the formal interface signals. Format is {name, bits}.
 z80fi_signals = [("valid", 1), ("insn", 32), ("insn_len", 3), ("pc_rdata", 16),
                  ("pc_wdata", 16), ("reg1_rd", 1), ("reg1_rnum", 4),
-                 ("reg2_rnum", 4), ("reg1_rdata", 16), ("reg2_rd", 1),
+                 ("reg1_rdata", 16), ("reg2_rd", 1), ("reg2_rnum", 4),
                  ("reg2_rdata", 16), ("reg_wr", 1), ("reg_wnum", 4),
                  ("reg_wdata", 16), ("mem_rd", 1), ("mem_raddr", 16),
                  ("mem_rdata", 8), ("mem_rd2", 1), ("mem_raddr2", 16),
@@ -71,14 +71,14 @@ z80fi_action_assignments = "; \\\n".join([
     for i, s in enumerate(z80fi_action_signals)
 ]) + ";"
 
-z80fi_spec_wires = "| logic [0:0] valid = !reset && z80fi_valid; \\\n"  # WIRE
+z80fi_spec_wires = "| wire [0:0] valid = !reset && z80fi_valid; \\\n"  # WIRE
 # Skip valid, which we already added above.
 z80fi_spec_wires += " \\\n".join([
-    f"| logic [{s[1]-1}:0] {s[0]} = z80fi_{s[0]};"  # WIRE
+    f"| wire [{s[1]-1}:0] {s[0]} = z80fi_{s[0]};"  # WIRE
     for s in z80fi_signals[1:] if s[0] in z80fi_spec_inputs
 ]) + " \\\n| \\\n"
 z80fi_spec_wires += " \\\n".join([
-    f"| logic [{s[1]-1}:0] {s[0]} = z80fi_{s[0]};"  # WIRE
+    f"| wire [{s[1]-1}:0] {s[0]} = z80fi_{s[0]};"  # WIRE
     for s in z80fi_signals if s[0] in z80fi_spec_outputs
 ]) + " \\\n| \\\n"
 # Add valid, which outputs doesn't have.
