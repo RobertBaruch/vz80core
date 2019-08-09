@@ -1,7 +1,7 @@
 // LD r, (IX/IY + d)
 //
 // This must write the contents of the memory address at IX + d
-// to register r.  d is zero-exteded to 16 bits.
+// to register r.  d is sign-extended to 16 bits.
 
 `default_nettype none
 
@@ -12,7 +12,7 @@ module z80fi_insn_spec_ld_reg_idx_ixiy(
     `Z80FI_INSN_SPEC_IO
 );
 
-wire [7:0] d           = z80fi_insn[23:16];
+wire [15:0] d           = { {8{z80fi_insn[23]}}, z80fi_insn[23:16]};
 wire [1:0] insn_fixed1 = z80fi_insn[15:14];
 wire [3:0] r           = {1'b0, z80fi_insn[13:11]};
 wire [2:0] insn_fixed2 = z80fi_insn[10:8];
@@ -42,7 +42,7 @@ assign spec_reg_e_out = (r == `REG_E) ? n : z80fi_reg_e_in;
 assign spec_reg_h_out = (r == `REG_H) ? n : z80fi_reg_h_in;
 assign spec_reg_l_out = (r == `REG_L) ? n : z80fi_reg_l_in;
 
-assign spec_mem_raddr = (iy ? z80fi_reg_iy_in : z80fi_reg_ix_in) + {8'b0, d};
+assign spec_mem_raddr = (iy ? z80fi_reg_iy_in : z80fi_reg_ix_in) + d;
 
 assign spec_reg_ip_out = z80fi_reg_ip_in + 3;
 

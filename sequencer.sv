@@ -484,7 +484,7 @@ always @(*) begin
                 case (state)
                     0: begin
                         task_read_reg16(1, instr_for_decoder[5] ? `REG_IY : `REG_IX);
-                        task_read_mem(1, reg1_rdata + {8'h0, insn_operand[7:0]});
+                        task_read_mem(1, reg1_rdata + { {8{insn_operand[7]}}, insn_operand[7:0]});
                     end
                     1: begin
                         task_collect_data(1);
@@ -497,7 +497,7 @@ always @(*) begin
                 case (state)
                     0: begin
                         task_read_reg16(1, instr_for_decoder[5] ? `REG_IY : `REG_IX);
-                        task_write_mem(1, reg1_rdata + {8'h0, insn_operand[7:0]}, insn_operand[15:8]);
+                        task_write_mem(1, reg1_rdata + { {8{insn_operand[7]}}, insn_operand[7:0]}, insn_operand[15:8]);
                     end
                     1: begin
                         task_write_mem_done(1);
@@ -510,7 +510,7 @@ always @(*) begin
                     0: begin
                         task_read_reg16(1, instr_for_decoder[5] ? `REG_IY : `REG_IX);
                         task_read_reg8(2, instr_for_decoder[10:8]);
-                        task_write_mem(1, reg1_rdata + {8'h0, insn_operand[7:0]}, reg2_rdata[7:0]);
+                        task_write_mem(1, reg1_rdata + { {8{insn_operand[7]}}, insn_operand[7:0]}, reg2_rdata[7:0]);
                     end
                     1: begin
                         task_write_mem_done(1);

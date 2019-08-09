@@ -1,7 +1,7 @@
 // LD (IX/IY + d), n
 //
 // This must write the contents of the memory address at IX/IY + d
-// with the immediate byte n. d is zero-exteded to 16 bits.
+// with the immediate byte n. d is sign-extended to 16 bits.
 
 `default_nettype none
 
@@ -13,7 +13,7 @@ module z80fi_insn_spec_ld_idx_ixiy_n(
 );
 
 wire [7:0] n           = z80fi_insn[31:24];
-wire [7:0] d           = z80fi_insn[23:16];
+wire [15:0] d           = { {8{z80fi_insn[23]}}, z80fi_insn[23:16]};
 wire [7:0] insn_fixed1 = z80fi_insn[15:8];
 wire [1:0] insn_fixed2 = z80fi_insn[7:6];
 wire       iy          = z80fi_insn[5];
@@ -29,7 +29,7 @@ assign spec_valid = z80fi_valid &&
 assign spec_signals = `SPEC_REG_IP | `SPEC_MEM_WR;
 
 assign spec_reg_ip_out = z80fi_reg_ip_in + 4;
-assign spec_mem_waddr = (iy ? z80fi_reg_iy_in : z80fi_reg_ix_in) + {8'b0, d};
+assign spec_mem_waddr = (iy ? z80fi_reg_iy_in : z80fi_reg_ix_in) + d;
 assign spec_mem_wdata = n;
 
 endmodule
