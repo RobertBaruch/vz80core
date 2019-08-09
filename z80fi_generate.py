@@ -29,97 +29,162 @@ def bit(i: int, l: int) -> str:
 # z80fi_signals.vh
 
 # Define all the formal interface signals. Format is {name, bits}.
-z80fi_signals = [("valid", 1), ("insn", 32), ("insn_len", 3), ("pc_rdata", 16),
-                 ("pc_wdata", 16), ("reg1_rd", 1), ("reg1_rnum", 4),
-                 ("reg1_rdata", 16), ("reg2_rd", 1), ("reg2_rnum", 4),
-                 ("reg2_rdata", 16), ("reg_wr", 1), ("reg_wnum", 4),
-                 ("reg_wdata", 16), ("mem_rd", 1), ("mem_raddr", 16),
-                 ("mem_rdata", 8), ("mem_rd2", 1), ("mem_raddr2", 16),
-                 ("mem_rdata2", 8), ("mem_wr", 1), ("mem_waddr", 16),
-                 ("mem_wdata", 8), ("mem_wr2", 1), ("mem_waddr2", 16),
-                 ("mem_wdata2", 8), ("i_rd", 1), ("i_wr", 1), ("i_rdata", 8),
-                 ("i_wdata", 8), ("r_rd", 1), ("r_wr", 1), ("r_rdata", 8),
-                 ("r_wdata", 8), ("f_rd", 1), ("f_wr", 1), ("f_rdata", 8),
-                 ("f_wdata", 8), ("iff1_rd", 1), ("iff1_rdata", 1),
-                 ("iff2_rd", 1), ("iff2_rdata", 1)]
+z80fi_signals = [("valid", 1), ("insn", 32), ("insn_len", 3), ("mem_rd", 1),
+                 ("mem_raddr", 16), ("mem_rdata", 8), ("mem_rd2", 1),
+                 ("mem_raddr2", 16), ("mem_rdata2", 8), ("mem_wr", 1),
+                 ("mem_waddr", 16), ("mem_wdata", 8), ("mem_wr2", 1),
+                 ("mem_waddr2", 16), ("mem_wdata2", 8)]
+
+# These are the signals which are registers, so they don't have to be
+# registered again. z80fi signals will be generated for z80fi_{register}_in and
+# z80fi_{register}_out.
+z80fi_registers = [("reg_ip", 16), ("reg_a", 8), ("reg_b", 8), ("reg_c", 8),
+                   ("reg_d", 8), ("reg_e", 8), ("reg_h", 8), ("reg_l", 8),
+                   ("reg_ix", 16), ("reg_iy", 16), ("reg_sp", 16),
+                   ("reg_i", 8), ("reg_r", 8), ("reg_f", 8), ("reg_iff1", 1),
+                   ("reg_iff2", 1)]
+z80fi_registers_in = [(f"{s[0]}_in", s[1]) for s in z80fi_registers]
+z80fi_registers_out = [(f"{s[0]}_out", s[1]) for s in z80fi_registers]
 
 # In addition to valid, insn, and insn_len, all _rdata signals need to
 # be listed here.
-z80fi_spec_inputs = [
-    "valid", "insn", "insn_len", "pc_rdata", "reg1_rdata", "reg2_rdata",
-    "mem_rdata", "mem_rdata2", "i_rdata", "r_rdata", "f_rdata", "iff1_rdata",
-    "iff2_rdata"
-]
+z80fi_spec_inputs = ["valid", "insn", "insn_len", "mem_rdata", "mem_rdata2"]
 z80fi_spec_outputs = [
     s[0] for s in z80fi_signals if s[0] not in z80fi_spec_inputs
 ]
 
 # These signals are generally single-bit signals indicating whether the
 # corresponding data (e.g. _rdata, _wdata, _raddr, etc) are modified/need
-# to be checked.
-z80fi_action_signals = [
-    "reg1_rd", "reg2_rd", "reg_wr", "mem_rd", "mem_rd2", "mem_wr", "mem_wr2",
-    "i_rd", "i_wr", "r_rd", "r_wr", "f_rd", "f_wr", "iff1_rd", "iff2_rd"
-]
+# to be checked. The reg_X signals are just for the spec, to let
+# the insn_check known which registers may change.
+#
+# In the insn_spec file, use, for example:
+#
+# `Z80FI_SPEC_SIGNALS
+# assign spec_signals = `SPEC_REG_A | `SPEC_MEM_RD;
+#
+# This indicates that register A changes, and a memory read happens.
+#
+# If a register changes, or a write happens, you must also specify the
+# expected change. For example, for register A:
+#
+# assign spec_reg_a_out = ...;
+z80fi_action_signals = [("mem_rd", 1), ("mem_rd2", 1), ("mem_wr", 1),
+                        ("mem_wr2", 1)]
 
+# Z80FI_SPEC_SIGNALS
 z80fi_spec_signals = "\n".join([
-    f"| `define SPEC_{s.upper()} {bit(i, len(z80fi_action_signals))}"
-    for i, s in enumerate(z80fi_action_signals)
+    f"| `define SPEC_{s[0].upper()} {bit(i, len(z80fi_action_signals + z80fi_registers))}"
+    for i, s in enumerate(z80fi_action_signals + z80fi_registers)
 ])
 z80fi_action_assignments = "; \\\n".join([
-    f"| assign spec_{s} = spec_signals[{i}]"
-    for i, s in enumerate(z80fi_action_signals)
+    f"| assign spec_{s[0]} = spec_signals[{i}]"
+    for i, s in enumerate(z80fi_action_signals + z80fi_registers)
 ]) + ";"
 
-z80fi_spec_wires = "| wire [0:0] valid = !reset && z80fi_valid; \\\n"  # WIRE
-# Skip valid, which we already added above.
-z80fi_spec_wires += " \\\n".join([
-    f"| wire [{s[1]-1}:0] {s[0]} = z80fi_{s[0]};"  # WIRE
-    for s in z80fi_signals[1:] if s[0] in z80fi_spec_inputs
-]) + " \\\n| \\\n"
-z80fi_spec_wires += " \\\n".join([
-    f"| wire [{s[1]-1}:0] {s[0]} = z80fi_{s[0]};"  # WIRE
-    for s in z80fi_signals if s[0] in z80fi_spec_outputs
-]) + " \\\n| \\\n"
-# Add valid, which outputs doesn't have.
-z80fi_spec_wires += "| logic [0:0] spec_valid; \\\n"
-z80fi_spec_wires += " \\\n".join([
-    f"| logic [{s[1]-1}:0] spec_{s[0]};" for s in z80fi_signals
-    if s[0] in z80fi_spec_outputs
-])
+# Z80FI_INSN_SPEC_IO are the I/O for z80fi_insn_spec files: inputs for the
+# z80fi signals, and outputs for the spec signals.
 
-z80fi_spec_conns = ", \\\n".join(
-    [f"| .z80fi_{s} ({s})" for s in z80fi_spec_inputs]) + ", \\\n"
-z80fi_spec_conns += "| .spec_valid (spec_valid), \\\n"
-z80fi_spec_conns += ", \\\n".join(
-    [f"| .spec_{s} (spec_{s})" for s in z80fi_spec_outputs])
-
-z80fi_inputs = ", \\\n".join(
-    [f"| input [{s[1]-1}:0] z80fi_{s[0]}" for s in z80fi_signals])
-z80fi_outputs = ", \\\n".join(
-    [f"| output logic [{s[1]-1}:0] z80fi_{s[0]}" for s in z80fi_signals])
-z80fi_wires = "; \\\n".join(
-    [f"| logic [{s[1]-1}:0] z80fi_{s[0]}" for s in z80fi_signals]) + ";"
-
-z80fi_next_state = "; \\\n".join(
-    [f"| logic [{s[1]-1}:0] next_z80fi_{s[0]}" for s in z80fi_signals]) + ";"
-z80fi_reset_state = "; \\\n".join(
-    [f"| z80fi_{s[0]} <= 0" for s in z80fi_signals]) + ";"
-z80fi_load_next_state = "; \\\n".join(
-    [f"| z80fi_{s[0]} <= next_z80fi_{s[0]}" for s in z80fi_signals]) + ";"
-
-# Special case: we skip the first element, valid, which must be set to 0.
-z80fi_retain_next_state = "; \\\n".join(
-    [f"| next_z80fi_{s[0]} = z80fi_{s[0]}" for s in z80fi_signals][1:]) + ";"
-
-z80fi_init_next_state = "; \\\n".join(
-    [f"| next_z80fi_{s[0]} = 0" for s in z80fi_signals]) + ";"
-z80fi_conn = ", \\\n".join(
-    [f"| .z80fi_{s[0]} (z80fi_{s[0]})" for s in z80fi_signals])
 z80fi_spec_io = ", \\\n".join([
     f"| input [{s[1]-1}:0] z80fi_{s[0]}" if s[0] in z80fi_spec_inputs else
     f"| output logic [{s[1]-1}:0] spec_{s[0]}" for s in z80fi_signals
+]) + ", \\\n"
+z80fi_spec_io += ", \\\n".join(
+    [f"| input [{s[1]-1}:0] z80fi_{s[0]}"
+     for s in z80fi_registers_in]) + ", \\\n"
+z80fi_spec_io += ", \\\n".join(
+    [f"| output logic [{s[1]-1}:0] spec_{s[0]}"
+     for s in z80fi_registers_out]) + ", \\\n"
+z80fi_spec_io += ", \\\n".join(
+    [f"| output logic [0:0] spec_{s[0]}" for s in z80fi_registers])
+
+# The Z80FI_SPEC_WIRES are connections to Z80FI_INPUTS and Z80FI_INSN_SPEC_IO:
+
+z80fi_spec_wires = "| wire [0:0] valid = !reset && z80fi_valid; \\\n"
+# Skip valid, which we already added above.
+z80fi_spec_wires += " \\\n".join([
+    f"| wire [{s[1]-1}:0] {s[0]} = z80fi_{s[0]};"
+    for s in z80fi_signals + z80fi_registers_in + z80fi_registers_out
+    if s[0] != "valid"
+]) + " \\\n| \\\n"
+
+# Add valid, which z80fi_spec_outputs doesn't have.
+z80fi_spec_wires += "| logic [0:0] spec_valid; \\\n"
+z80fi_spec_wires += "; \\\n".join([
+    f"| logic [{s[1]-1}:0] spec_{s[0]}"
+    for s in z80fi_signals + z80fi_registers_out if s[0] != "valid"
+]) + "; \\\n"
+z80fi_spec_wires += "; \\\n".join(
+    [f"| logic [0:0] spec_{s[0]}" for s in z80fi_registers]) + ";"
+
+# Z80FI_SPEC_CONNS are module connections to Z80FI_INSN_SPEC_IO.
+
+z80fi_spec_conns = ", \\\n".join([
+    f"| .z80fi_{s[0]} ({s[0]})"
+    if s[0] in z80fi_spec_inputs else f"| .spec_{s[0]} (spec_{s[0]})"
+    for s in z80fi_signals
+]) + ", \\\n"
+z80fi_spec_conns += "| .spec_valid (spec_valid), \\\n"
+z80fi_spec_conns += ", \\\n".join(
+    [f"| .z80fi_{s[0]} (z80fi_{s[0]})" for s in z80fi_registers_in]) + ", \\\n"
+z80fi_spec_conns += ", \\\n".join([
+    f"| .spec_{s[0]} (spec_{s[0]})"
+    for s in z80fi_registers_out + z80fi_registers
 ])
+
+# Z80FI_INPUTS, Z80FI_OUTPUTS, Z80FI_WIRES
+
+z80fi_inputs = ", \\\n".join([
+    f"| input [{s[1]-1}:0] z80fi_{s[0]}"
+    for s in z80fi_signals + z80fi_registers_in + z80fi_registers_out
+])
+z80fi_outputs = ", \\\n".join([
+    f"| output logic [{s[1]-1}:0] z80fi_{s[0]}"
+    for s in z80fi_signals + z80fi_registers_in + z80fi_registers_out
+])
+z80fi_wires = "; \\\n".join([
+    f"| logic [{s[1]-1}:0] z80fi_{s[0]}"
+    for s in z80fi_signals + z80fi_registers_in + z80fi_registers_out
+]) + ";"
+
+# Z80FI_NEXT_STATE, Z80FI_RESET_STATE, Z80FI_LOAD_NEXT_STATE
+# include registers_in but not registers_out.
+
+z80fi_next_state = "; \\\n".join([
+    f"| logic [{s[1]-1}:0] next_z80fi_{s[0]}"
+    for s in z80fi_signals + z80fi_registers_in
+]) + ";"
+z80fi_reset_state = "; \\\n".join(
+    [f"| z80fi_{s[0]} <= 0" for s in z80fi_signals + z80fi_registers_in]) + ";"
+z80fi_load_next_state = "; \\\n".join([
+    f"| z80fi_{s[0]} <= next_z80fi_{s[0]}"
+    for s in z80fi_signals + z80fi_registers_in
+]) + ";"
+
+# Z80FI_RETAIN_NEXT_STATE, includes registers_in but not registers_out.
+# Special case: we skip "valid" which must be set to 0.
+
+z80fi_retain_next_state = "; \\\n".join([
+    f"| next_z80fi_{s[0]} = z80fi_{s[0]}"
+    for s in z80fi_signals + z80fi_registers_in if s[0] != "valid"
+]) + ";"
+
+# Z80_INIT_NEXT_STATE, which also sets registers_in to their values.
+
+z80fi_init_next_state = "; \\\n".join(
+    [f"| next_z80fi_{s[0]} = 0" for s in z80fi_signals]) + "; \\\n"
+z80fi_init_next_state += "; \\\n".join(
+    [f"| next_z80fi_{s[0]}_in = z80_{s[0]}" for s in z80fi_registers]) + ";"
+
+# Z80FI_CONN, module connections for Z80FI_OUTPUTS.
+z80fi_conn = ", \\\n".join([
+    f"| .z80fi_{s[0]} (z80fi_{s[0]})"
+    for s in z80fi_signals + z80fi_registers_in + z80fi_registers_out
+])
+
+# Z80FI_REG_ASSIGN assigns register values to z80fi_regs.
+z80fi_reg_assign = "; \\\n".join(
+    [f"| assign z80fi_{s[0]}_out = z80_{s[0]}" for s in z80fi_registers]) + ";"
 
 with open("z80fi_signals.vh", "w") as f:
     print_dedent(
@@ -150,6 +215,9 @@ with open("z80fi_signals.vh", "w") as f:
         | `define Z80FI_INIT_NEXT_STATE \\
         {z80fi_init_next_state}
         |
+        | `define Z80FI_REG_ASSIGN \\
+        {z80fi_reg_assign}
+        |
         | `define Z80FI_CONN \\
         {z80fi_conn}
         |
@@ -160,8 +228,11 @@ with open("z80fi_signals.vh", "w") as f:
         {z80fi_spec_signals}
         |
         | `define Z80FI_SPEC_SIGNALS \\
-        | logic [{len(z80fi_action_signals)-1}:0] spec_signals; \\
-        {z80fi_action_assignments}
+        | logic [{len(z80fi_action_signals + z80fi_registers)-1}:0] spec_signals; \\
+        {z80fi_action_assignments} \\
+        | wire [15:0] z80fi_reg_bc_in = {{z80fi_reg_b_in, z80fi_reg_c_in}}; \\
+        | wire [15:0] z80fi_reg_de_in = {{z80fi_reg_d_in, z80fi_reg_e_in}}; \\
+        | wire [15:0] z80fi_reg_hl_in = {{z80fi_reg_h_in, z80fi_reg_l_in}};
         |
         | `define Z80FI_SPEC_WIRES \\
         {z80fi_spec_wires}

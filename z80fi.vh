@@ -16,6 +16,10 @@
 
 `include "z80fi_signals.vh"
 
+`define SPEC_REG_BC (`SPEC_REG_B | `SPEC_REG_C)
+`define SPEC_REG_DE (`SPEC_REG_D | `SPEC_REG_E)
+`define SPEC_REG_HL (`SPEC_REG_H | `SPEC_REG_L)
+
 // Z80FI signal definitions:
 //
 // z80fi_valid:

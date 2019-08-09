@@ -46,15 +46,21 @@ logic reg_wr;
 logic [7:0] f_rdata;
 logic [7:0] f_wdata;
 logic f_wr;
+logic block_inc;
+logic block_dec;
 
 logic i_wr;
 logic [7:0] i_wdata;
 logic r_wr;
 logic [7:0] r_wdata;
-logic [7:0] i_rdata;
-logic [7:0] r_rdata;
-logic iff1;
-logic iff2;
+logic [7:0] z80_reg_i;
+logic [7:0] z80_reg_r;
+logic z80_reg_iff1;
+logic z80_reg_iff2;
+logic enable_interrupts = 0;
+logic disable_interrupts = 0;
+logic accept_nmi = 0;
+logic ret_from_nmi = 0;
 
 logic [2:0] decoded_len;
 logic [7:0] decoded_group;
@@ -77,7 +83,7 @@ logic [15:0] collected_data;
 logic collected_data_ready;
 logic [1:0] collected_data_len;
 
-logic [15:0] ip;
+logic [15:0] z80_reg_ip;
 
 logic [3:0] state;
 
@@ -90,10 +96,6 @@ logic [15:0] next_addr;
 logic next_mem_rd;
 logic next_mem_wr;
 logic [7:0] next_mem_wdata;
-logic next_reg_wr;
-logic next_i_wr;
-logic next_r_wr;
-logic next_f_wr;
 
 logic [31:0] next_collected_insn;
 logic [2:0] next_collected_insn_len;
@@ -105,7 +107,7 @@ logic [15:0] next_collected_data;
 logic next_collected_data_ready;
 logic [1:0] next_collected_data_len;
 
-logic [15:0] next_ip;
+logic [15:0] next_z80_reg_ip;
 
 logic [3:0] next_state;
 
@@ -120,10 +122,6 @@ always @(posedge clk or posedge reset) begin
         mem_rd <= 1;
         mem_wr <= 0;
         mem_wdata <= 0;
-        reg_wr <= 0;
-        i_wr <= 0;
-        r_wr <= 0;
-        f_wr <= 0;
 
         collected_insn <= 0;
         collected_insn_len <= 0;
@@ -135,7 +133,7 @@ always @(posedge clk or posedge reset) begin
         collected_data_ready <= 0;
         collected_data_len <= 0;
 
-        ip <= 0;
+        z80_reg_ip <= 0;
 
         state <= 0;
 
@@ -148,10 +146,6 @@ always @(posedge clk or posedge reset) begin
         mem_rd <= next_mem_rd;
         mem_wr <= next_mem_wr;
         mem_wdata <= next_mem_wdata;
-        reg_wr <= next_reg_wr;
-        i_wr <= next_i_wr;
-        r_wr <= next_r_wr;
-        f_wr <= next_f_wr;
 
         collected_insn <= next_collected_insn;
         collected_insn_len <= next_collected_insn_len;
@@ -163,7 +157,7 @@ always @(posedge clk or posedge reset) begin
         collected_data_ready <= next_collected_data_ready;
         collected_data_len <= next_collected_data_len;
 
-        ip <= next_ip;
+        z80_reg_ip <= next_z80_reg_ip;
 
         state <= next_state;
 
@@ -175,6 +169,7 @@ end
 
 `ifdef Z80_FORMAL
     `Z80FI_NEXT_STATE
+    `Z80FI_REG_ASSIGN
 `endif
 
 registers registers(
@@ -193,7 +188,10 @@ registers registers(
 
     .reg_f(f_rdata),
     .f_in(f_wdata),
-    .f_wr(f_wr)
+    .f_wr(f_wr),
+
+    .block_inc(block_inc),
+    .block_dec(block_dec)
 
 `ifdef Z80_FORMAL
     ,
@@ -210,11 +208,15 @@ ir_registers ir_registers(
     .r_wr(r_wr),
     .r_in(r_wdata),
 
-    .reg_i(i_rdata),
-    .reg_r(r_rdata),
+    .reg_i(z80_reg_i),
+    .reg_r(z80_reg_r),
+    .enable_interrupts(enable_interrupts),
+    .disable_interrupts(disable_interrupts),
+    .accept_nmi(accept_nmi),
+    .ret_from_nmi(ret_from_nmi),
 
-    .iff1(iff1),
-    .iff2(iff2)
+    .iff1(z80_reg_iff1),
+    .iff2(z80_reg_iff2)
 );
 
 logic [31:0] instr_for_decoder;
@@ -235,7 +237,7 @@ always @(*) begin
     if (reset || done) begin
         `ifdef Z80_FORMAL
             `Z80FI_INIT_NEXT_STATE
-            next_z80fi_pc_rdata = addr;
+            next_z80fi_reg_ip_in = addr;
         `endif
     end else begin
         `ifdef Z80_FORMAL
@@ -249,17 +251,20 @@ always @(*) begin
 
     next_mem_wr = 0;
     next_mem_wdata = 0;
-    next_reg_wr = 0;
-    next_i_wr = 0;
-    next_r_wr = 0;
-    next_f_wr = 0;
 
     reg1_rnum = 0;
     reg2_rnum = 0;
+    reg_wr = 0;
     reg_wnum = 0;
     reg_wdata = 0;
+    block_inc = 0;
+    block_dec = 0;
+
+    i_wr = 0;
     i_wdata = 0;
+    r_wr = 0;
     r_wdata = 0;
+    f_wr = 0;
     f_wdata = 0;
 
     next_collected_insn_len = 0;
@@ -270,7 +275,7 @@ always @(*) begin
     next_collected_data = collected_data;
 
         next_addr = addr;
-        next_ip = ip;
+        next_z80_reg_ip = z80_reg_ip;
         next_mem_rd = 0;
 
         if (collected_insn_ready) begin
@@ -283,8 +288,8 @@ always @(*) begin
                 3: instr_for_decoder = {mem_rdata, collected_insn[23:0]};
                 default: instr_for_decoder = collected_insn;
             endcase
-            next_addr = ip + 1;
-            next_ip = ip + 1;
+            next_addr = z80_reg_ip + 1;
+            next_z80_reg_ip = z80_reg_ip + 1;
             next_mem_rd = 1;
         end
 
@@ -414,15 +419,12 @@ always @(*) begin
                 endcase
 
             `INSN_GROUP_LD_A_I: begin  /* LD  A, I         */
-                task_read_i();
-                task_read_f();
-                task_read_iff2();
                 task_write_f(
                     (f_rdata & (`FLAG_5_BIT | `FLAG_3_BIT | `FLAG_C_BIT)) |
-                    (i_rdata == 0 ? `FLAG_Z_BIT : 0) |
-                    (i_rdata[7] == 1 ? `FLAG_S_BIT : 0) |
-                    (iff2 == 1 ? `FLAG_PV_BIT : 0));
-                task_write_reg8(`REG_A, i_rdata);
+                    (z80_reg_i == 0 ? `FLAG_Z_BIT : 0) |
+                    (z80_reg_i[7] == 1 ? `FLAG_S_BIT : 0) |
+                    (z80_reg_iff2 == 1 ? `FLAG_PV_BIT : 0));
+                task_write_reg8(`REG_A, z80_reg_i);
                 task_done();
             end
 
@@ -433,15 +435,12 @@ always @(*) begin
             end
 
             `INSN_GROUP_LD_A_R: begin  /* LD  A, R         */
-                task_read_r();
-                task_read_f();
-                task_read_iff2();
                 task_write_f(
                     (f_rdata & (`FLAG_5_BIT | `FLAG_3_BIT | `FLAG_C_BIT)) |
-                    (r_rdata == 0 ? `FLAG_Z_BIT : 0) |
-                    (r_rdata[7] == 1 ? `FLAG_S_BIT : 0) |
-                    (iff2 == 1 ? `FLAG_PV_BIT : 0));
-                task_write_reg8(`REG_A, r_rdata);
+                    (z80_reg_r == 0 ? `FLAG_Z_BIT : 0) |
+                    (z80_reg_r[7] == 1 ? `FLAG_S_BIT : 0) |
+                    (z80_reg_iff2 == 1 ? `FLAG_PV_BIT : 0));
+                task_write_reg8(`REG_A, z80_reg_r);
                 task_done();
             end
 
@@ -526,6 +525,7 @@ always @(*) begin
                         task_write_mem(1, insn_operand, reg1_rdata[7:0]);
                     end
                     1: begin
+                        task_read_reg_pair(1, instr_for_decoder[13:12]);
                         task_write_mem_done(1);
                         task_write_mem(2, insn_operand + 1, reg1_rdata[15:8]);
                     end
@@ -542,6 +542,7 @@ always @(*) begin
                         task_write_mem(1, insn_operand, reg1_rdata[7:0]);
                     end
                     1: begin
+                        task_read_reg_pair(1, `REG_HL);
                         task_write_mem_done(1);
                         task_write_mem(2, insn_operand + 1, reg1_rdata[15:8]);
                     end
@@ -586,6 +587,7 @@ always @(*) begin
                         task_write_mem(1, insn_operand, reg1_rdata[7:0]);
                     end
                     1: begin
+                        task_read_reg16(1, instr_for_decoder[5] ? `REG_IY : `REG_IX);
                         task_write_mem_done(1);
                         task_write_mem(2, insn_operand + 1, reg1_rdata[15:8]);
                     end
@@ -621,7 +623,7 @@ always @(*) begin
     end
 
     if (next_done) begin
-        next_addr = next_ip;
+        next_addr = next_z80_reg_ip;
         next_collected_data = 0;
         next_collected_insn_len = 0;
         next_collected_insn_ready = 0;
@@ -633,9 +635,11 @@ always @(*) begin
 
         `ifdef Z80_FORMAL
             next_z80fi_valid = 1;
-            next_z80fi_pc_wdata = next_ip;
             next_z80fi_insn = instr_for_decoder;
             next_z80fi_insn_len = insn_len_for_sequencer;
+            // We can't do something like next_z80fi_reg_a_out = z80_reg_a
+            // because if we've set up the register to be written to,
+            // the register has not yet been set.
         `endif
     end
 end

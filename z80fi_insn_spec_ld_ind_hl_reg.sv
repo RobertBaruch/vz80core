@@ -13,24 +13,26 @@ module z80fi_insn_spec_ld_ind_hl_reg(
 );
 
 wire [4:0] insn_fixed1 = z80fi_insn[7:3];
-wire [2:0] r           = z80fi_insn[2:0];
+wire [3:0] r           = {1'b0, z80fi_insn[2:0]};
 
-// LD (HL), n instruction
 assign spec_valid = z80fi_valid &&
     z80fi_insn_len == 1 &&
     insn_fixed1 == 5'b01110 &&
     r != 6;
 
 `Z80FI_SPEC_SIGNALS
-assign spec_signals = `SPEC_REG1_RD | `SPEC_REG2_RD | `SPEC_MEM_WR;
+assign spec_signals = `SPEC_REG_IP | `SPEC_MEM_WR;
 
-// Data for 1's above.
-assign spec_reg1_rnum = `REG_HL;
-assign spec_reg2_rnum = {1'b0, r};
+assign spec_mem_waddr = z80fi_reg_hl_in;
+assign spec_mem_wdata =
+    (r == `REG_A) ? z80fi_reg_a_in :
+    (r == `REG_B) ? z80fi_reg_b_in :
+    (r == `REG_C) ? z80fi_reg_c_in :
+    (r == `REG_D) ? z80fi_reg_d_in :
+    (r == `REG_E) ? z80fi_reg_e_in :
+    (r == `REG_H) ? z80fi_reg_h_in :
+    (r == `REG_L) ? z80fi_reg_l_in : 0;
 
-assign spec_mem_waddr = z80fi_reg1_rdata;
-assign spec_mem_wdata = z80fi_reg2_rdata[7:0];
-
-assign spec_pc_wdata = z80fi_pc_rdata + 1;
+assign spec_reg_ip_out = z80fi_reg_ip_in + 1;
 
 endmodule

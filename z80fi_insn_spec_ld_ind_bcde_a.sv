@@ -21,15 +21,11 @@ assign spec_valid = z80fi_valid &&
     insn_fixed2 == 4'b0010;
 
 `Z80FI_SPEC_SIGNALS
-assign spec_signals = `SPEC_REG1_RD | `SPEC_REG2_RD |`SPEC_MEM_WR;
+assign spec_signals = `SPEC_REG_IP |`SPEC_MEM_WR;
 
-// Data for 1's above.
-assign spec_reg1_rnum = de ? `REG_DE : `REG_BC;
-assign spec_reg2_rnum = `REG_A;
+assign spec_mem_waddr = de ? z80fi_reg_de_in : z80fi_reg_bc_in;
+assign spec_mem_wdata = z80fi_reg_a_in;
 
-assign spec_mem_waddr = z80fi_reg1_rdata;
-assign spec_mem_wdata = z80fi_reg2_rdata[7:0];
-
-assign spec_pc_wdata = z80fi_pc_rdata + 1;
+assign spec_reg_ip_out = z80fi_reg_ip_in + 1;
 
 endmodule

@@ -16,14 +16,9 @@ assign spec_valid = z80fi_valid &&
     z80fi_insn[7:0] == 16'hF9;
 
 `Z80FI_SPEC_SIGNALS
-assign spec_signals = `SPEC_REG1_RD | `SPEC_REG_WR;
+assign spec_signals = `SPEC_REG_IP | `SPEC_REG_SP;
 
-// Data for 1's above.
-assign spec_reg1_rnum = `REG_HL;
-
-assign spec_reg_wnum = `REG_SP;
-assign spec_reg_wdata = z80fi_reg1_rdata;
-
-assign spec_pc_wdata = z80fi_pc_rdata + 1;
+assign spec_reg_sp_out = z80fi_reg_hl_in;
+assign spec_reg_ip_out = z80fi_reg_ip_in + 1;
 
 endmodule

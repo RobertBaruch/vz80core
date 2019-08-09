@@ -8,6 +8,7 @@
 
 `include "sequencer.sv"
 
+// The z80. We've only implemented the basic signals so far.
 module z80(
     input CLK,
     input nRESET,

@@ -16,8 +16,8 @@ assign spec_valid = z80fi_valid &&
     insn_fixed1 == 8'h00;
 
 `Z80FI_SPEC_SIGNALS
-assign spec_signals = 0;
+assign spec_signals = `SPEC_REG_IP;
 
-assign spec_pc_wdata = z80fi_pc_rdata + 1;
+assign spec_reg_ip_out = z80fi_reg_ip_in + 1;
 
 endmodule

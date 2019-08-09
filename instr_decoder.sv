@@ -3,6 +3,10 @@
 
 `include "z80.vh"
 
+// Give an instruction (in little-endian order) and its op_len
+// (the instruction length without any operands), determine
+// what its total length (including operands) should be, and
+// what group it's in.
 module instr_decoder(
     input logic [31:0] instr,
     input logic [1:0] op_len,

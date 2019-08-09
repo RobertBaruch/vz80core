@@ -1,6 +1,7 @@
 `include "z80fi.vh"
 `include "z80.v"
 
+// See if we can read and write some memory.
 module testbench(
     input clk,
 

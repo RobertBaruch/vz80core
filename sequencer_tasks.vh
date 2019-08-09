@@ -15,6 +15,9 @@
 // task_write_reg8(rnum, data)
 // task_write_reg16(rnum, data)
 // task_write_reg_pair(rnum, data)
+// task_write_i(data)  // write the I register
+// task_write_r(data)  // write the R register
+// task_write_f(data)  // write the Flags register
 
 // task_read_mem(n, addr)
 // Set up to read memory at the given address. n is the
@@ -92,24 +95,16 @@ begin
 end
 endtask
 
+// task_read_reg16/8/pair places the given register on the given
+// register output bus (there are two of them, 1 and 2). Remember that
+// if you need the register output for more than one cycle, you
+// have to read it again. This doesn't cost anything.
 task task_read_reg16;
     input [1:0] local_n;
     input [3:0] local_rnum;
 begin
     if (local_n == 1) reg1_rnum = local_rnum;
     else reg2_rnum = local_rnum;
-
-    `ifdef Z80_FORMAL
-        if (local_n == 1) begin
-            next_z80fi_reg1_rd = 1;
-            next_z80fi_reg1_rnum = local_rnum;
-            next_z80fi_reg1_rdata = reg1_rdata;
-        end else begin
-            next_z80fi_reg2_rd = 1;
-            next_z80fi_reg2_rnum = local_rnum;
-            next_z80fi_reg2_rdata = reg2_rdata;
-        end
-    `endif
 end
 endtask
 
@@ -129,19 +124,15 @@ begin
 end
 endtask
 
+// task_write_reg16/8/pair writes the given register with the given
+// data on the next positive edge of the clock.
 task task_write_reg16;
     input `reg_select local_wnum;
     input [15:0] local_data;
 begin
-    next_reg_wr = 1;
+    reg_wr = 1;
     reg_wnum = local_wnum;
     reg_wdata = local_data;
-
-    `ifdef Z80_FORMAL
-        next_z80fi_reg_wr = 1;
-        next_z80fi_reg_wnum = local_wnum;
-        next_z80fi_reg_wdata = local_data;
-    `endif
 end
 endtask
 
@@ -161,79 +152,35 @@ begin
 end
 endtask
 
-task task_read_i;
-begin
-    `ifdef Z80_FORMAL
-        next_z80fi_i_rd = 1;
-        next_z80fi_i_rdata = i_rdata;
-    `endif
-end
-endtask
-
+// task_write_i writes the I register on the next positive edge of the clock.
 task task_write_i;
     input [7:0] local_data;
 begin
-    next_i_wr = 1;
+    i_wr = 1;
     i_wdata = local_data;
-    `ifdef Z80_FORMAL
-        next_z80fi_i_wr = 1;
-        next_z80fi_i_wdata = local_data;
-    `endif
 end
 endtask
 
-task task_read_iff2;
-begin
-    `ifdef Z80_FORMAL
-        next_z80fi_iff2_rd = 1;
-        next_z80fi_iff2_rdata = iff2;
-    `endif
-end
-endtask
-
-
-task task_read_r;
-begin
-    `ifdef Z80_FORMAL
-        next_z80fi_r_rd = 1;
-        next_z80fi_r_rdata = r_rdata;
-    `endif
-end
-endtask
-
+// task_write_r writes the R register on the next positive edge of the clock.
 task task_write_r;
     input [7:0] local_data;
 begin
-    next_r_wr = 1;
+    r_wr = 1;
     r_wdata = local_data;
-    `ifdef Z80_FORMAL
-        next_z80fi_r_wr = 1;
-        next_z80fi_r_wdata = local_data;
-    `endif
 end
 endtask
 
-task task_read_f;
-begin
-    `ifdef Z80_FORMAL
-        next_z80fi_f_rd = 1;
-        next_z80fi_f_rdata = f_rdata;
-    `endif
-end
-endtask
-
+// task_write_f writes the Flags register on the next positive edge of the clock.
 task task_write_f;
     input [7:0] local_data;
 begin
-    next_f_wr = 1;
+    f_wr = 1;
     f_wdata = local_data;
-    `ifdef Z80_FORMAL
-        next_z80fi_f_wr = 1;
-        next_z80fi_f_wdata = local_data;
-    `endif
 end
 endtask
 
+// task_done must be run at the end of an instruction, otherwise the
+// instruction will never end!
 task task_done;
     next_done = 1;
 endtask

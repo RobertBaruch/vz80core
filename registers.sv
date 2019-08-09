@@ -5,11 +5,14 @@
 
 `include "z80.vh"
 
+// registers stores the A, B, C, D, E, H, L, IX, IY, SP, and Flags
+// registers. You can read any two registers or register pairs
+// at a time, and write one of them. Flags are always output.
 module registers(
     input logic reset,
     input logic clk,
 
-    // What to write.
+    // What to write. Writes on the next positive edge of the clock.
     input logic write_en,
     input logic `reg_select dest,
     input logic [15:0] in,

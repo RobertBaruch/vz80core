@@ -14,7 +14,7 @@ module z80fi_insn_spec_ld_reg_idx_ixiy(
 
 wire [7:0] d           = z80fi_insn[23:16];
 wire [1:0] insn_fixed1 = z80fi_insn[15:14];
-wire [2:0] r           = z80fi_insn[13:11];
+wire [3:0] r           = {1'b0, z80fi_insn[13:11]};
 wire [2:0] insn_fixed2 = z80fi_insn[10:8];
 wire [1:0] insn_fixed3 = z80fi_insn[7:6];
 wire       iy          = z80fi_insn[5];
@@ -30,16 +30,20 @@ assign spec_valid = z80fi_valid &&
     r != 6;
 
 `Z80FI_SPEC_SIGNALS
-assign spec_signals = `SPEC_REG1_RD | `SPEC_REG_WR | `SPEC_MEM_RD;
+assign spec_signals = `SPEC_REG_IP | `SPEC_REG_BC | `SPEC_REG_DE |
+    `SPEC_REG_HL | `SPEC_REG_A | `SPEC_MEM_RD;
 
-// Data for 1's above.
-assign spec_reg1_rnum = iy ? `REG_IY : `REG_IX;
+wire [7:0] n = z80fi_mem_rdata;
+assign spec_reg_a_out = (r == `REG_A) ? n : z80fi_reg_a_in;
+assign spec_reg_b_out = (r == `REG_B) ? n : z80fi_reg_b_in;
+assign spec_reg_c_out = (r == `REG_C) ? n : z80fi_reg_c_in;
+assign spec_reg_d_out = (r == `REG_D) ? n : z80fi_reg_d_in;
+assign spec_reg_e_out = (r == `REG_E) ? n : z80fi_reg_e_in;
+assign spec_reg_h_out = (r == `REG_H) ? n : z80fi_reg_h_in;
+assign spec_reg_l_out = (r == `REG_L) ? n : z80fi_reg_l_in;
 
-assign spec_reg_wnum = {1'b0, r};
-assign spec_reg_wdata = z80fi_mem_rdata;
+assign spec_mem_raddr = (iy ? z80fi_reg_iy_in : z80fi_reg_ix_in) + {8'b0, d};
 
-assign spec_mem_raddr = z80fi_reg1_rdata + {8'b0, d};
-
-assign spec_pc_wdata = z80fi_pc_rdata + 3;
+assign spec_reg_ip_out = z80fi_reg_ip_in + 3;
 
 endmodule

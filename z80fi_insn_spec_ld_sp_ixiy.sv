@@ -23,14 +23,9 @@ assign spec_valid = z80fi_valid &&
     insn_fixed3 == 5'b11101;
 
 `Z80FI_SPEC_SIGNALS
-assign spec_signals = `SPEC_REG1_RD | `SPEC_REG_WR;
+assign spec_signals = `SPEC_REG_IP | `SPEC_REG_SP;
 
-// Data for 1's above.
-assign spec_reg1_rnum = iy ? `REG_IY : `REG_IX;
-
-assign spec_reg_wnum = `REG_SP;
-assign spec_reg_wdata = z80fi_reg1_rdata;
-
-assign spec_pc_wdata = z80fi_pc_rdata + 2;
+assign spec_reg_sp_out = iy ? z80fi_reg_iy_in : z80fi_reg_ix_in;
+assign spec_reg_ip_out = z80fi_reg_ip_in + 2;
 
 endmodule
