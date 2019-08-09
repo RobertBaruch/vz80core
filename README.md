@@ -1,4 +1,4 @@
-vz80
+vz80core, a formally-verified Z80 core written in Verilog.
 
 Not much documentation here, since it's still a work in progress
 and will likely change radically from time to time. Still, there's
@@ -14,7 +14,7 @@ Follow the [instructions to install](https://symbiyosys.readthedocs.io/en/latest
 
 Generally tests are run as:
 
-sudo sby -f <sby-file>
+sudo sby -f /sby-file/
 
 Changing the z80fi (Z80 Formal Interface) requires running
 z80fi_generate.py to generate lots of macros for bunches of
@@ -28,4 +28,3 @@ Some useful books:
 
 * [Rodnay Zaks, Programming the Z80](https://archive.org/details/Programming_the_Z-80_2nd_Edition_1980_Rodnay_Zaks)
 * [Zilog Z80 Family User Manual](https://archive.org/details/Zilog_Z80_Family_user_manual)
-*
