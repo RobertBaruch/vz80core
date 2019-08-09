@@ -334,18 +334,18 @@ always @(*) begin
                 task_done();
 
             `INSN_GROUP_LD_REG_REG: begin  /* LD  r, r' */
-                task_read_reg8(1, instr_for_decoder[2:0]);
-                task_write_reg8(instr_for_decoder[5:3], reg1_rdata[7:0]);
+                task_read_reg(1, instr_for_decoder[2:0]);
+                task_write_reg(instr_for_decoder[5:3], reg1_rdata);
                 task_done();
             end
 
             `INSN_GROUP_LD_DD_NN: begin  /* LD  dd, nn */
-                task_write_reg_pair(instr_for_decoder[5:4], insn_operand);
+                task_write_reg({`REG_SET_DD, instr_for_decoder[5:4]}, insn_operand);
                 task_done();
             end
 
             `INSN_GROUP_LD_IXIY_NN: begin  /* LD  IX/IY, nn */
-                task_write_reg16(instr_for_decoder[5] ? `REG_IY : `REG_IX, insn_operand);
+                task_write_reg({`REG_SET_IDX, instr_for_decoder[5]}, insn_operand);
                 task_done();
             end
 
@@ -360,8 +360,8 @@ always @(*) begin
                     end
                     2: begin
                         task_collect_data(2);
-                        task_write_reg_pair(
-                            instr_for_decoder[13:12],
+                        task_write_reg(
+                            {`REG_SET_DD, instr_for_decoder[13:12]},
                             next_collected_data
                         );
                         task_done();
@@ -371,8 +371,8 @@ always @(*) begin
             `INSN_GROUP_LD_IND_BCDE_A:  /* LD  (BC/DE), A */
                 case (state)
                     0: begin
-                        task_read_reg16(1, instr_for_decoder[4] ? `REG_DE : `REG_BC);
-                        task_read_reg8(2, `REG_A);
+                        task_read_reg(1, {`REG_SET_DD, 1'b0, instr_for_decoder[4]});
+                        task_read_reg(2, `REG_A);
                         task_write_mem(1, reg1_rdata, reg2_rdata[7:0]);
                     end
                     1: begin
@@ -384,12 +384,12 @@ always @(*) begin
             `INSN_GROUP_LD_A_IND_BCDE:  /* LD  A, (BC/DE)   */
                 case (state)
                     0: begin
-                        task_read_reg16(1, instr_for_decoder[4] ? `REG_DE : `REG_BC);
+                        task_read_reg(1, {`REG_SET_DD, 1'b0, instr_for_decoder[4]});
                         task_read_mem(1, reg1_rdata);
                     end
                     1: begin
                         task_collect_data(1);
-                        task_write_reg8(`REG_A, next_collected_data[7:0]);
+                        task_write_reg(`REG_A, next_collected_data[7:0]);
                         task_done();
                     end
                 endcase
@@ -401,7 +401,7 @@ always @(*) begin
                     end
                     1: begin
                         task_collect_data(1);
-                        task_write_reg8(`REG_A, next_collected_data[7:0]);
+                        task_write_reg(`REG_A, next_collected_data[7:0]);
                         task_done();
                     end
                 endcase
@@ -409,7 +409,7 @@ always @(*) begin
             `INSN_GROUP_LD_IND_NN_A:  /* LD  (nn), A */
                 case (state)
                     0: begin
-                        task_read_reg8(1, `REG_A);
+                        task_read_reg(1, `REG_A);
                         task_write_mem(1, insn_operand, reg1_rdata[7:0]);
                     end
                     1: begin
@@ -424,12 +424,12 @@ always @(*) begin
                     (z80_reg_i == 0 ? `FLAG_Z_BIT : 0) |
                     (z80_reg_i[7] == 1 ? `FLAG_S_BIT : 0) |
                     (z80_reg_iff2 == 1 ? `FLAG_PV_BIT : 0));
-                task_write_reg8(`REG_A, z80_reg_i);
+                task_write_reg(`REG_A, z80_reg_i);
                 task_done();
             end
 
             `INSN_GROUP_LD_I_A: begin  /* LD  I, A         */
-                task_read_reg8(1, `REG_A);
+                task_read_reg(1, `REG_A);
                 task_write_i(reg1_rdata);
                 task_done();
             end
@@ -440,25 +440,25 @@ always @(*) begin
                     (z80_reg_r == 0 ? `FLAG_Z_BIT : 0) |
                     (z80_reg_r[7] == 1 ? `FLAG_S_BIT : 0) |
                     (z80_reg_iff2 == 1 ? `FLAG_PV_BIT : 0));
-                task_write_reg8(`REG_A, z80_reg_r);
+                task_write_reg(`REG_A, z80_reg_r);
                 task_done();
             end
 
             `INSN_GROUP_LD_R_A: begin  /* LD  R, A         */
-                task_read_reg8(1, `REG_A);
+                task_read_reg(1, `REG_A);
                 task_write_r(reg1_rdata);
                 task_done();
             end
 
             `INSN_GROUP_LD_REG_N: begin  /* LD  r, n */
-                task_write_reg8(instr_for_decoder[5:3], insn_operand[7:0]);
+                task_write_reg(instr_for_decoder[5:3], insn_operand[7:0]);
                 task_done();
             end
 
             `INSN_GROUP_LD_IND_HL_N:  /* LD  (HL), n */
                 case (state)
                     0: begin
-                        task_read_reg16(1, `REG_HL);
+                        task_read_reg(1, `DD_REG_HL);
                         task_write_mem(1, reg1_rdata, insn_operand[7:0]);
                     end
                     1: begin
@@ -470,8 +470,8 @@ always @(*) begin
             `INSN_GROUP_LD_IND_HL_REG:  /* LD  (HL), r */
                 case (state)
                     0: begin
-                        task_read_reg16(1, `REG_HL);
-                        task_read_reg8(2, instr_for_decoder[2:0]);
+                        task_read_reg(1, `DD_REG_HL);
+                        task_read_reg(2, instr_for_decoder[2:0]);
                         task_write_mem(1, reg1_rdata, reg2_rdata[7:0]);
                     end
                     1: begin
@@ -483,12 +483,12 @@ always @(*) begin
             `INSN_GROUP_LD_REG_IDX_IXIY:  /* LD  r, (IX/IY+d) */
                 case (state)
                     0: begin
-                        task_read_reg16(1, instr_for_decoder[5] ? `REG_IY : `REG_IX);
+                        task_read_reg(1, {`REG_SET_IDX, instr_for_decoder[5]});
                         task_read_mem(1, reg1_rdata + { {8{insn_operand[7]}}, insn_operand[7:0]});
                     end
                     1: begin
                         task_collect_data(1);
-                        task_write_reg8(instr_for_decoder[13:11], next_collected_data[7:0]);
+                        task_write_reg(instr_for_decoder[13:11], next_collected_data[7:0]);
                         task_done();
                     end
                 endcase
@@ -496,7 +496,7 @@ always @(*) begin
             `INSN_GROUP_LD_IDX_IXIY_N:  /* LD  (IX/IY+d), n */
                 case (state)
                     0: begin
-                        task_read_reg16(1, instr_for_decoder[5] ? `REG_IY : `REG_IX);
+                        task_read_reg(1, {`REG_SET_IDX, instr_for_decoder[5]});
                         task_write_mem(1, reg1_rdata + { {8{insn_operand[7]}}, insn_operand[7:0]}, insn_operand[15:8]);
                     end
                     1: begin
@@ -508,8 +508,8 @@ always @(*) begin
             `INSN_GROUP_LD_IDX_IXIY_REG:  /* LD  (IX/IY+d), r */
                 case (state)
                     0: begin
-                        task_read_reg16(1, instr_for_decoder[5] ? `REG_IY : `REG_IX);
-                        task_read_reg8(2, instr_for_decoder[10:8]);
+                        task_read_reg(1, {`REG_SET_IDX, instr_for_decoder[5]});
+                        task_read_reg(2, instr_for_decoder[10:8]);
                         task_write_mem(1, reg1_rdata + { {8{insn_operand[7]}}, insn_operand[7:0]}, reg2_rdata[7:0]);
                     end
                     1: begin
@@ -521,11 +521,11 @@ always @(*) begin
             `INSN_GROUP_LD_IND_NN_DD:  /* LD  (nn), dd     */
                 case (state)
                     0: begin
-                        task_read_reg_pair(1, instr_for_decoder[13:12]);
+                        task_read_reg(1, {`REG_SET_DD, instr_for_decoder[13:12]});
                         task_write_mem(1, insn_operand, reg1_rdata[7:0]);
                     end
                     1: begin
-                        task_read_reg_pair(1, instr_for_decoder[13:12]);
+                        task_read_reg(1, {`REG_SET_DD, instr_for_decoder[13:12]});
                         task_write_mem_done(1);
                         task_write_mem(2, insn_operand + 1, reg1_rdata[15:8]);
                     end
@@ -538,11 +538,11 @@ always @(*) begin
             `INSN_GROUP_LD_IND_NN_HL:  /* LD  (nn), HL     */
                 case (state)
                     0: begin
-                        task_read_reg_pair(1, `REG_HL);
+                        task_read_reg(1, `DD_REG_HL);
                         task_write_mem(1, insn_operand, reg1_rdata[7:0]);
                     end
                     1: begin
-                        task_read_reg_pair(1, `REG_HL);
+                        task_read_reg(1, `DD_REG_HL);
                         task_write_mem_done(1);
                         task_write_mem(2, insn_operand + 1, reg1_rdata[15:8]);
                     end
@@ -563,31 +563,31 @@ always @(*) begin
                     end
                     2: begin
                         task_collect_data(2);
-                        task_write_reg16(`REG_HL, next_collected_data);
+                        task_write_reg(`DD_REG_HL, next_collected_data);
                         task_done();
                     end
                 endcase
 
             `INSN_GROUP_LD_SP_HL: begin  /* LD  SP, HL       */
-                task_read_reg16(1, `REG_HL);
-                task_write_reg16(`REG_SP, reg1_rdata);
+                task_read_reg(1, `DD_REG_HL);
+                task_write_reg(`DD_REG_SP, reg1_rdata);
                 task_done();
             end
 
             `INSN_GROUP_LD_SP_IXIY: begin  /* LD  SP, IX/IY    */
-                task_read_reg16(1, instr_for_decoder[5] ? `REG_IY : `REG_IX);
-                task_write_reg16(`REG_SP, reg1_rdata);
+                task_read_reg(1, {`REG_SET_IDX, instr_for_decoder[5]});
+                task_write_reg(`DD_REG_SP, reg1_rdata);
                 task_done();
             end
 
             `INSN_GROUP_LD_IND_NN_IXIY:  /* LD  (nn), IX/IY  */
                 case (state)
                     0: begin
-                        task_read_reg16(1, instr_for_decoder[5] ? `REG_IY : `REG_IX);
+                        task_read_reg(1, {`REG_SET_IDX, instr_for_decoder[5]});
                         task_write_mem(1, insn_operand, reg1_rdata[7:0]);
                     end
                     1: begin
-                        task_read_reg16(1, instr_for_decoder[5] ? `REG_IY : `REG_IX);
+                        task_read_reg(1, {`REG_SET_IDX, instr_for_decoder[5]});
                         task_write_mem_done(1);
                         task_write_mem(2, insn_operand + 1, reg1_rdata[15:8]);
                     end
@@ -608,10 +608,29 @@ always @(*) begin
                     end
                     2: begin
                         task_collect_data(2);
-                        task_write_reg16(
-                            instr_for_decoder[5] ? `REG_IY : `REG_IX,
+                        task_write_reg(
+                            {`REG_SET_IDX, instr_for_decoder[5]},
                             next_collected_data
                         );
+                        task_done();
+                    end
+                endcase
+
+            `INSN_GROUP_POP_QQ:  /* POP qq */
+                case (state)
+                    0: begin
+                        task_read_reg(1, `DD_REG_SP);
+                        task_read_mem(1, reg1_rdata);
+                    end
+                    1: begin
+                        task_collect_data(1);
+                        task_read_reg(1, `DD_REG_SP);
+                        task_read_mem(2, reg1_rdata + 16'h1);
+                        task_write_reg(`DD_REG_SP, reg1_rdata + 16'h2);
+                    end
+                    2: begin
+                        task_collect_data(2);
+                        task_write_reg({`REG_SET_QQ, instr_for_decoder[5:4]}, next_collected_data);
                         task_done();
                     end
                 endcase

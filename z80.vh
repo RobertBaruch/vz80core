@@ -6,32 +6,68 @@
 
 `define Z80_FORMAL 1
 
-`define reg_select [3:0]
+// reg_select is big enough for 4 bits of set number, and 3 bits of
+// register number. Not all combinations are valid.
+`define reg_select [4:0]
+
+// The 8-bit registers A, B, C, D, E, H, L
+`define REG_SET_R  2'b00
+// The 16-bit registers BC, DE, HL, SP
+`define REG_SET_DD 3'b010
+// The 16-bit registers BC, DE, HL, AF
+`define REG_SET_QQ 3'b100
+// The 16-bit registers IX, IY
+`define REG_SET_IDX 4'b1100
 
 // 8-bit register numbers.
 // These are ordered so that they correspond with the standard
-// 3-bit encoding in instructions.
-`define REG_A 7
-`define REG_B 0
-`define REG_C 1
-`define REG_D 2
-`define REG_E 3
-`define REG_H 4
-`define REG_L 5
+// 3-bit encoding in instructions. You may use these directly in
+// task_reg_read and task_reg_write, no need to concat to
+// REG_SET_R.
+`define REG_B 3'b000
+`define REG_C 3'b001
+`define REG_D 3'b010
+`define REG_E 3'b011
+`define REG_H 3'b100
+`define REG_L 3'b101
+`define REG_A 3'b111
 
-// 16-bit register numbers.
-// These are ordered so that the lower two bits correspond with
-// the standard 2-bit encoding in instructions.
-// REG_{FIRST|LAST}16 are the register numbers for the first
-// and last 16 bit register, for range checks.
-`define REG_FIRST16 8
-`define REG_BC 8
-`define REG_DE 9
-`define REG_HL 10
-`define REG_SP 11
-`define REG_IX 12
-`define REG_IY 13
-`define REG_LAST16 13
+// 16-bit registers dd.
+// These are ordered so that the two bits are the same as
+// the standard 2-bit encoding for dd in instructions.
+// When specifying these registers, use DD_REG_*, or
+// concat your 2 bits to REG_SET_DD.
+`define REG_BC 2'b00
+`define REG_DE 2'b01
+`define REG_HL 2'b10
+`define REG_SP 2'b11
+
+// 16-bit registers qq. BC, DE, and HL have the same numbers.
+// These are ordered so that the two bits are the same as
+// the standard 2-bit encoding for dd in instructions.
+// When specifying these registers, use QQ_REG_*, or
+// concat your 2 bits to REG_SET_QQ.
+`define REG_AF 2'b11
+
+// 16-bit index register numbers. IY is 1 to be the same as
+// the standard 1-bit encoding in instructions.
+// When specifying these registers, use IDX_REG_*, or
+// concat your single bit to REG_SET_IDX.
+`define REG_IX 1'b0
+`define REG_IY 1'b1
+
+`define DD_REG_BC ({`REG_SET_DD, `REG_BC})
+`define DD_REG_DE ({`REG_SET_DD, `REG_DE})
+`define DD_REG_HL ({`REG_SET_DD, `REG_HL})
+`define DD_REG_SP ({`REG_SET_DD, `REG_SP})
+
+`define QQ_REG_BC ({`REG_SET_QQ, `REG_BC})
+`define QQ_REG_DE ({`REG_SET_QQ, `REG_DE})
+`define QQ_REG_HL ({`REG_SET_QQ, `REG_HL})
+`define QQ_REG_AF ({`REG_SET_QQ, `REG_AF})
+
+`define IDX_REG_IX ({`REG_SET_IDX, `REG_IX})
+`define IDX_REG_IY ({`REG_SET_IDX, `REG_IY})
 
 `define FLAG_S_BIT  8'b10000000
 `define FLAG_S_MASK (~`FLAG_S_BIT)
@@ -78,7 +114,8 @@
 `define INSN_GROUP_LD_R_A 23           /* LD  R, A         */
 `define INSN_GROUP_LD_SP_HL 24         /* LD  SP, HL       */
 `define INSN_GROUP_LD_SP_IXIY 25       /* LD  SP, IX/IY    */
-`define INSN_GROUP_LDD 26              /* LDD              */
+`define INSN_GROUP_POP_QQ 26           /* POP qq           */
+`define INSN_GROUP_LDD 27              /* LDD              */
 
 `define Z80_REGS_OUTPUTS \
 output [7:0] z80_reg_a, \

@@ -95,60 +95,29 @@ begin
 end
 endtask
 
-// task_read_reg16/8/pair places the given register on the given
+// task_read_reg places the given register on the given
 // register output bus (there are two of them, 1 and 2). Remember that
 // if you need the register output for more than one cycle, you
 // have to read it again. This doesn't cost anything.
-task task_read_reg16;
+task task_read_reg;
     input [1:0] local_n;
-    input [3:0] local_rnum;
+    input `reg_select local_rnum;
 begin
     if (local_n == 1) reg1_rnum = local_rnum;
     else reg2_rnum = local_rnum;
 end
 endtask
 
-task task_read_reg8;
-    input [1:0] local_n;
-    input [2:0] local_rnum;
-begin
-    task_read_reg16(local_n, {1'b0, local_rnum});
-end
-endtask
-
-task task_read_reg_pair;
-    input [1:0] local_n;
-    input [1:0] local_rnum;
-begin
-    task_read_reg16(local_n, {2'b10, local_rnum});
-end
-endtask
-
-// task_write_reg16/8/pair writes the given register with the given
-// data on the next positive edge of the clock.
-task task_write_reg16;
+// task_write_reg writes the given register with the given data
+// on the next positive edge of the clock. If writing an 8-bit
+// register, the upper 8 bits of the data are ignored.
+task task_write_reg;
     input `reg_select local_wnum;
     input [15:0] local_data;
 begin
     reg_wr = 1;
     reg_wnum = local_wnum;
     reg_wdata = local_data;
-end
-endtask
-
-task task_write_reg8;
-    input [2:0] local_wnum;
-    input [7:0] local_data;
-begin
-    task_write_reg16({1'b0, local_wnum}, {8'b0, local_data});
-end
-endtask
-
-task task_write_reg_pair;
-    input [1:0] local_wnum;
-    input [15:0] local_data;
-begin
-    task_write_reg16({2'b10, local_wnum}, local_data);
 end
 endtask
 

@@ -97,7 +97,7 @@ logic [15:0] next_sp;
 `endif // Z80_FORMAL
 
 logic f_wr2;
-assign f_wr2 = f_wr && !block_inc && !block_dec;
+assign f_wr2 = f_wr && !block_inc && !block_dec && !(write_en && (dest == `QQ_REG_AF));
 assign reg_f = _af[7:0];
 
 logic write_en2;
@@ -114,12 +114,16 @@ always @(*) begin
       `REG_E: out1[7:0] = _de[7:0];
       `REG_H: out1[7:0] = _hl[15:8];
       `REG_L: out1[7:0] = _hl[7:0];
-      `REG_BC: out1[15:0] = _bc;
-      `REG_DE: out1[15:0] = _de;
-      `REG_HL: out1[15:0] = _hl;
-      `REG_IX: out1[15:0] = _ix;
-      `REG_IY: out1[15:0] = _iy;
-      `REG_SP: out1[15:0] = _sp;
+      `DD_REG_BC: out1[15:0] = _bc;
+      `DD_REG_DE: out1[15:0] = _de;
+      `DD_REG_HL: out1[15:0] = _hl;
+      `DD_REG_SP: out1[15:0] = _sp;
+      `QQ_REG_BC: out1[15:0] = _bc;
+      `QQ_REG_DE: out1[15:0] = _de;
+      `QQ_REG_HL: out1[15:0] = _hl;
+      `QQ_REG_AF: out1[15:0] = _af;
+      `IDX_REG_IX: out1[15:0] = _ix;
+      `IDX_REG_IY: out1[15:0] = _iy;
     endcase
     case (src2)
       `REG_A: out2[7:0] = _af[15:8];
@@ -129,12 +133,16 @@ always @(*) begin
       `REG_E: out2[7:0] = _de[7:0];
       `REG_H: out2[7:0] = _hl[15:8];
       `REG_L: out2[7:0] = _hl[7:0];
-      `REG_BC: out2[15:0] = _bc;
-      `REG_DE: out2[15:0] = _de;
-      `REG_HL: out2[15:0] = _hl;
-      `REG_IX: out2[15:0] = _ix;
-      `REG_IY: out2[15:0] = _iy;
-      `REG_SP: out2[15:0] = _sp;
+      `DD_REG_BC: out2[15:0] = _bc;
+      `DD_REG_DE: out2[15:0] = _de;
+      `DD_REG_HL: out2[15:0] = _hl;
+      `DD_REG_SP: out2[15:0] = _sp;
+      `QQ_REG_BC: out2[15:0] = _bc;
+      `QQ_REG_DE: out2[15:0] = _de;
+      `QQ_REG_HL: out2[15:0] = _hl;
+      `QQ_REG_AF: out2[15:0] = _af;
+      `IDX_REG_IX: out2[15:0] = _ix;
+      `IDX_REG_IY: out2[15:0] = _iy;
     endcase
 end
 
@@ -152,9 +160,7 @@ always @(posedge clk or posedge reset) begin
     _iy <= 0;
     _sp <= 0;
   end else begin
-    if (f_wr2) begin
-      _af[7:0] <= f_in;
-    end
+    if (f_wr2) _af[7:0] <= f_in;
     if (write_en2) begin
       case (dest)
         `REG_A: _af[15:8] <= in[7:0];
@@ -164,12 +170,16 @@ always @(posedge clk or posedge reset) begin
         `REG_E: _de[7:0] <= in[7:0];
         `REG_H: _hl[15:8] <= in[7:0];
         `REG_L: _hl[7:0] <= in[7:0];
-        `REG_BC: _bc <= in;
-        `REG_DE: _de <= in;
-        `REG_HL: _hl <= in;
-        `REG_IX: _ix <= in;
-        `REG_IY: _iy <= in;
-        `REG_SP: _sp <= in;
+        `DD_REG_BC: _bc <= in;
+        `DD_REG_DE: _de <= in;
+        `DD_REG_HL: _hl <= in;
+        `DD_REG_SP: _sp <= in;
+        `QQ_REG_BC: _bc <= in;
+        `QQ_REG_DE: _de <= in;
+        `QQ_REG_HL: _hl <= in;
+        `QQ_REG_AF: _af <= in;
+        `IDX_REG_IX: _ix <= in;
+        `IDX_REG_IY: _iy <= in;
       endcase
     end else if (block_inc) begin
       _de <= _de + 16'b1;
@@ -199,7 +209,12 @@ function is_8bit(input `reg_select x);
 endfunction
 
 function is_16bit(input `reg_select x);
-  is_16bit = (x >= `REG_FIRST16 && x <= `REG_LAST16);
+  case (x)
+    `DD_REG_BC, `DD_REG_DE, `DD_REG_HL, `DD_REG_SP,
+    `QQ_REG_BC, `QQ_REG_DE, `QQ_REG_HL, `QQ_REG_AF,
+    `IDX_REG_IX, `IDX_REG_IY: is_16bit = 1;
+    default: is_16bit = 0;
+  endcase
 endfunction
 
 always @(posedge clk) begin
@@ -216,9 +231,9 @@ always @(posedge clk) begin
 
     // Check 16-bit register writes and reads from src1 and src2.
     if ($past(write_en2) && $past(dest) == src1 && is_16bit(src1))
-      assert(out1[15:0] == $past(in[15:0]));
+      assert(out1 == $past(in));
     if ($past(write_en2) && $past(dest) == src2 && is_16bit(src2))
-      assert(out2[15:0] == $past(in[15:0]));
+      assert(out2 == $past(in));
 
     // Check writing flags.
     if ($past(f_wr2))
