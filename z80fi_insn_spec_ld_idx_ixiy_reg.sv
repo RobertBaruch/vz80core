@@ -14,7 +14,7 @@ module z80fi_insn_spec_ld_idx_ixiy_reg(
 
 wire [15:0] d           = { {8{z80fi_insn[23]}}, z80fi_insn[23:16]};
 wire [4:0] insn_fixed1 = z80fi_insn[15:11];
-wire [3:0] r           = {1'b0, z80fi_insn[10:8]};
+wire [2:0] r           = z80fi_insn[10:8];
 wire [1:0] insn_fixed2 = z80fi_insn[7:6];
 wire       iy          = z80fi_insn[5];
 wire [4:0] insn_fixed3 = z80fi_insn[4:0];

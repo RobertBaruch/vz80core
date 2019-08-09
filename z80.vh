@@ -115,7 +115,10 @@
 `define INSN_GROUP_LD_SP_HL 24         /* LD  SP, HL       */
 `define INSN_GROUP_LD_SP_IXIY 25       /* LD  SP, IX/IY    */
 `define INSN_GROUP_POP_QQ 26           /* POP qq           */
-`define INSN_GROUP_LDD 27              /* LDD              */
+`define INSN_GROUP_POP_IXIY 27         /* POP IX/IY        */
+`define INSN_GROUP_PUSH_QQ 28          /* PUSH qq          */
+`define INSN_GROUP_PUSH_IXIY 29        /* PUSH IX/IY       */
+`define INSN_GROUP_LDD 30              /* LDD              */
 
 `define Z80_REGS_OUTPUTS \
 output [7:0] z80_reg_a, \

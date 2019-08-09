@@ -14,7 +14,7 @@ module z80fi_insn_spec_ld_ind_nn_dd(
 
 wire [15:0] nn         = z80fi_insn[31:16];
 wire [1:0] insn_fixed1 = z80fi_insn[15:14];
-wire [3:0] dd          = {2'b10, z80fi_insn[13:12]};
+wire [1:0] dd          = z80fi_insn[13:12];
 wire [3:0] insn_fixed2 = z80fi_insn[11:8];
 wire [7:0] insn_fixed3 = z80fi_insn[7:0];
 

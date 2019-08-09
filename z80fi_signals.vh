@@ -490,7 +490,8 @@ assign spec_reg_iff1 = spec_signals[18]; \
 assign spec_reg_iff2 = spec_signals[19]; \
 wire [15:0] z80fi_reg_bc_in = {z80fi_reg_b_in, z80fi_reg_c_in}; \
 wire [15:0] z80fi_reg_de_in = {z80fi_reg_d_in, z80fi_reg_e_in}; \
-wire [15:0] z80fi_reg_hl_in = {z80fi_reg_h_in, z80fi_reg_l_in};
+wire [15:0] z80fi_reg_hl_in = {z80fi_reg_h_in, z80fi_reg_l_in}; \
+wire [15:0] z80fi_reg_af_in = {z80fi_reg_a_in, z80fi_reg_f_in};
 
 `define Z80FI_SPEC_WIRES \
 wire [0:0] valid = !reset && z80fi_valid; \

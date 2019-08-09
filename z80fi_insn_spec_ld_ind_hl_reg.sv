@@ -13,7 +13,7 @@ module z80fi_insn_spec_ld_ind_hl_reg(
 );
 
 wire [4:0] insn_fixed1 = z80fi_insn[7:3];
-wire [3:0] r           = {1'b0, z80fi_insn[2:0]};
+wire [2:0] r           = z80fi_insn[2:0];
 
 assign spec_valid = z80fi_valid &&
     z80fi_insn_len == 1 &&

@@ -13,7 +13,7 @@ module z80fi_insn_spec_pop_qq(
 );
 
 wire [1:0] insn_fixed1 = z80fi_insn[7:6];
-wire [4:0] qq          = {3'b100, z80fi_insn[5:4]};
+wire [1:0] qq          = z80fi_insn[5:4];
 wire [3:0] insn_fixed2 = z80fi_insn[3:0];
 
 assign spec_valid = z80fi_valid &&
@@ -31,14 +31,14 @@ wire [15:0] data = {z80fi_mem_rdata2, z80fi_mem_rdata};
 assign spec_mem_raddr = z80fi_reg_sp_in;
 assign spec_mem_raddr2 = z80fi_reg_sp_in + 1;
 assign spec_reg_sp_out = z80fi_reg_sp_in + 2;
-assign spec_reg_b_out = (qq == `QQ_REG_BC) ? data[15:8] : z80fi_reg_b_in;
-assign spec_reg_c_out = (qq == `QQ_REG_BC) ? data[7:0] : z80fi_reg_c_in;
-assign spec_reg_d_out = (qq == `QQ_REG_DE) ? data[15:8] : z80fi_reg_d_in;
-assign spec_reg_e_out = (qq == `QQ_REG_DE) ? data[7:0] : z80fi_reg_e_in;
-assign spec_reg_h_out = (qq == `QQ_REG_HL) ? data[15:8] : z80fi_reg_h_in;
-assign spec_reg_l_out = (qq == `QQ_REG_HL) ? data[7:0] : z80fi_reg_l_in;
-assign spec_reg_a_out = (qq == `QQ_REG_AF) ? data[15:8] : z80fi_reg_a_in;
-assign spec_reg_f_out = (qq == `QQ_REG_AF) ? data[7:0] : z80fi_reg_f_in;
+assign spec_reg_b_out = (qq == `REG_BC) ? data[15:8] : z80fi_reg_b_in;
+assign spec_reg_c_out = (qq == `REG_BC) ? data[7:0] : z80fi_reg_c_in;
+assign spec_reg_d_out = (qq == `REG_DE) ? data[15:8] : z80fi_reg_d_in;
+assign spec_reg_e_out = (qq == `REG_DE) ? data[7:0] : z80fi_reg_e_in;
+assign spec_reg_h_out = (qq == `REG_HL) ? data[15:8] : z80fi_reg_h_in;
+assign spec_reg_l_out = (qq == `REG_HL) ? data[7:0] : z80fi_reg_l_in;
+assign spec_reg_a_out = (qq == `REG_AF) ? data[15:8] : z80fi_reg_a_in;
+assign spec_reg_f_out = (qq == `REG_AF) ? data[7:0] : z80fi_reg_f_in;
 
 assign spec_reg_ip_out = z80fi_reg_ip_in + 1;
 

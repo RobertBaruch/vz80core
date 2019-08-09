@@ -278,6 +278,7 @@ always @(*) begin
         next_z80_reg_ip = z80_reg_ip;
         next_mem_rd = 0;
 
+        // This part collects all the bytes for the current instruction.
         if (collected_insn_ready) begin
             instr_for_decoder = collected_insn;
         end else begin
@@ -293,6 +294,9 @@ always @(*) begin
             next_mem_rd = 1;
         end
 
+        // This part determines the current op and insn length.
+        // (the op is just the opcode part, while the insn includes
+        // the op bytes and the operand bytes).
         if (collected_op_ready) op_len_for_decoder = collected_op_len;
         else op_len_for_decoder = collected_op_len + 1;
 
@@ -305,6 +309,7 @@ always @(*) begin
         next_collected_op_len = op_len_for_decoder;
         next_collected_op_ready = 0;
 
+        // Here we check that we have enough bytes for the op.
         if (decoded_group == `INSN_GROUP_NEED_MORE_BYTES) begin
             next_collected_op_ready = 0;
             next_collected_insn_ready = 0;
@@ -317,6 +322,8 @@ always @(*) begin
             end
         end
 
+    // I guess I could just use collected_insn_ready? In any case, until
+    // we have all the bytes in the instruction, we remain in state 0.
     if (insn_len_for_sequencer == decoded_len) begin
         next_state = state + 1;
 
@@ -631,6 +638,67 @@ always @(*) begin
                     2: begin
                         task_collect_data(2);
                         task_write_reg({`REG_SET_QQ, instr_for_decoder[5:4]}, next_collected_data);
+                        task_done();
+                    end
+                endcase
+
+            `INSN_GROUP_POP_IXIY:  /* POP IX/IY */
+                case (state)
+                    0: begin
+                        task_read_reg(1, `DD_REG_SP);
+                        task_read_mem(1, reg1_rdata);
+                    end
+                    1: begin
+                        task_collect_data(1);
+                        task_read_reg(1, `DD_REG_SP);
+                        task_read_mem(2, reg1_rdata + 16'h1);
+                        task_write_reg(`DD_REG_SP, reg1_rdata + 16'h2);
+                    end
+                    2: begin
+                        task_collect_data(2);
+                        task_write_reg({`REG_SET_IDX, instr_for_decoder[5]}, next_collected_data);
+                        task_done();
+                    end
+                endcase
+
+            `INSN_GROUP_PUSH_QQ:  /* PUSH qq */
+                case (state)
+                    0: begin
+                        task_read_reg(1, `DD_REG_SP);
+                        task_read_reg(2, {`REG_SET_QQ, instr_for_decoder[5:4]});
+                        task_write_mem(1, reg1_rdata - 16'h2, reg2_rdata[7:0]);
+                    end
+                    1: begin
+                        task_write_mem_done(1);
+                        task_read_reg(1, `DD_REG_SP);
+                        task_read_reg(2, {`REG_SET_QQ, instr_for_decoder[5:4]});
+                        task_write_mem(2, reg1_rdata - 16'h1, reg2_rdata[15:8]);
+                    end
+                    2: begin
+                        task_write_mem_done(2);
+                        task_read_reg(1, `DD_REG_SP);
+                        task_write_reg(`DD_REG_SP, reg1_rdata - 16'h2);
+                        task_done();
+                    end
+                endcase
+
+            `INSN_GROUP_PUSH_IXIY:  /* PUSH IX/IY */
+                case (state)
+                    0: begin
+                        task_read_reg(1, `DD_REG_SP);
+                        task_read_reg(2, {`REG_SET_IDX, instr_for_decoder[5]});
+                        task_write_mem(1, reg1_rdata - 16'h2, reg2_rdata[7:0]);
+                    end
+                    1: begin
+                        task_write_mem_done(1);
+                        task_read_reg(1, `DD_REG_SP);
+                        task_read_reg(2, {`REG_SET_IDX, instr_for_decoder[5]});
+                        task_write_mem(2, reg1_rdata - 16'h1, reg2_rdata[15:8]);
+                    end
+                    2: begin
+                        task_write_mem_done(2);
+                        task_read_reg(1, `DD_REG_SP);
+                        task_write_reg(`DD_REG_SP, reg1_rdata - 16'h2);
                         task_done();
                     end
                 endcase

@@ -12,8 +12,8 @@ module z80fi_insn_spec_ld_reg_reg(
 );
 
 wire [1:0] insn_fixed = z80fi_insn[7:6];
-wire [3:0] insn_rreg = {1'b0, z80fi_insn[2:0]};
-wire [3:0] insn_wreg = {1'b0, z80fi_insn[5:3]};
+wire [2:0] insn_rreg  = z80fi_insn[2:0];
+wire [2:0] insn_wreg  = z80fi_insn[5:3];
 
 // LD r, r' instruction
 assign spec_valid = z80fi_valid &&
