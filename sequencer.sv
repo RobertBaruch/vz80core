@@ -49,6 +49,24 @@ logic f_wr;
 logic block_inc;
 logic block_dec;
 
+logic flag_s;
+logic flag_z;
+logic flag_5;
+logic flag_h;
+logic flag_3;
+logic flag_pv;
+logic flag_n;
+logic flag_c;
+
+assign flag_s  = f_rdata[7];
+assign flag_z  = f_rdata[6];
+assign flag_5  = f_rdata[5];
+assign flag_h  = f_rdata[4];
+assign flag_3  = f_rdata[3];
+assign flag_pv = f_rdata[2];
+assign flag_n  = f_rdata[1];
+assign flag_c  = f_rdata[0];
+
 logic i_wr;
 logic [7:0] i_wdata;
 logic r_wr;
@@ -619,6 +637,80 @@ always @(*) begin
                             {`REG_SET_IDX, instr_for_decoder[5]},
                             next_collected_data
                         );
+                        task_done();
+                    end
+                endcase
+
+            `INSN_GROUP_LDD:  /* LDD */
+                case (state)
+                    0: begin
+                        task_read_reg(1, `DD_REG_HL);
+                        task_read_mem(1, reg1_rdata);
+                    end
+                    1: begin
+                        task_collect_data(1);
+                        task_read_reg(1, `DD_REG_DE);
+                        task_write_mem(1, reg1_rdata, next_collected_data[7:0]);
+                        task_block_dec();
+                    end
+                    2: begin
+                        task_write_mem_done(1);
+                        task_done();
+                    end
+                endcase
+
+            `INSN_GROUP_LDI:  /* LDI */
+                case (state)
+                    0: begin
+                        task_read_reg(1, `DD_REG_HL);
+                        task_read_mem(1, reg1_rdata);
+                    end
+                    1: begin
+                        task_collect_data(1);
+                        task_read_reg(1, `DD_REG_DE);
+                        task_write_mem(1, reg1_rdata, next_collected_data[7:0]);
+                        task_block_inc();
+                    end
+                    2: begin
+                        task_write_mem_done(1);
+                        task_done();
+                    end
+                endcase
+
+            `INSN_GROUP_LDDR:  /* LDDR */
+                case (state)
+                    0: begin
+                        task_read_reg(1, `DD_REG_HL);
+                        task_read_mem(1, reg1_rdata);
+                    end
+                    1: begin
+                        task_collect_data(1);
+                        task_read_reg(1, `DD_REG_DE);
+                        task_write_mem(1, reg1_rdata, next_collected_data[7:0]);
+                        task_block_dec();
+                    end
+                    2: begin
+                        task_write_mem_done(1);
+                        next_z80_reg_ip = z80_reg_ip - (flag_pv ? 16'h2 : 0);
+                        task_done();
+                    end
+                endcase
+
+            `INSN_GROUP_LDIR:  /* LDIR */
+                case (state)
+                    0: begin
+                        task_read_reg(1, `DD_REG_HL);
+                        task_read_mem(1, reg1_rdata);
+                    end
+                    1: begin
+                        task_collect_data(1);
+                        task_read_reg(1, `DD_REG_DE);
+                        task_write_mem(1, reg1_rdata, next_collected_data[7:0]);
+                        task_block_inc();
+                    end
+                    2: begin
+                        task_write_mem_done(1);
+                        next_z80_reg_ip = z80_reg_ip - (flag_pv ? 16'h2 : 0);
                         task_done();
                     end
                 endcase

@@ -164,8 +164,20 @@ always @(*) begin
                 group <= `INSN_GROUP_LD_SP_IXIY;
                 len <= 2;
             end
+            16'hA0ED: begin
+                group <= `INSN_GROUP_LDI;
+                len <= 2;
+            end
+            16'hB0ED: begin
+                group <= `INSN_GROUP_LDIR;
+                len <= 2;
+            end
             16'hA8ED: begin
                 group <= `INSN_GROUP_LDD;
+                len <= 2;
+            end
+            16'hB8ED: begin
+                group <= `INSN_GROUP_LDDR;
                 len <= 2;
             end
             default: begin

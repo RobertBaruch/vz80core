@@ -121,6 +121,22 @@ begin
 end
 endtask
 
+// Sets up the registers to do a block increment operation on the
+// next positive edge of the clock.
+task task_block_inc;
+begin
+    block_inc = 1;
+end
+endtask
+
+// Sets up the registers to do a block decrement operation on the
+// next positive edge of the clock.
+task task_block_dec;
+begin
+    block_dec = 1;
+end
+endtask
+
 // task_write_i writes the I register on the next positive edge of the clock.
 task task_write_i;
     input [7:0] local_data;

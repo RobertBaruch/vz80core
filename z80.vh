@@ -119,6 +119,9 @@
 `define INSN_GROUP_PUSH_QQ 28          /* PUSH qq          */
 `define INSN_GROUP_PUSH_IXIY 29        /* PUSH IX/IY       */
 `define INSN_GROUP_LDD 30              /* LDD              */
+`define INSN_GROUP_LDI 31              /* LDI              */
+`define INSN_GROUP_LDDR 32             /* LDDR             */
+`define INSN_GROUP_LDIR 33             /* LDIR             */
 
 `define Z80_REGS_OUTPUTS \
 output [7:0] z80_reg_a, \
