@@ -10,14 +10,16 @@
 // task_collect_data(n)
 // task_write_mem(n, addr, data)  // requires delay with task_write_mem_done(n)
 // task_write_mem_done(n)
-// task_read_reg8(n, rnum)
-// task_read_reg16(n, rnum)
-// task_write_reg8(rnum, data)
-// task_write_reg16(rnum, data)
-// task_write_reg_pair(rnum, data)
+// task_read_reg(n, rnum)
+// task_write_reg(rnum, data)
 // task_write_i(data)  // write the I register
 // task_write_r(data)  // write the R register
 // task_write_f(data)  // write the Flags register
+// task_block_inc()
+// task_block_dec()
+// task_ex_de_hl()
+// task_ex_af_af2()
+// task_exx()
 
 // task_read_mem(n, addr)
 // Set up to read memory at the given address. n is the
@@ -134,6 +136,30 @@ endtask
 task task_block_dec;
 begin
     block_dec = 1;
+end
+endtask
+
+// Sets up the registers to exchange DE and HL on the
+// next positive edge of the clock.
+task task_ex_de_hl;
+begin
+    ex_de_hl = 1;
+end
+endtask
+
+// Sets up the registers to exchange AF and AF2 on the
+// next positive edge of the clock.
+task task_ex_af_af2;
+begin
+    ex_af_af2 = 1;
+end
+endtask
+
+// Sets up the registers to exchange BC, DE, HL and BC2, DE2, HL2
+// on the next positive edge of the clock.
+task task_exx;
+begin
+    exx = 1;
 end
 endtask
 

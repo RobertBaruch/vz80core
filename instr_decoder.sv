@@ -83,6 +83,18 @@ always @(*) begin
                 group <= `INSN_GROUP_PUSH_QQ;
                 len <= 1;
             end
+            8'h08: begin
+                group <= `INSN_GROUP_EX_AF_AF2;
+                len <= 1;
+            end
+            8'hEB: begin
+                group <= `INSN_GROUP_EX_DE_HL;
+                len <= 1;
+            end
+            8'hD9: begin
+                group <= `INSN_GROUP_EXX;
+                len <= 1;
+            end
             8'hF9: begin
                 group <= `INSN_GROUP_LD_SP_HL;
                 len <= 1;

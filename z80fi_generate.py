@@ -38,10 +38,12 @@ z80fi_signals = [("valid", 1), ("insn", 32), ("insn_len", 3), ("mem_rd", 1),
 # These are the signals which are registers, so they don't have to be
 # registered again. z80fi signals will be generated for z80fi_{register}_in and
 # z80fi_{register}_out.
-z80fi_registers = [("reg_ip", 16), ("reg_a", 8), ("reg_b", 8), ("reg_c", 8),
-                   ("reg_d", 8), ("reg_e", 8), ("reg_h", 8), ("reg_l", 8),
-                   ("reg_ix", 16), ("reg_iy", 16), ("reg_sp", 16),
-                   ("reg_i", 8), ("reg_r", 8), ("reg_f", 8), ("reg_iff1", 1),
+z80fi_registers = [("reg_ip", 16), ("reg_a", 8), ("reg_f", 8), ("reg_b", 8),
+                   ("reg_c", 8), ("reg_d", 8), ("reg_e", 8), ("reg_h", 8),
+                   ("reg_l", 8), ("reg_a2", 8), ("reg_f2", 8), ("reg_b2", 8),
+                   ("reg_c2", 8), ("reg_d2", 8), ("reg_e2", 8), ("reg_h2", 8),
+                   ("reg_l2", 8), ("reg_ix", 16), ("reg_iy", 16),
+                   ("reg_sp", 16), ("reg_i", 8), ("reg_r", 8), ("reg_iff1", 1),
                    ("reg_iff2", 1)]
 z80fi_registers_in = [(f"{s[0]}_in", s[1]) for s in z80fi_registers]
 z80fi_registers_out = [(f"{s[0]}_out", s[1]) for s in z80fi_registers]
@@ -233,7 +235,11 @@ with open("z80fi_signals.vh", "w") as f:
         | wire [15:0] z80fi_reg_bc_in = {{z80fi_reg_b_in, z80fi_reg_c_in}}; \\
         | wire [15:0] z80fi_reg_de_in = {{z80fi_reg_d_in, z80fi_reg_e_in}}; \\
         | wire [15:0] z80fi_reg_hl_in = {{z80fi_reg_h_in, z80fi_reg_l_in}}; \\
-        | wire [15:0] z80fi_reg_af_in = {{z80fi_reg_a_in, z80fi_reg_f_in}};
+        | wire [15:0] z80fi_reg_af_in = {{z80fi_reg_a_in, z80fi_reg_f_in}}; \\
+        | wire [15:0] z80fi_reg_bc2_in = {{z80fi_reg_b2_in, z80fi_reg_c2_in}}; \\
+        | wire [15:0] z80fi_reg_de2_in = {{z80fi_reg_d2_in, z80fi_reg_e2_in}}; \\
+        | wire [15:0] z80fi_reg_hl2_in = {{z80fi_reg_h2_in, z80fi_reg_l2_in}}; \\
+        | wire [15:0] z80fi_reg_af2_in = {{z80fi_reg_a2_in, z80fi_reg_f2_in}};
         |
         | `define Z80FI_SPEC_WIRES \\
         {z80fi_spec_wires}

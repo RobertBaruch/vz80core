@@ -20,6 +20,10 @@
 `define SPEC_REG_DE (`SPEC_REG_D | `SPEC_REG_E)
 `define SPEC_REG_HL (`SPEC_REG_H | `SPEC_REG_L)
 `define SPEC_REG_AF (`SPEC_REG_A | `SPEC_REG_F)
+`define SPEC_REG_BC2 (`SPEC_REG_B2 | `SPEC_REG_C2)
+`define SPEC_REG_DE2 (`SPEC_REG_D2 | `SPEC_REG_E2)
+`define SPEC_REG_HL2 (`SPEC_REG_H2 | `SPEC_REG_L2)
+`define SPEC_REG_AF2 (`SPEC_REG_A2 | `SPEC_REG_F2)
 
 // Z80FI signal definitions:
 //

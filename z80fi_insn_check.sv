@@ -65,18 +65,26 @@ always @(*) begin
         // Check that all the registers either didn't change if they're
         // not supposed to, or did change to the correct value.
         assert(reg_a_out == (spec_reg_a ? spec_reg_a_out : z80fi_reg_a_in));
+        assert(reg_f_out == (spec_reg_f ? spec_reg_f_out : z80fi_reg_f_in));
         assert(reg_b_out == (spec_reg_b ? spec_reg_b_out : z80fi_reg_b_in));
         assert(reg_c_out == (spec_reg_c ? spec_reg_c_out : z80fi_reg_c_in));
         assert(reg_d_out == (spec_reg_d ? spec_reg_d_out : z80fi_reg_d_in));
         assert(reg_e_out == (spec_reg_e ? spec_reg_e_out : z80fi_reg_e_in));
         assert(reg_h_out == (spec_reg_h ? spec_reg_h_out : z80fi_reg_h_in));
         assert(reg_l_out == (spec_reg_l ? spec_reg_l_out : z80fi_reg_l_in));
+        assert(reg_a2_out == (spec_reg_a2 ? spec_reg_a2_out : z80fi_reg_a2_in));
+        assert(reg_f2_out == (spec_reg_f2 ? spec_reg_f2_out : z80fi_reg_f2_in));
+        assert(reg_b2_out == (spec_reg_b2 ? spec_reg_b2_out : z80fi_reg_b2_in));
+        assert(reg_c2_out == (spec_reg_c2 ? spec_reg_c2_out : z80fi_reg_c2_in));
+        assert(reg_d2_out == (spec_reg_d2 ? spec_reg_d2_out : z80fi_reg_d2_in));
+        assert(reg_e2_out == (spec_reg_e2 ? spec_reg_e2_out : z80fi_reg_e2_in));
+        assert(reg_h2_out == (spec_reg_h2 ? spec_reg_h2_out : z80fi_reg_h2_in));
+        assert(reg_l2_out == (spec_reg_l2 ? spec_reg_l2_out : z80fi_reg_l2_in));
         assert(reg_ix_out == (spec_reg_ix ? spec_reg_ix_out : z80fi_reg_ix_in));
         assert(reg_iy_out == (spec_reg_iy ? spec_reg_iy_out : z80fi_reg_iy_in));
         assert(reg_sp_out == (spec_reg_sp ? spec_reg_sp_out : z80fi_reg_sp_in));
         assert(reg_i_out == (spec_reg_i ? spec_reg_i_out : z80fi_reg_i_in));
         assert(reg_r_out == (spec_reg_r ? spec_reg_r_out : z80fi_reg_r_in));
-        assert(reg_f_out == (spec_reg_f ? spec_reg_f_out : z80fi_reg_f_in));
         assert(reg_iff1_out == (spec_reg_iff1 ? spec_reg_iff1_out : z80fi_reg_iff1_in));
         assert(reg_iff2_out == (spec_reg_iff2 ? spec_reg_iff2_out : z80fi_reg_iff2_in));
     end

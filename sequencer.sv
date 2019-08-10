@@ -48,6 +48,9 @@ logic [7:0] f_wdata;
 logic f_wr;
 logic block_inc;
 logic block_dec;
+logic ex_de_hl;
+logic ex_af_af2;
+logic exx;
 
 logic flag_s;
 logic flag_z;
@@ -209,7 +212,10 @@ registers registers(
     .f_wr(f_wr),
 
     .block_inc(block_inc),
-    .block_dec(block_dec)
+    .block_dec(block_dec),
+    .ex_de_hl(ex_de_hl),
+    .ex_af_af2(ex_af_af2),
+    .exx(exx)
 
 `ifdef Z80_FORMAL
     ,
@@ -277,6 +283,9 @@ always @(*) begin
     reg_wdata = 0;
     block_inc = 0;
     block_dec = 0;
+    ex_de_hl = 0;
+    ex_af_af2 = 0;
+    exx = 0;
 
     i_wr = 0;
     i_wdata = 0;
@@ -794,6 +803,21 @@ always @(*) begin
                         task_done();
                     end
                 endcase
+
+            `INSN_GROUP_EX_DE_HL: begin /* EX DE, HL */
+                task_ex_de_hl();
+                task_done();
+            end
+
+            `INSN_GROUP_EX_AF_AF2: begin /* EX AF, AF2 */
+                task_ex_af_af2();
+                task_done();
+            end
+
+            `INSN_GROUP_EXX: begin /* EXX */
+                task_exx();
+                task_done();
+            end
 
             default: begin // For now, just assume done
                 next_done = 1;

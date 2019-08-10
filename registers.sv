@@ -8,6 +8,23 @@
 // registers stores the A, B, C, D, E, H, L, IX, IY, SP, and Flags
 // registers. You can read any two registers or register pairs
 // at a time, and write one of them. Flags are always output.
+//
+// The write methods, aside from writing flags, are:
+//
+// * write one register
+// * block increment
+// * block decrement
+// * exchange DE and HL
+// * exchange AF and AF2
+// * exchange BE, DE, HL and BE2, DE2, HL2.
+//
+// Only one of the write methods can be active at a time. If
+// more than one is active, then none will actually happen.
+//
+// Writing flags is not compatible with block inc/dec or exchanging
+// AF with AF2, because those set flags too. You also can't write
+// flags through f_wr/f_in and write flags through write_en at the
+// same time.
 module registers(
     input logic reset,
     input logic clk,
@@ -32,12 +49,19 @@ module registers(
     input logic f_wr,
 
     // DE <- DE + 1, HL <- HL + 1, BC <- BC - 1
-    // overrides any other write, except block_dec.
     input logic block_inc,
 
     // DE <- DE - 1, HL <- HL - 1, BC <- BC - 1
-    // overrides any other write, including block_inc.
-    input logic block_dec
+    input logic block_dec,
+
+    // DE <-> HL
+    input logic ex_de_hl,
+
+    // AF <-> AF2
+    input logic ex_af_af2,
+
+    // (BC, DE, HL) <-> (BC2, DE2, HL2)
+    input logic exx
 
 `ifdef Z80_FORMAL
     ,
@@ -96,12 +120,39 @@ logic [15:0] next_sp;
   assign z80_reg_sp = _sp;
 `endif // Z80_FORMAL
 
-logic f_wr2;
-assign f_wr2 = f_wr && !block_inc && !block_dec && !(write_en && (dest == `QQ_REG_AF));
 assign reg_f = _af[7:0];
 
-logic write_en2;
-assign write_en2 = write_en && !block_inc && !block_dec;
+logic _writing_flags;
+assign _writing_flags = write_en && (dest == `QQ_REG_AF);
+
+logic _f_wr;
+assign _f_wr = f_wr && !block_inc && !block_dec &&
+    !_writing_flags && !ex_af_af2;
+
+logic _write_en;
+assign _write_en = write_en && !block_inc && !block_dec &&
+    !ex_de_hl && !ex_af_af2 && !exx;
+
+logic _block_inc;
+assign _block_inc = !write_en && block_inc && !block_dec &&
+    !ex_de_hl && !ex_af_af2 && !exx && !f_wr && !_writing_flags;
+
+logic _block_dec;
+assign _block_dec = !write_en && !block_inc && block_dec &&
+    !ex_de_hl && !ex_af_af2 && !exx && !f_wr && !_writing_flags;
+
+logic _ex_de_hl;
+assign _ex_de_hl = !write_en && !block_inc && !block_dec &&
+    ex_de_hl && !ex_af_af2 && !exx;
+
+logic _ex_af_af2;
+assign _ex_af_af2 = !write_en && !block_inc && !block_dec &&
+    !ex_de_hl && ex_af_af2 && !exx && !f_wr && !_writing_flags;
+
+logic _exx;
+assign _exx = !write_en && !block_inc && !block_dec &&
+    !ex_de_hl && !ex_af_af2 && exx;
+
 
 always @(*) begin
     out1[15:0] = 0;
@@ -160,8 +211,11 @@ always @(posedge clk or posedge reset) begin
     _iy <= 0;
     _sp <= 0;
   end else begin
-    if (f_wr2) _af[7:0] <= f_in;
-    if (write_en2) begin
+    // You can write flags while doing other things, as long as
+    // those other things don't also write flags.
+    if (_f_wr) _af[7:0] <= f_in;
+
+    if (_write_en) begin
       case (dest)
         `REG_A: _af[15:8] <= in[7:0];
         `REG_B: _bc[15:8] <= in[7:0];
@@ -181,19 +235,33 @@ always @(posedge clk or posedge reset) begin
         `IDX_REG_IX: _ix <= in;
         `IDX_REG_IY: _iy <= in;
       endcase
-    end else if (block_inc) begin
+    end else if (_block_inc) begin
       _de <= _de + 16'b1;
       _hl <= _hl + 16'b1;
       _bc <= _bc - 16'b1;
       _af[7:0] <= (_af[7:0] & `FLAG_H_MASK & `FLAG_N_MASK & `FLAG_PV_MASK) |
         (_bc - 16'b1 == 16'b0 ? 0 : `FLAG_PV_BIT);
-    end else if (block_dec) begin
+    end else if (_block_dec) begin
       _de <= _de - 16'b1;
       _hl <= _hl - 16'b1;
       _bc <= _bc - 16'b1;
       _af[7:0] <= (_af[7:0] & `FLAG_H_MASK & `FLAG_N_MASK & `FLAG_PV_MASK) |
         (_bc - 16'b1 == 16'b0 ? 0 : `FLAG_PV_BIT);
+    end else if (_ex_de_hl) begin
+      _de <= _hl;
+      _hl <= _de;
+    end else if (_ex_af_af2) begin
+      _af <= _af2;
+      _af2 <= _af;
+    end else if (_exx) begin
+      _bc <= _bc2;
+      _de <= _de2;
+      _hl <= _hl2;
+      _bc2 <= _bc;
+      _de2 <= _de;
+      _hl2 <= _hl;
     end
+
   end
 end
 
@@ -224,23 +292,23 @@ always @(posedge clk) begin
     assume(!reset && $past(!reset));
 
     // Check 8-bit register writes and reads from src1 and src2.
-    if ($past(write_en2) && $past(dest) == src1 && is_8bit(src1))
+    if ($past(_write_en) && $past(dest) == src1 && is_8bit(src1))
       assert(out1[7:0] == $past(in[7:0]));
-    if ($past(write_en2) && $past(dest) == src2 && is_8bit(src2))
+    if ($past(_write_en) && $past(dest) == src2 && is_8bit(src2))
       assert(out2[7:0] == $past(in[7:0]));
 
     // Check 16-bit register writes and reads from src1 and src2.
-    if ($past(write_en2) && $past(dest) == src1 && is_16bit(src1))
+    if ($past(_write_en) && $past(dest) == src1 && is_16bit(src1))
       assert(out1 == $past(in));
-    if ($past(write_en2) && $past(dest) == src2 && is_16bit(src2))
+    if ($past(_write_en) && $past(dest) == src2 && is_16bit(src2))
       assert(out2 == $past(in));
 
     // Check writing flags.
-    if ($past(f_wr2))
+    if ($past(_f_wr))
       assert(reg_f == $past(f_in));
 
     // Check block increment
-    if (!write_en && !f_wr && !block_dec && $past(!write_en && !f_wr && !block_dec) && $fell(block_inc)) begin
+    if ($past(_block_inc)) begin
       assert(_de == $past(_de) + 16'b1);
       assert(_hl == $past(_hl) + 16'b1);
       assert(_bc == $past(_bc) - 16'b1);
@@ -255,7 +323,7 @@ always @(posedge clk) begin
     end
 
     // Check block decrement
-    if (!write_en && !f_wr && !block_inc && $past(!write_en && !f_wr && !block_inc) && $fell(block_dec)) begin
+    if ($past(_block_dec)) begin
       assert(_de == $past(_de) - 16'b1);
       assert(_hl == $past(_hl) - 16'b1);
       assert(_bc == $past(_bc) - 16'b1);
@@ -271,7 +339,7 @@ always @(posedge clk) begin
 
   end
   cover(_bc == 16'h1234 && _ix == 16'h1234 && out1[15:0] == 16'h5678 && out2[15:0] == 16'h0098);
-  cover($past(_af) == 16'hFFFF && reg_f == 0 && $past(f_wr2));
+  cover($past(_af) == 16'hFFFF && reg_f == 0 && $past(_f_wr));
 end
 `endif
 

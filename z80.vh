@@ -122,6 +122,9 @@
 `define INSN_GROUP_LDI 31              /* LDI              */
 `define INSN_GROUP_LDDR 32             /* LDDR             */
 `define INSN_GROUP_LDIR 33             /* LDIR             */
+`define INSN_GROUP_EX_DE_HL 34         /* EX DE, HL        */
+`define INSN_GROUP_EX_AF_AF2 35        /* EX AF, AF2       */
+`define INSN_GROUP_EXX 36              /* EXX              */
 
 `define Z80_REGS_OUTPUTS \
 output [7:0] z80_reg_a, \
