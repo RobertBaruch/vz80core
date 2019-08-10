@@ -27,7 +27,10 @@ module z80fi_insn_check(
 `ifdef FORMAL
 always @(*) begin
     if (!reset) begin
+        // Make sure we can generate the instruction under test.
         cover(spec_valid);
+        // Make sure we can generate the instructino under test
+        // during the check cycle (typically the last cycle).
         cover(check && spec_valid);
     end
     if (!reset && check) begin
@@ -65,7 +68,18 @@ always @(*) begin
         // Check that all the registers either didn't change if they're
         // not supposed to, or did change to the correct value.
         assert(reg_a_out == (spec_reg_a ? spec_reg_a_out : z80fi_reg_a_in));
-        assert(reg_f_out == (spec_reg_f ? spec_reg_f_out : z80fi_reg_f_in));
+
+        // Separate out the flags to separate asserts for easier debugging.
+        // S Z 5 H 3 V N C
+        assert(reg_f_out[7] == (spec_reg_f ? spec_reg_f_out[7] : z80fi_reg_f_in[7]));
+        assert(reg_f_out[6] == (spec_reg_f ? spec_reg_f_out[6] : z80fi_reg_f_in[6]));
+        assert(reg_f_out[5] == (spec_reg_f ? spec_reg_f_out[5] : z80fi_reg_f_in[5]));
+        assert(reg_f_out[4] == (spec_reg_f ? spec_reg_f_out[4] : z80fi_reg_f_in[4]));
+        assert(reg_f_out[3] == (spec_reg_f ? spec_reg_f_out[3] : z80fi_reg_f_in[3]));
+        assert(reg_f_out[2] == (spec_reg_f ? spec_reg_f_out[2] : z80fi_reg_f_in[2]));
+        assert(reg_f_out[1] == (spec_reg_f ? spec_reg_f_out[1] : z80fi_reg_f_in[1]));
+        assert(reg_f_out[0] == (spec_reg_f ? spec_reg_f_out[0] : z80fi_reg_f_in[0]));
+
         assert(reg_b_out == (spec_reg_b ? spec_reg_b_out : z80fi_reg_b_in));
         assert(reg_c_out == (spec_reg_c ? spec_reg_c_out : z80fi_reg_c_in));
         assert(reg_d_out == (spec_reg_d ? spec_reg_d_out : z80fi_reg_d_in));

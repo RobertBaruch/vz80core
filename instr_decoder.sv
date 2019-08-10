@@ -188,16 +188,32 @@ always @(*) begin
                 group <= `INSN_GROUP_LDI;
                 len <= 2;
             end
-            16'hB0ED: begin
-                group <= `INSN_GROUP_LDIR;
+            16'hA1ED: begin
+                group <= `INSN_GROUP_CPI;
                 len <= 2;
             end
             16'hA8ED: begin
                 group <= `INSN_GROUP_LDD;
                 len <= 2;
             end
+            16'hA9ED: begin
+                group <= `INSN_GROUP_CPD;
+                len <= 2;
+            end
+            16'hB0ED: begin
+                group <= `INSN_GROUP_LDIR;
+                len <= 2;
+            end
+            16'hB1ED: begin
+                group <= `INSN_GROUP_CPIR;
+                len <= 2;
+            end
             16'hB8ED: begin
                 group <= `INSN_GROUP_LDDR;
+                len <= 2;
+            end
+            16'hB9ED: begin
+                group <= `INSN_GROUP_CPDR;
                 len <= 2;
             end
             default: begin

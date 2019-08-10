@@ -86,6 +86,21 @@
 `define FLAG_C_BIT  8'b00000001
 `define FLAG_C_MASK (~`FLAG_C_BIT)
 
+// A function that keeps all of the flags in f1 specified in mask1,
+// and the rest are taken from f2.
+function [7:0] _combine_flags(input [7:0] f1, input [7:0] f2, input [7:0] mask1);
+  _combine_flags = (f1 & mask1) | (f2 & ~mask1);
+endfunction
+
+
+`define ALU_FUNC_ADD 0
+`define ALU_FUNC_ADC 1
+`define ALU_FUNC_SUB 2
+`define ALU_FUNC_SBC 3
+`define ALU_FUNC_AND 4
+`define ALU_FUNC_XOR 5
+`define ALU_FUNC_OR 6
+
 `define INSN_GROUP_NEED_MORE_BYTES 254
 `define INSN_GROUP_ILLEGAL_INSTR 255
 `define INSN_GROUP_LD_REG_REG 0        /* LD  r, r'        */
@@ -127,6 +142,10 @@
 `define INSN_GROUP_EXX 36              /* EXX              */
 `define INSN_GROUP_EX_IND_SP_HL 37     /* EX (SP), HL      */
 `define INSN_GROUP_EX_IND_SP_IXIY 38   /* EX (SP), IX/IY   */
+`define INSN_GROUP_CPD 39              /* CPD              */
+`define INSN_GROUP_CPI 40              /* CPI              */
+`define INSN_GROUP_CPDR 41             /* CPDR             */
+`define INSN_GROUP_CPIR 42             /* CPIR             */
 
 `define Z80_REGS_OUTPUTS \
 output [7:0] z80_reg_a, \

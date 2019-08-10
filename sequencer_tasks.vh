@@ -17,6 +17,8 @@
 // task_write_f(data)  // write the Flags register
 // task_block_inc()
 // task_block_dec()
+// task_compare_block_inc()
+// task_compare_block_dec()
 // task_ex_de_hl()
 // task_ex_af_af2()
 // task_exx()
@@ -139,6 +141,24 @@ begin
 end
 endtask
 
+// Sets up the registers to do a compare block increment operation on the
+// next positive edge of the clock.
+task task_compare_block_inc;
+begin
+    block_inc = 1;
+    block_compare = 1;
+end
+endtask
+
+// Sets up the registers to do a compare block decrement operation on the
+// next positive edge of the clock.
+task task_compare_block_dec;
+begin
+    block_dec = 1;
+    block_compare = 1;
+end
+endtask
+
 // Sets up the registers to exchange DE and HL on the
 // next positive edge of the clock.
 task task_ex_de_hl;
@@ -187,6 +207,17 @@ task task_write_f;
 begin
     f_wr = 1;
     f_wdata = local_data;
+end
+endtask
+
+task task_alu8_compare;
+    input [7:0] local_x;
+    input [7:0] local_y;
+begin
+    alu8_x = local_x;
+    alu8_y = local_y;
+    alu8_f_in = f_rdata;
+    alu8_func = `ALU_FUNC_SUB;
 end
 endtask
 

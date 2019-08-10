@@ -25,6 +25,29 @@
 `define SPEC_REG_HL2 (`SPEC_REG_H2 | `SPEC_REG_L2)
 `define SPEC_REG_AF2 (`SPEC_REG_A2 | `SPEC_REG_F2)
 
+// Functions useful for checking flags
+function parity8(input [7:0] x);
+  parity8 = x[0] ^ x[1] ^ x[2] ^ x[3] ^ x[4] ^ x[5] ^ x[6] ^ x[7];
+endfunction
+
+function halfcarry8(input [7:0] x, input [7:0] y, input carry);
+  reg [4:0] out;
+  out = x[3:0] + y[3:0] + carry;
+  halfcarry8 = out[4];
+endfunction
+
+function carry8(input [7:0] x, input [7:0] y, input carry);
+  reg [8:0] out;
+  out = x + y + carry;
+  carry8 = out[8];
+endfunction
+
+function overflow8(input [7:0] x, input [7:0] y, input carry);
+  reg [7:0] out;
+  out = x[6:0] + y[6:0] + carry;
+  overflow8 = carry8(x, y, carry) ^ out[7];
+endfunction
+
 // Z80FI signal definitions:
 //
 // z80fi_valid:

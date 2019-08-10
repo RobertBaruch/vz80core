@@ -54,6 +54,11 @@ module registers(
     // DE <- DE - 1, HL <- HL - 1, BC <- BC - 1
     input logic block_dec,
 
+    // When executing CPD/CPI instructions, DE is not changed
+    // and flags N and H are not cleared, so set this high
+    // along with one of the block_inc/block_dec signals.
+    input logic block_compare,
+
     // DE <-> HL
     input logic ex_de_hl,
 
@@ -236,17 +241,19 @@ always @(posedge clk or posedge reset) begin
         `IDX_REG_IY: _iy <= in;
       endcase
     end else if (_block_inc) begin
-      _de <= _de + 16'b1;
+      if (!block_compare) _de <= _de + 16'b1;
       _hl <= _hl + 16'b1;
       _bc <= _bc - 16'b1;
-      _af[7:0] <= (_af[7:0] & `FLAG_H_MASK & `FLAG_N_MASK & `FLAG_PV_MASK) |
-        (_bc - 16'b1 == 16'b0 ? 0 : `FLAG_PV_BIT);
+      _af[7:0] <= ((_af[7:0] & `FLAG_PV_MASK) |
+        (_bc - 16'b1 == 16'b0 ? 0 : `FLAG_PV_BIT)) &
+        (block_compare ? 8'hFF : (`FLAG_H_MASK & `FLAG_N_MASK));
     end else if (_block_dec) begin
-      _de <= _de - 16'b1;
+      if (!block_compare) _de <= _de - 16'b1;
       _hl <= _hl - 16'b1;
       _bc <= _bc - 16'b1;
-      _af[7:0] <= (_af[7:0] & `FLAG_H_MASK & `FLAG_N_MASK & `FLAG_PV_MASK) |
-        (_bc - 16'b1 == 16'b0 ? 0 : `FLAG_PV_BIT);
+      _af[7:0] <= ((_af[7:0] & `FLAG_PV_MASK) |
+        (_bc - 16'b1 == 16'b0 ? 0 : `FLAG_PV_BIT)) &
+        (block_compare ? 8'hFF : (`FLAG_H_MASK & `FLAG_N_MASK));
     end else if (_ex_de_hl) begin
       _de <= _hl;
       _hl <= _de;
@@ -309,31 +316,37 @@ always @(posedge clk) begin
 
     // Check block increment
     if ($past(_block_inc)) begin
-      assert(_de == $past(_de) + 16'b1);
+      if ($past(block_compare)) assert($stable(_de));
+      else assert(_de == $past(_de) + 16'b1);
       assert(_hl == $past(_hl) + 16'b1);
       assert(_bc == $past(_bc) - 16'b1);
       assert($stable(reg_f & `FLAG_S_BIT));
       assert($stable(reg_f & `FLAG_Z_BIT));
       assert($stable(reg_f & `FLAG_5_BIT));
-      assert((reg_f & `FLAG_H_BIT) == 0);
+      if ($past(block_compare)) assert($stable(reg_f & `FLAG_H_BIT));
+      else assert((reg_f & `FLAG_H_BIT) == 0);
       assert($stable(reg_f & `FLAG_3_BIT));
       assert((reg_f & `FLAG_PV_BIT) == (_bc == 16'b0 ? 0 : `FLAG_PV_BIT));
-      assert((reg_f & `FLAG_N_BIT) == 0);
+      if ($past(block_compare)) assert($stable(reg_f & `FLAG_N_BIT));
+      else assert((reg_f & `FLAG_N_BIT) == 0);
       assert($stable(reg_f & `FLAG_C_BIT));
     end
 
     // Check block decrement
     if ($past(_block_dec)) begin
-      assert(_de == $past(_de) - 16'b1);
+      if ($past(block_compare)) assert($stable(_de));
+      else assert(_de == $past(_de) - 16'b1);
       assert(_hl == $past(_hl) - 16'b1);
       assert(_bc == $past(_bc) - 16'b1);
       assert($stable(reg_f & `FLAG_S_BIT));
       assert($stable(reg_f & `FLAG_Z_BIT));
       assert($stable(reg_f & `FLAG_5_BIT));
-      assert((reg_f & `FLAG_H_BIT) == 0);
+      if ($past(block_compare)) assert($stable(reg_f & `FLAG_H_BIT));
+      else assert((reg_f & `FLAG_H_BIT) == 0);
       assert($stable(reg_f & `FLAG_3_BIT));
       assert((reg_f & `FLAG_PV_BIT) == (_bc == 16'b0 ? 0 : `FLAG_PV_BIT));
-      assert((reg_f & `FLAG_N_BIT) == 0);
+      if ($past(block_compare)) assert($stable(reg_f & `FLAG_N_BIT));
+      else assert((reg_f & `FLAG_N_BIT) == 0);
       assert($stable(reg_f & `FLAG_C_BIT));
     end
 

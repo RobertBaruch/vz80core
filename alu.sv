@@ -1,8 +1,10 @@
-`ifndef _alu_vh_
-`define _alu_vh_
+`ifndef _alu_sv_
+`define _alu_sv_
 
 `default_nettype none
 `timescale 1us/100 ns
+
+`include "z80.vh"
 
 function _alu_iszero8(input [7:0] x);
   _alu_iszero8 = (x == 0);
@@ -37,12 +39,14 @@ module adc8(
 
 logic flag_s; // sign
 logic flag_z; // zero
+logic flag_5; // flag 5
 logic flag_h; // half-carry
+logic flag_3; // flag 3
 logic flag_v; // parity/overflow
 logic flag_n; // negative
 logic flag_c; // carry
 
-assign f = {flag_s, flag_z, 1'b0, flag_h, 1'b0, flag_v, flag_n, flag_c};
+assign f = {flag_s, flag_z, flag_5, flag_h, flag_3, flag_v, flag_n, flag_c};
 
 logic [4:0] out_lo;
 logic [3:0] out_hi1;
@@ -59,6 +63,8 @@ always @(*) begin
       flag_n = sub_y;
       flag_c = out_hi2[1];
       flag_v = out_hi2[1] ^ out_hi1[3];
+      flag_5 = 0; // will be overwritten in the parent alu
+      flag_3 = 0; // will be overwritten in the parent alu
 end
 
 endmodule
@@ -74,12 +80,14 @@ module adc16(
 
 logic flag_s; // sign
 logic flag_z; // zero
+logic flag_5; // flag 5
 logic flag_h; // half-carry
+logic flag_3; // flag 3
 logic flag_v; // parity/overflow
 logic flag_n; // negative
 logic flag_c; // carry
 
-assign f = {flag_s, flag_z, 1'b0, flag_h, 1'b0, flag_v, flag_n, flag_c};
+assign f = {flag_s, flag_z, flag_5, flag_h, flag_3, flag_v, flag_n, flag_c};
 
 logic [12:0] out_lo;
 logic [4:0] out_hi;
@@ -94,6 +102,8 @@ always @(*) begin
       flag_v = f_in[2];
       flag_n = sub_y;
       flag_c = out_hi[4];
+      flag_5 = 0; // will be overwritten in the parent alu
+      flag_3 = 0; // will be overwritten in the parent alu
 end
 
 endmodule
@@ -108,8 +118,12 @@ module alu8(
 );
 
 logic carry;
-
 assign carry = f_in[0];
+
+logic [7:0] flag_5;
+logic [7:0] flag_3;
+assign flag_5 = f_in & `FLAG_5_BIT;
+assign flag_3 = f_in & `FLAG_3_BIT;
 
 logic [7:0] add_out, add_f;
 adc8 add8(
@@ -154,31 +168,31 @@ adc8 sbc8(
 always @(*) begin
   case (func)
     // ADD. Use also for INC (set y = 1, ignore flags).
-    0: begin
+    `ALU_FUNC_ADD: begin
         out = add_out;
         f = add_f;
     end
 
     // ADC
-    1: begin
+    `ALU_FUNC_ADC: begin
         out = adc_out;
         f = adc_f;
     end
 
     // SUB. Use also for DEC (set y = 1, ignore flags) and CP (ignore out).
-    2: begin
+    `ALU_FUNC_SUB: begin
         out = sub_out;
         f = sub_f;
     end
-    
+
     // SBC
-    3: begin
+    `ALU_FUNC_SBC: begin
         out = sbc_out;
         f = sbc_f;
     end
 
     // AND
-    4: begin
+    `ALU_FUNC_AND: begin
       out = x & y;
       f = {
         out[7], // sign
@@ -190,7 +204,7 @@ always @(*) begin
     end
 
     // XOR
-    5: begin
+    `ALU_FUNC_XOR: begin
       out = x ^ y;
       f = {
         out[7], // sign
@@ -202,7 +216,7 @@ always @(*) begin
     end
 
     // OR
-    6: begin
+    `ALU_FUNC_OR: begin
       out = x | y;
       f = {
         out[7], // sign
@@ -219,6 +233,8 @@ always @(*) begin
     end
 
   endcase
+
+  f = (f & `FLAG_5_MASK & `FLAG_3_MASK) | flag_5 | flag_3;
 end
 
 endmodule
@@ -231,6 +247,11 @@ module alu16(
     output logic [15:0] out,
     output logic [7:0] f
 );
+
+logic [7:0] flag_5;
+logic [7:0] flag_3;
+assign flag_5 = f_in & `FLAG_5_BIT;
+assign flag_3 = f_in & `FLAG_3_BIT;
 
 logic [15:0] add_out;
 logic [7:0] add_f;
@@ -279,31 +300,33 @@ adc16 sbc16(
 always @(*) begin
   case (func)
     // ADD. Use also for INC (set y = 1, ignore flags).
-    0: begin
+    `ALU_FUNC_ADD: begin
         out = add_out;
         f = add_f;
     end
 
     // ADC
-    1: begin
+    `ALU_FUNC_ADC: begin
         out = adc_out;
         f = adc_f;
     end
 
     // SUB. Use also for DEC (set y = 1, ignore flags) and CP (ignore out).
-    2: begin
+    `ALU_FUNC_SUB: begin
         out = sub_out;
         f = sub_f;
     end
-    
+
     // SBC
-    3: begin
+    `ALU_FUNC_SBC: begin
         out = sbc_out;
         f = sbc_f;
     end
   endcase
+
+  f = (f & `FLAG_5_MASK & `FLAG_3_MASK) | flag_5 | flag_3;
 end
 
 endmodule
 
-`endif  // _alu_vh_
+`endif  // _alu_sv_

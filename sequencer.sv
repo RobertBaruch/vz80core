@@ -5,6 +5,7 @@
 `include "z80fi.vh"
 `include "registers.sv"
 `include "ir_registers.sv"
+`include "alu.sv"
 `include "instr_decoder.sv"
 
 module sequencer(
@@ -48,6 +49,7 @@ logic [7:0] f_wdata;
 logic f_wr;
 logic block_inc;
 logic block_dec;
+logic block_compare;
 logic ex_de_hl;
 logic ex_af_af2;
 logic exx;
@@ -213,6 +215,8 @@ registers registers(
 
     .block_inc(block_inc),
     .block_dec(block_dec),
+    .block_compare(block_compare),
+
     .ex_de_hl(ex_de_hl),
     .ex_af_af2(ex_af_af2),
     .exx(exx)
@@ -241,6 +245,22 @@ ir_registers ir_registers(
 
     .iff1(z80_reg_iff1),
     .iff2(z80_reg_iff2)
+);
+
+logic [7:0] alu8_x;
+logic [7:0] alu8_y;
+logic [7:0] alu8_out;
+logic [7:0] alu8_f_in;
+logic [7:0] alu8_f_out;
+logic [3:0] alu8_func;
+
+alu8 alu8(
+    .x(alu8_x),
+    .y(alu8_y),
+    .func(alu8_func),
+    .f_in(alu8_f_in),
+    .out(alu8_out),
+    .f(alu8_f_out)
 );
 
 logic [31:0] instr_for_decoder;
@@ -283,6 +303,7 @@ always @(*) begin
     reg_wdata = 0;
     block_inc = 0;
     block_dec = 0;
+    block_compare = 0;
     ex_de_hl = 0;
     ex_af_af2 = 0;
     exx = 0;
@@ -293,6 +314,11 @@ always @(*) begin
     r_wdata = 0;
     f_wr = 0;
     f_wdata = 0;
+
+    alu8_x = 0;
+    alu8_y = 0;
+    alu8_f_in = f_rdata;
+    alu8_func = 0;
 
     next_collected_insn_len = 0;
     next_collected_insn = 0;
@@ -719,6 +745,94 @@ always @(*) begin
                     end
                     2: begin
                         task_write_mem_done(1);
+                        next_z80_reg_ip = z80_reg_ip - (flag_pv ? 16'h2 : 0);
+                        task_done();
+                    end
+                endcase
+
+            `INSN_GROUP_CPD:  /* CPD */
+                case (state)
+                    0: begin
+                        task_read_reg(1, `DD_REG_HL);
+                        task_read_mem(1, reg1_rdata);
+                    end
+                    1: begin
+                        task_collect_data(1);
+                        task_read_reg(1, `REG_A);
+                        task_alu8_compare(reg1_rdata[7:0], next_collected_data[7:0]);
+                        // Flag C should be unaffected by the ALU.
+                        task_write_f(
+                            _combine_flags(f_rdata, alu8_f_out, `FLAG_C_BIT));
+                    end
+                    2: begin
+                        task_compare_block_dec();
+                        task_done();
+                    end
+                endcase
+
+            `INSN_GROUP_CPDR:  /* CPDR */
+                case (state)
+                    0: begin
+                        task_read_reg(1, `DD_REG_HL);
+                        task_read_mem(1, reg1_rdata);
+                    end
+                    1: begin
+                        task_collect_data(1);
+                        task_read_reg(1, `REG_A);
+                        task_alu8_compare(reg1_rdata[7:0], next_collected_data[7:0]);
+                        // Flag C should be unaffected by the ALU.
+                        task_write_f(
+                            _combine_flags(f_rdata, alu8_f_out, `FLAG_C_BIT));
+                    end
+                    2: begin
+                        // Have to wait one cycle for the flags to be written.
+                        task_compare_block_dec();
+                    end
+                    3: begin
+                        next_z80_reg_ip = z80_reg_ip - (flag_pv ? 16'h2 : 0);
+                        task_done();
+                    end
+                endcase
+
+            `INSN_GROUP_CPI:  /* CPI */
+                case (state)
+                    0: begin
+                        task_read_reg(1, `DD_REG_HL);
+                        task_read_mem(1, reg1_rdata);
+                    end
+                    1: begin
+                        task_collect_data(1);
+                        task_read_reg(1, `REG_A);
+                        task_alu8_compare(reg1_rdata[7:0], next_collected_data[7:0]);
+                        // Flag C should be unaffected by the ALU.
+                        task_write_f(
+                            _combine_flags(f_rdata, alu8_f_out, `FLAG_C_BIT));
+                    end
+                    2: begin
+                        task_compare_block_inc();
+                        task_done();
+                    end
+                endcase
+
+            `INSN_GROUP_CPIR:  /* CPIR */
+                case (state)
+                    0: begin
+                        task_read_reg(1, `DD_REG_HL);
+                        task_read_mem(1, reg1_rdata);
+                    end
+                    1: begin
+                        task_collect_data(1);
+                        task_read_reg(1, `REG_A);
+                        task_alu8_compare(reg1_rdata[7:0], next_collected_data[7:0]);
+                        // Flag C should be unaffected by the ALU.
+                        task_write_f(
+                            _combine_flags(f_rdata, alu8_f_out, `FLAG_C_BIT));
+                    end
+                    2: begin
+                        // Have to wait one cycle for the flags to be written.
+                        task_compare_block_inc();
+                    end
+                    3: begin
                         next_z80_reg_ip = z80_reg_ip - (flag_pv ? 16'h2 : 0);
                         task_done();
                     end

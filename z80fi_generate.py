@@ -353,8 +353,8 @@ for spec in specs:
             f"""| # DO NOT EDIT -- auto-generated from z80fi_generate.py
             |
             | [tasks]
-            | bmc
             | cover
+            | bmc
             |
             | [options]
             | bmc: mode bmc
@@ -388,6 +388,7 @@ for spec in specs:
             | z80fi_wrapper.sv
             | z80.vh
             | z80.v
+            | alu.sv
             | sequencer.sv
             | sequencer_tasks.vh
             | registers.sv
