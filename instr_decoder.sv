@@ -87,6 +87,10 @@ always @(*) begin
                 group <= `INSN_GROUP_EX_AF_AF2;
                 len <= 1;
             end
+            8'hE3: begin
+                group <= `INSN_GROUP_EX_IND_SP_HL;
+                len <= 1;
+            end
             8'hEB: begin
                 group <= `INSN_GROUP_EX_DE_HL;
                 len <= 1;
@@ -143,6 +147,10 @@ always @(*) begin
             16'h36DD, 16'h36FD: begin
                 group <= `INSN_GROUP_LD_IDX_IXIY_N;
                 len <= 4;
+            end
+            16'hE3DD, 16'hE3FD: begin
+                group <= `INSN_GROUP_EX_IND_SP_IXIY;
+                len <= 2;
             end
             16'hE1DD, 16'hE1FD: begin
                 group <= `INSN_GROUP_POP_IXIY;

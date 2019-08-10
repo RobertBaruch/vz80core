@@ -125,6 +125,8 @@
 `define INSN_GROUP_EX_DE_HL 34         /* EX DE, HL        */
 `define INSN_GROUP_EX_AF_AF2 35        /* EX AF, AF2       */
 `define INSN_GROUP_EXX 36              /* EXX              */
+`define INSN_GROUP_EX_IND_SP_HL 37     /* EX (SP), HL      */
+`define INSN_GROUP_EX_IND_SP_IXIY 38   /* EX (SP), IX/IY   */
 
 `define Z80_REGS_OUTPUTS \
 output [7:0] z80_reg_a, \

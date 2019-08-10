@@ -819,6 +819,72 @@ always @(*) begin
                 task_done();
             end
 
+            `INSN_GROUP_EX_IND_SP_HL:  /* EX (SP), HL */
+                case (state)
+                    0: begin
+                        task_read_reg(1, `DD_REG_SP);
+                        task_read_reg(2, `DD_REG_HL);
+                        task_read_mem(1, reg1_rdata);
+                    end
+                    1: begin
+                        task_collect_data(1);
+                        task_read_reg(1, `DD_REG_SP);
+                        task_read_reg(2, `DD_REG_HL);
+                        task_write_mem(1, reg1_rdata, reg2_rdata[7:0]);
+                    end
+                    2: begin
+                        task_write_mem_done(1);
+                        task_read_reg(1, `DD_REG_SP);
+                        task_read_reg(2, `DD_REG_HL);
+                        task_read_mem(2, reg1_rdata + 1);
+                    end
+                    3: begin
+                        task_collect_data(2);
+                        task_read_reg(1, `DD_REG_SP);
+                        task_read_reg(2, `DD_REG_HL);
+                        task_write_mem(1, reg1_rdata + 1, reg2_rdata[15:8]);
+                        task_write_reg(`DD_REG_HL, next_collected_data);
+                    end
+                    4: begin
+                        task_write_mem_done(2);
+                        task_done();
+                    end
+                endcase
+
+            `INSN_GROUP_EX_IND_SP_IXIY:  /* EX (SP), IX/IY */
+                case (state)
+                    0: begin
+                        task_read_reg(1, `DD_REG_SP);
+                        task_read_reg(2, {`REG_SET_IDX, instr_for_decoder[5]});
+                        task_read_mem(1, reg1_rdata);
+                    end
+                    1: begin
+                        task_collect_data(1);
+                        task_read_reg(1, `DD_REG_SP);
+                        task_read_reg(2, {`REG_SET_IDX, instr_for_decoder[5]});
+                        task_write_mem(1, reg1_rdata, reg2_rdata[7:0]);
+                    end
+                    2: begin
+                        task_write_mem_done(1);
+                        task_read_reg(1, `DD_REG_SP);
+                        task_read_reg(2, {`REG_SET_IDX, instr_for_decoder[5]});
+                        task_read_mem(2, reg1_rdata + 1);
+                    end
+                    3: begin
+                        task_collect_data(2);
+                        task_read_reg(1, `DD_REG_SP);
+                        task_read_reg(2, {`REG_SET_IDX, instr_for_decoder[5]});
+                        task_write_mem(1, reg1_rdata + 1, reg2_rdata[15:8]);
+                        task_write_reg(
+                            {`REG_SET_IDX, instr_for_decoder[5]},
+                            next_collected_data);
+                    end
+                    4: begin
+                        task_write_mem_done(2);
+                        task_done();
+                    end
+                endcase
+
             default: begin // For now, just assume done
                 next_done = 1;
             end
