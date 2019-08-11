@@ -158,7 +158,6 @@ logic _exx;
 assign _exx = !write_en && !block_inc && !block_dec &&
     !ex_de_hl && !ex_af_af2 && exx;
 
-
 always @(*) begin
     out1[15:0] = 0;
     out2[15:0] = 0;

@@ -69,20 +69,28 @@
 `define IDX_REG_IX ({`REG_SET_IDX, `REG_IX})
 `define IDX_REG_IY ({`REG_SET_IDX, `REG_IY})
 
+`define FLAG_S_NUM  7
 `define FLAG_S_BIT  8'b10000000
 `define FLAG_S_MASK (~`FLAG_S_BIT)
+`define FLAG_Z_NUM  6
 `define FLAG_Z_BIT  8'b01000000
 `define FLAG_Z_MASK (~`FLAG_Z_BIT)
+`define FLAG_5_NUM  5
 `define FLAG_5_BIT  8'b00100000
 `define FLAG_5_MASK (~`FLAG_5_BIT)
+`define FLAG_H_NUM  4
 `define FLAG_H_BIT  8'b00010000
 `define FLAG_H_MASK (~`FLAG_H_BIT)
+`define FLAG_3_NUM  3
 `define FLAG_3_BIT  8'b00001000
 `define FLAG_3_MASK (~`FLAG_3_BIT)
+`define FLAG_PV_NUM  2
 `define FLAG_PV_BIT  8'b00000100
 `define FLAG_PV_MASK (~`FLAG_PV_BIT)
+`define FLAG_N_NUM  1
 `define FLAG_N_BIT  8'b00000010
 `define FLAG_N_MASK (~`FLAG_N_BIT)
+`define FLAG_C_NUM  0
 `define FLAG_C_BIT  8'b00000001
 `define FLAG_C_MASK (~`FLAG_C_BIT)
 
@@ -90,6 +98,27 @@
 // and the rest are taken from f2.
 function [7:0] _combine_flags(input [7:0] f1, input [7:0] f2, input [7:0] mask1);
   _combine_flags = (f1 & mask1) | (f2 & ~mask1);
+endfunction
+
+// A function that returns the amount that needs to be added to or
+// subtracted from A for decimal adjust.
+//
+// The description of DAA in various Z80 books is grotesque. The
+// readable algorithm is:
+//
+// * If H is set or lower nibble of A is > 9 then
+//   add (N=0) or subtract (N=1) 8'h06 from A.
+// * If C is set or upper nibble of A is > 9 then
+//   add (N=0) or subtract (N=1) 8'h60 from A.
+//
+// Note that this is the whole raison d'etre of the half-carry
+// flag.
+function [7:0] _daa_adjustment(input flag_c, input flag_h, input [7:0] a);
+begin
+    _daa_adjustment =
+        ((flag_h || (a[3:0] > 4'h9)) ? 8'h6 : 0) +
+        ((flag_c || (a[7:4] > 4'h9)) ? 8'h60 : 0);
+end
 endfunction
 
 // These are numbered and ordered in the same way as instructions
@@ -167,6 +196,7 @@ endfunction
 `define INSN_GROUP_INC_DEC_REG 47      /* INC/DEC r        */
 `define INSN_GROUP_INC_DEC_IND_HL 48   /* INC/DEC (HL)     */
 `define INSN_GROUP_INC_DEC_IDX_IXIY 49 /* INC/DEC (IX/IY + d)     */
+`define INSN_GROUP_DAA 50              /* DAA              */
 
 `define Z80_REGS_OUTPUTS \
 output [7:0] z80_reg_a, \

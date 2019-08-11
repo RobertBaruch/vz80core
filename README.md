@@ -28,3 +28,4 @@ Some useful books:
 
 * [Rodnay Zaks, Programming the Z80](https://archive.org/details/Programming_the_Z-80_2nd_Edition_1980_Rodnay_Zaks)
 * [Zilog Z80 Family User Manual](https://archive.org/details/Zilog_Z80_Family_user_manual)
+* [The Undocumented Z80 Documented](http://datasheets.chipdb.org/Zilog/Z80/z80-documented-0.90.pdf)

@@ -38,6 +38,10 @@ always @(*) begin
                 group <= `INSN_GROUP_INC_DEC_REG;
                 len <= 1;
             end
+            8'h27: begin
+                group <= `INSN_GROUP_DAA;
+                len <= 1;
+            end
             8'h34, 8'h35: begin
                 group <= `INSN_GROUP_INC_DEC_IND_HL;
                 len <= 1;

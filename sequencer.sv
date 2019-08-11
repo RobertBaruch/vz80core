@@ -1106,6 +1106,19 @@ always @(*) begin
                     end
                 endcase
 
+            `INSN_GROUP_DAA: begin  /* DAA */
+                task_read_reg(1, `REG_A);
+                task_alu8_op(f_rdata[`FLAG_N_NUM] ? `ALU_FUNC_SUB : `ALU_FUNC_ADD,
+                    reg1_rdata,
+                    _daa_adjustment(f_rdata[`FLAG_C_NUM], f_rdata[`FLAG_H_NUM], reg1_rdata));
+                task_write_reg(`REG_A, alu8_out);
+                // Flag PV is parity, not overflow.
+                task_write_f(
+                    _combine_flags(_alu_parity8(alu8_out) ? `FLAG_PV_BIT : 0,
+                        alu8_f_out, `FLAG_PV_BIT));
+                task_done();
+            end
+
             default: begin // For now, just assume done
                 next_done = 1;
             end
