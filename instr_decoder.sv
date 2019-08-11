@@ -84,9 +84,17 @@ always @(*) begin
                 group <= `INSN_GROUP_LD_IND_NN_A;
                 len <= 3;
             end
+            8'h37: begin
+                group <= `INSN_GROUP_SCF;
+                len <= 1;
+            end
             8'h3A: begin
                 group <= `INSN_GROUP_LD_A_IND_NN;
                 len <= 3;
+            end
+            8'h3F: begin
+                group <= `INSN_GROUP_CCF;
+                len <= 1;
             end
             8'h70, 8'h71, 8'h72, 8'h73, 8'h74, 8'h75, 8'h77: begin
                 group <= `INSN_GROUP_LD_IND_HL_REG;

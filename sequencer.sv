@@ -1136,6 +1136,34 @@ always @(*) begin
                 task_done();
             end
 
+            `INSN_GROUP_CCF: begin  /* CCF */
+                task_write_f({
+                    f_rdata[7], // s
+                    f_rdata[6], // z
+                    f_rdata[5], // 5
+                    f_rdata[0], // h (original c)
+                    f_rdata[3], // 3
+                    f_rdata[2], // v
+                    1'b0,       // n
+                    ~f_rdata[0] // c (complemented c)
+                    });
+                task_done();
+            end
+
+            `INSN_GROUP_SCF: begin  /* SCF */
+                task_write_f({
+                    f_rdata[7], // s
+                    f_rdata[6], // z
+                    f_rdata[5], // 5
+                    1'b0,       // h
+                    f_rdata[3], // 3
+                    f_rdata[2], // v
+                    1'b0,       // n
+                    1'b1        // c
+                    });
+                task_done();
+            end
+
             default: begin // For illegal instructions, just assume done
                 task_done();
             end
