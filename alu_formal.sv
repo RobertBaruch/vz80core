@@ -78,7 +78,6 @@ alu8 alu(
 );
 
 always @(*) begin
-  // ADD
   if (func == `ALU_FUNC_ADD) begin
     assert(out == (x + y));
     assert(flag_s == out[7]);
@@ -91,7 +90,6 @@ always @(*) begin
     assert(flag_c == carry8(x, y, 0));
   end
 
-  // ADC
   if (func == `ALU_FUNC_ADC) begin
     assert(out == (x + y + flag_in_c));
     assert(flag_s == out[7]);
@@ -104,8 +102,7 @@ always @(*) begin
     assert(flag_c == carry8(x, y, flag_in_c));
   end
 
-  // SUB
-  if (func == `ALU_FUNC_SUB) begin
+  if (func == `ALU_FUNC_SUB || func == `ALU_FUNC_CP) begin
     assert(out == (x - y));
     assert(flag_s == out[7]);
     assert(flag_z == (out == 0));
@@ -117,7 +114,6 @@ always @(*) begin
     assert(flag_c == carry8(x, ~y, 1));
   end
 
-  // SBC
   if (func == `ALU_FUNC_SBC) begin
     assert(out == (x - y - flag_in_c));
     assert(flag_s == out[7]);
@@ -130,7 +126,6 @@ always @(*) begin
     assert(flag_c == carry8(x, ~y, ~flag_in_c));
   end
 
-  // AND
   if (func == `ALU_FUNC_AND) begin
     assert(flag_h == 1);
     assert(flag_n == 0);
@@ -143,9 +138,8 @@ always @(*) begin
     assert(flag_3 == flag_in_3);
   end
 
-  // XOR
   if (func == `ALU_FUNC_XOR) begin
-    assert(flag_h == 1);
+    assert(flag_h == 0);
     assert(flag_n == 0);
     assert(flag_c == 0);
     assert(out == (x ^ y));
@@ -156,9 +150,8 @@ always @(*) begin
     assert(flag_3 == flag_in_3);
   end
 
-  // OR
   if (func == `ALU_FUNC_OR) begin
-    assert(flag_h == 1);
+    assert(flag_h == 0);
     assert(flag_n == 0);
     assert(flag_c == 0);
     assert(out == (x | y));

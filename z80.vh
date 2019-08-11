@@ -92,7 +92,8 @@ function [7:0] _combine_flags(input [7:0] f1, input [7:0] f2, input [7:0] mask1)
   _combine_flags = (f1 & mask1) | (f2 & ~mask1);
 endfunction
 
-
+// These are numbered and ordered in the same way as instructions
+// 80-BF.
 `define ALU_FUNC_ADD 0
 `define ALU_FUNC_ADC 1
 `define ALU_FUNC_SUB 2
@@ -100,6 +101,7 @@ endfunction
 `define ALU_FUNC_AND 4
 `define ALU_FUNC_XOR 5
 `define ALU_FUNC_OR 6
+`define ALU_FUNC_CP 7
 
 `define INSN_GROUP_NEED_MORE_BYTES 254
 `define INSN_GROUP_ILLEGAL_INSTR 255
@@ -146,6 +148,15 @@ endfunction
 `define INSN_GROUP_CPI 40              /* CPI              */
 `define INSN_GROUP_CPDR 41             /* CPDR             */
 `define INSN_GROUP_CPIR 42             /* CPIR             */
+`define INSN_GROUP_ALU_A_REG 43        /* ADD/ADC A, r     */
+                                       /* SUB/SBC A, r     */
+                                       /* AND/XOR A, r     */
+                                       /* OR/CP A, r       */
+`define INSN_GROUP_ADD_ADC_A_N 44      /* ADD/ADC A, n     */
+`define INSN_GROUP_ALU_A_IND_HL 45     /* ADD/ADC A, (HL)  */
+                                       /* SUB/SBC A, (HL)  */
+                                       /* AND/XOR A, (HL)  */
+                                       /* OR/CP A, (HL)    */
 
 `define Z80_REGS_OUTPUTS \
 output [7:0] z80_reg_a, \

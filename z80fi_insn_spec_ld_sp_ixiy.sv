@@ -18,7 +18,7 @@ wire [4:0] insn_fixed3 = z80fi_insn[4:0];
 
 assign spec_valid = z80fi_valid &&
     z80fi_insn_len == 2 &&
-    insn_fixed1 == 16'hF9 &&
+    insn_fixed1 == 8'hF9 &&
     insn_fixed2 == 2'b11 &&
     insn_fixed3 == 5'b11101;
 

@@ -167,61 +167,60 @@ adc8 sbc8(
 
 always @(*) begin
   case (func)
-    // ADD. Use also for INC (set y = 1, ignore flags).
     `ALU_FUNC_ADD: begin
         out = add_out;
         f = add_f;
     end
 
-    // ADC
     `ALU_FUNC_ADC: begin
         out = adc_out;
         f = adc_f;
     end
 
-    // SUB. Use also for DEC (set y = 1, ignore flags) and CP (ignore out).
-    `ALU_FUNC_SUB: begin
+    `ALU_FUNC_SUB, `ALU_FUNC_CP: begin
         out = sub_out;
         f = sub_f;
     end
 
-    // SBC
     `ALU_FUNC_SBC: begin
         out = sbc_out;
         f = sbc_f;
     end
 
-    // AND
     `ALU_FUNC_AND: begin
       out = x & y;
       f = {
         out[7], // sign
         _alu_iszero8(out), // zero
-        3'b010, // h
+        f_in[5],
+        1'b1, // h
+        f_in[3],
         _alu_parity8(out), // parity
         2'b00 // n, c
       };
     end
 
-    // XOR
     `ALU_FUNC_XOR: begin
       out = x ^ y;
       f = {
         out[7], // sign
         _alu_iszero8(out), // zero
-        3'b010, // h
+        f_in[5],
+        1'b0, // h
+        f_in[3],
         _alu_parity8(out), // parity
         2'b00 // n, c
       };
     end
 
-    // OR
     `ALU_FUNC_OR: begin
       out = x | y;
       f = {
         out[7], // sign
         _alu_iszero8(out), // zero
-        3'b010, // h
+        f_in[5],
+        1'b0, // h
+        f_in[3],
         _alu_parity8(out), // parity
         2'b00 // n, c
       };

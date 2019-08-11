@@ -103,6 +103,25 @@ always @(*) begin
                 group <= `INSN_GROUP_LD_SP_HL;
                 len <= 1;
             end
+            8'h80, 8'h81, 8'h82, 8'h83, 8'h84, 8'h85, 8'h87,
+            8'h88, 8'h89, 8'h8A, 8'h8B, 8'h8C, 8'h8D, 8'h8F,
+            8'h90, 8'h91, 8'h92, 8'h93, 8'h94, 8'h95, 8'h97,
+            8'h98, 8'h99, 8'h9A, 8'h9B, 8'h9C, 8'h9D, 8'h9F,
+            8'hA0, 8'hA1, 8'hA2, 8'hA3, 8'hA4, 8'hA5, 8'hA7,
+            8'hA8, 8'hA9, 8'hAA, 8'hAB, 8'hAC, 8'hAD, 8'hAF,
+            8'hB0, 8'hB1, 8'hB2, 8'hB3, 8'hB4, 8'hB5, 8'hB7,
+            8'hB8, 8'hB9, 8'hBA, 8'hBB, 8'hBC, 8'hBD, 8'hBF: begin
+                group <= `INSN_GROUP_ALU_A_REG;
+                len <= 1;
+            end
+            8'h86, 8'h8E, 8'h96, 8'h9E, 8'hA6, 8'hAE, 8'hB6, 8'hBE: begin
+                group <= `INSN_GROUP_ALU_A_IND_HL;
+                len <= 1;
+            end
+            8'hC6, 8'hCE: begin
+                group <= `INSN_GROUP_ADD_ADC_A_N;
+                len <= 2;
+            end
             8'hCB, 8'hDD, 8'hED, 8'hFD: begin
                 group <= `INSN_GROUP_NEED_MORE_BYTES;
                 len <= 2;
