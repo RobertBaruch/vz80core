@@ -1011,6 +1011,18 @@ always @(*) begin
                     end
                 endcase
 
+            `INSN_GROUP_INC_DEC_REG:  /* INC/DEC r */
+                case (state)
+                    0: begin
+                        task_read_reg(1, instr_for_decoder[5:3]);
+                        task_alu8_op(instr_for_decoder[0] ? `ALU_FUNC_ADD : `ALU_FUNC_SUB, reg1_rdata[7:0], 8'b1);
+                        task_write_reg(instr_for_decoder[5:3], alu8_out);
+                        // Flag C is not affected.
+                        task_write_f(_combine_flags(f_rdata, alu8_f_out, `FLAG_C_BIT));
+                        task_done();
+                    end
+                endcase
+
             `INSN_GROUP_ALU_A_N:  /* ADD/ADC/SUB/SBC/AND/XOR/OR/CP A, n */
                 case (state)
                     0: begin
@@ -1038,6 +1050,26 @@ always @(*) begin
                     end
                 endcase
 
+            `INSN_GROUP_INC_DEC_IND_HL:  /* INC/DEC (HL) */
+                case (state)
+                    0: begin
+                        task_read_reg(1, `DD_REG_HL);
+                        task_read_mem(1, reg1_rdata);
+                    end
+                    1: begin
+                        task_read_reg(1, `DD_REG_HL);
+                        task_collect_data(1);
+                        task_alu8_op(instr_for_decoder[0] ? `ALU_FUNC_ADD : `ALU_FUNC_SUB, next_collected_data[7:0], 8'b1);
+                        task_write_mem(1, reg1_rdata, alu8_out);
+                        // Flag C is not affected.
+                        task_write_f(_combine_flags(f_rdata, alu8_f_out, `FLAG_C_BIT));
+                    end
+                    2: begin
+                        task_write_mem_done(1);
+                        task_done();
+                    end
+                endcase
+
             `INSN_GROUP_ALU_A_IDX_IXIY:  /* ADD/ADC/SUB/SBC/AND/XOR/OR/CP A, (IX/IY + d) */
                 case (state)
                     0: begin
@@ -1050,6 +1082,26 @@ always @(*) begin
                         task_alu8_op(instr_for_decoder[13:11], reg1_rdata[7:0], next_collected_data[7:0]);
                         if (instr_for_decoder[13:11] != `ALU_FUNC_CP) task_write_reg(`REG_A, alu8_out);
                         task_write_f(alu8_f_out);
+                        task_done();
+                    end
+                endcase
+
+            `INSN_GROUP_INC_DEC_IDX_IXIY:  /* INC/DEC (IX/IY + d) */
+                case (state)
+                    0: begin
+                        task_read_reg(1, {`REG_SET_IDX, instr_for_decoder[5]});
+                        task_read_mem(1, reg1_rdata + { {8{insn_operand[7]}}, insn_operand[7:0]});
+                    end
+                    1: begin
+                        task_read_reg(1, {`REG_SET_IDX, instr_for_decoder[5]});
+                        task_collect_data(1);
+                        task_alu8_op(instr_for_decoder[8] ? `ALU_FUNC_ADD : `ALU_FUNC_SUB, next_collected_data[7:0], 8'b1);
+                        task_write_mem(1, reg1_rdata + { {8{insn_operand[7]}}, insn_operand[7:0]}, alu8_out);
+                        // Flag C is not affected.
+                        task_write_f(_combine_flags(f_rdata, alu8_f_out, `FLAG_C_BIT));
+                    end
+                    2: begin
+                        task_write_mem_done(1);
                         task_done();
                     end
                 endcase

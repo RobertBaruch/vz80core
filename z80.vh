@@ -164,6 +164,9 @@ endfunction
                                        /* SUB/SBC A, (IX/IY + d)  */
                                        /* AND/XOR A, (IX/IY + d)  */
                                        /* OR/CP A, (IX/IY + d)    */
+`define INSN_GROUP_INC_DEC_REG 47      /* INC/DEC r        */
+`define INSN_GROUP_INC_DEC_IND_HL 48   /* INC/DEC (HL)     */
+`define INSN_GROUP_INC_DEC_IDX_IXIY 49 /* INC/DEC (IX/IY + d)     */
 
 `define Z80_REGS_OUTPUTS \
 output [7:0] z80_reg_a, \

@@ -33,6 +33,15 @@ always @(*) begin
                 group <= `INSN_GROUP_LD_IND_BCDE_A;
                 len <= 1;
             end
+            8'h04, 8'h0C, 8'h14, 8'h1C, 8'h24, 8'h2C, 8'h3C,
+            8'h05, 8'h0D, 8'h15, 8'h1D, 8'h25, 8'h2D, 8'h3D: begin
+                group <= `INSN_GROUP_INC_DEC_REG;
+                len <= 1;
+            end
+            8'h34, 8'h35: begin
+                group <= `INSN_GROUP_INC_DEC_IND_HL;
+                len <= 1;
+            end
             8'h0A, 8'h1A: begin
                 group <= `INSN_GROUP_LD_A_IND_BCDE;
                 len <= 1;
@@ -162,6 +171,10 @@ always @(*) begin
             16'h2ADD, 16'h2AFD: begin
                 group <= `INSN_GROUP_LD_IXIY_IND_NN;
                 len <= 4;
+            end
+            16'h34DD, 16'h34FD, 16'h35DD, 16'h35FD: begin
+                group <= `INSN_GROUP_INC_DEC_IDX_IXIY;
+                len <= 3;
             end
             16'h36DD, 16'h36FD: begin
                 group <= `INSN_GROUP_LD_IDX_IXIY_N;
