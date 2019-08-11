@@ -118,8 +118,8 @@ always @(*) begin
                 group <= `INSN_GROUP_ALU_A_IND_HL;
                 len <= 1;
             end
-            8'hC6, 8'hCE: begin
-                group <= `INSN_GROUP_ADD_ADC_A_N;
+            8'hC6, 8'hCE, 8'hD6, 8'hDE, 8'hE6, 8'hEE, 8'hF6, 8'hFE: begin
+                group <= `INSN_GROUP_ALU_A_N;
                 len <= 2;
             end
             8'hCB, 8'hDD, 8'hED, 8'hFD: begin
@@ -182,6 +182,13 @@ always @(*) begin
             16'h22DD, 16'h22FD: begin
                 group <= `INSN_GROUP_LD_IND_NN_IXIY;
                 len <= 4;
+            end
+            16'h86DD, 16'h8EDD, 16'h96DD, 16'h9EDD,
+            16'hA6DD, 16'hAEDD, 16'hB6DD, 16'hBEDD,
+            16'h86FD, 16'h8EFD, 16'h96FD, 16'h9EFD,
+            16'hA6FD, 16'hAEFD, 16'hB6FD, 16'hBEFD: begin
+                group <= `INSN_GROUP_ALU_A_IDX_IXIY;
+                len <= 3;
             end
             16'h47ED: begin
                 group <= `INSN_GROUP_LD_I_A;

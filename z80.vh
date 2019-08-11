@@ -152,11 +152,18 @@ endfunction
                                        /* SUB/SBC A, r     */
                                        /* AND/XOR A, r     */
                                        /* OR/CP A, r       */
-`define INSN_GROUP_ADD_ADC_A_N 44      /* ADD/ADC A, n     */
+`define INSN_GROUP_ALU_A_N 44          /* ADD/ADC A, n     */
+                                       /* SUB/SBC A, n     */
+                                       /* AND/XOR A, n     */
+                                       /* OR/CP A, n       */
 `define INSN_GROUP_ALU_A_IND_HL 45     /* ADD/ADC A, (HL)  */
                                        /* SUB/SBC A, (HL)  */
                                        /* AND/XOR A, (HL)  */
                                        /* OR/CP A, (HL)    */
+`define INSN_GROUP_ALU_A_IDX_IXIY 46   /* ADD/ADC A, (IX/IY + d)  */
+                                       /* SUB/SBC A, (IX/IY + d)  */
+                                       /* AND/XOR A, (IX/IY + d)  */
+                                       /* OR/CP A, (IX/IY + d)    */
 
 `define Z80_REGS_OUTPUTS \
 output [7:0] z80_reg_a, \

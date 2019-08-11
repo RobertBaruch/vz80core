@@ -1011,6 +1011,17 @@ always @(*) begin
                     end
                 endcase
 
+            `INSN_GROUP_ALU_A_N:  /* ADD/ADC/SUB/SBC/AND/XOR/OR/CP A, n */
+                case (state)
+                    0: begin
+                        task_read_reg(1, `REG_A);
+                        task_alu8_op(instr_for_decoder[5:3], reg1_rdata[7:0], insn_operand[7:0]);
+                        if (instr_for_decoder[5:3] != `ALU_FUNC_CP) task_write_reg(`REG_A, alu8_out);
+                        task_write_f(alu8_f_out);
+                        task_done();
+                    end
+                endcase
+
             `INSN_GROUP_ALU_A_IND_HL:  /* ADD/ADC/SUB/SBC/AND/XOR/OR/CP A, (HL) */
                 case (state)
                     0: begin
@@ -1027,12 +1038,17 @@ always @(*) begin
                     end
                 endcase
 
-            `INSN_GROUP_ADD_ADC_A_N:  /* ADD/ADC A, n */
+            `INSN_GROUP_ALU_A_IDX_IXIY:  /* ADD/ADC/SUB/SBC/AND/XOR/OR/CP A, (IX/IY + d) */
                 case (state)
                     0: begin
+                        task_read_reg(2, {`REG_SET_IDX, instr_for_decoder[5]});
+                        task_read_mem(1, reg2_rdata + { {8{insn_operand[7]}}, insn_operand[7:0]});
+                    end
+                    1: begin
+                        task_collect_data(1);
                         task_read_reg(1, `REG_A);
-                        task_alu8_op(instr_for_decoder[3] ? `ALU_FUNC_ADC : `ALU_FUNC_ADD, reg1_rdata[7:0], insn_operand[7:0]);
-                        task_write_reg(`REG_A, alu8_out);
+                        task_alu8_op(instr_for_decoder[13:11], reg1_rdata[7:0], next_collected_data[7:0]);
+                        if (instr_for_decoder[13:11] != `ALU_FUNC_CP) task_write_reg(`REG_A, alu8_out);
                         task_write_f(alu8_f_out);
                         task_done();
                     end
