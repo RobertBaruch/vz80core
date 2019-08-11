@@ -80,10 +80,10 @@ logic [7:0] z80_reg_i;
 logic [7:0] z80_reg_r;
 logic z80_reg_iff1;
 logic z80_reg_iff2;
-logic enable_interrupts = 0;
-logic disable_interrupts = 0;
-logic accept_nmi = 0;
-logic ret_from_nmi = 0;
+logic enable_interrupts;
+logic disable_interrupts;
+logic accept_nmi;
+logic ret_from_nmi;
 
 logic [2:0] decoded_len;
 logic [7:0] decoded_group;
@@ -242,6 +242,7 @@ ir_registers ir_registers(
     .disable_interrupts(disable_interrupts),
     .accept_nmi(accept_nmi),
     .ret_from_nmi(ret_from_nmi),
+    .next_insn_done(next_done),
 
     .iff1(z80_reg_iff1),
     .iff2(z80_reg_iff2)
@@ -314,6 +315,10 @@ always @(*) begin
     r_wdata = 0;
     f_wr = 0;
     f_wdata = 0;
+    enable_interrupts = 0;
+    disable_interrupts = reset;
+    accept_nmi = 0;
+    ret_from_nmi = 0;
 
     alu8_x = 0;
     alu8_y = 0;
@@ -392,6 +397,18 @@ always @(*) begin
         case (decoded_group)
             `INSN_GROUP_NOP:  /* NOP */
                 task_done();
+
+            // TODO: Break out of halt on interrupt
+            `INSN_GROUP_HALT: begin  /* HALT */
+                next_z80_reg_ip = z80_reg_ip - 16'h1;
+                task_done();
+            end
+
+            `INSN_GROUP_EI_DI: begin  /* EI/DI */
+                if (!instr_for_decoder[3]) task_disable_interrupts();
+                else task_enable_interrupts();
+                task_done();
+            end
 
             `INSN_GROUP_LD_REG_REG: begin  /* LD  r, r' */
                 task_read_reg(1, instr_for_decoder[2:0]);

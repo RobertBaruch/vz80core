@@ -201,6 +201,8 @@ endfunction
 `define INSN_GROUP_NEG 52              /* NEG              */
 `define INSN_GROUP_CCF 53              /* CCF              */
 `define INSN_GROUP_SCF 54              /* SCF              */
+`define INSN_GROUP_HALT 55             /* HALT             */
+`define INSN_GROUP_EI_DI 56            /* EI/DI            */
 
 `define Z80_REGS_OUTPUTS \
 output [7:0] z80_reg_a, \

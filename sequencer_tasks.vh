@@ -235,6 +235,18 @@ begin
 end
 endtask
 
+task task_disable_interrupts;
+begin
+    disable_interrupts = 1;
+end
+endtask
+
+task task_enable_interrupts;
+begin
+    enable_interrupts = 1;
+end
+endtask
+
 // task_done must be run at the end of an instruction, otherwise the
 // instruction will never end!
 task task_done;

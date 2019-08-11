@@ -100,6 +100,10 @@ always @(*) begin
                 group <= `INSN_GROUP_LD_IND_HL_REG;
                 len <= 1;
             end
+            8'h76: begin
+                group <= `INSN_GROUP_HALT;
+                len <= 1;
+            end
             8'hC1, 8'hD1, 8'hE1, 8'hF1: begin
                 group <= `INSN_GROUP_POP_QQ;
                 len <= 1;
@@ -150,6 +154,10 @@ always @(*) begin
             8'hCB, 8'hDD, 8'hED, 8'hFD: begin
                 group <= `INSN_GROUP_NEED_MORE_BYTES;
                 len <= 2;
+            end
+            8'hF3, 8'hFB: begin
+                group <= `INSN_GROUP_EI_DI;
+                len <= 1;
             end
             default: begin
                 group <= `INSN_GROUP_ILLEGAL_INSTR;

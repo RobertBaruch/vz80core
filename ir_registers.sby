@@ -1,0 +1,20 @@
+[tasks]
+bmc
+cover
+
+[options]
+bmc: mode bmc
+cover: mode cover
+depth 10
+
+[engines]
+smtbmc boolector
+
+[script]
+verilog_defines -D IR_REGISTERS_FORMAL=1
+read -formal -sv ir_registers.sv
+prep -top ir_registers
+
+[files]
+z80.vh
+ir_registers.sv

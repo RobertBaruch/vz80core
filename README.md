@@ -1,5 +1,8 @@
 vz80core, a formally-verified Z80 core written in Verilog.
 
+*"The rules of magic were about as regular as the instruction set on a Z80."*<br/>
+-- *Wizard's Bane*, Rick Cook, 1997
+
 Not much documentation here, since it's still a work in progress
 and will likely change radically from time to time. Still, there's
 some information in each file, and especially in z80fi_tests.md.
@@ -14,7 +17,7 @@ Follow the [instructions to install](https://symbiyosys.readthedocs.io/en/latest
 
 Generally tests are run as:
 
-sudo sby -f /sby-file/
+sudo sby -f *sby-file*
 
 Changing the z80fi (Z80 Formal Interface) requires running
 z80fi_generate.py to generate lots of macros for bunches of
