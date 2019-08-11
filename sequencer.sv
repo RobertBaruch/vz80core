@@ -1119,8 +1119,25 @@ always @(*) begin
                 task_done();
             end
 
-            default: begin // For now, just assume done
-                next_done = 1;
+            `INSN_GROUP_CPL: begin  /* CPL */
+                task_read_reg(1, `REG_A);
+                task_write_reg(`REG_A, ~reg1_rdata);
+                task_write_f(_combine_flags(
+                    `FLAG_H_BIT | `FLAG_N_BIT, f_rdata,
+                    `FLAG_H_BIT | `FLAG_N_BIT));
+                task_done();
+            end
+
+            `INSN_GROUP_NEG: begin  /* NEG */
+                task_read_reg(1, `REG_A);
+                task_alu8_op(`ALU_FUNC_SUB, 8'b0, reg1_rdata);
+                task_write_reg(`REG_A, alu8_out);
+                task_write_f(alu8_f_out);
+                task_done();
+            end
+
+            default: begin // For illegal instructions, just assume done
+                task_done();
             end
         endcase
     end

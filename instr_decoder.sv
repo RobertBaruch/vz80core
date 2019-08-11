@@ -42,6 +42,10 @@ always @(*) begin
                 group <= `INSN_GROUP_DAA;
                 len <= 1;
             end
+            8'h2F: begin
+                group <= `INSN_GROUP_CPL;
+                len <= 1;
+            end
             8'h34, 8'h35: begin
                 group <= `INSN_GROUP_INC_DEC_IND_HL;
                 len <= 1;
@@ -149,6 +153,10 @@ always @(*) begin
             16'h4BED, 16'h5BED, 16'h6BED, 16'h7BED: begin
                 group <= `INSN_GROUP_LD_DD_IND_NN;
                 len <= 4;
+            end
+            16'h44ED: begin
+                group <= `INSN_GROUP_NEG;
+                len <= 2;
             end
             16'h43ED, 16'h53ED, 16'h63ED, 16'h73ED: begin
                 group <= `INSN_GROUP_LD_IND_NN_DD;

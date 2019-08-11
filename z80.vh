@@ -197,6 +197,8 @@ endfunction
 `define INSN_GROUP_INC_DEC_IND_HL 48   /* INC/DEC (HL)     */
 `define INSN_GROUP_INC_DEC_IDX_IXIY 49 /* INC/DEC (IX/IY + d)     */
 `define INSN_GROUP_DAA 50              /* DAA              */
+`define INSN_GROUP_CPL 51              /* CPL              */
+`define INSN_GROUP_NEG 52              /* NEG              */
 
 `define Z80_REGS_OUTPUTS \
 output [7:0] z80_reg_a, \
