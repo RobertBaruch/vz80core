@@ -28,8 +28,8 @@ assign spec_signals = `SPEC_REG_IP | `SPEC_REG_IFF1 | `SPEC_REG_IFF2;
 // completes. Since the effect of EI is delayed by one instruction, we
 // can't test that here. Instead, we rely on the formal tests for
 // the ir_registers module to test that.
-assign spec_reg_iff1_out = enable ? z80fi_reg_iff1_in : 0;
-assign spec_reg_iff2_out = enable ? z80fi_reg_iff2_in : 0;
+assign spec_reg_iff1_out = enable ? 1 : 0;
+assign spec_reg_iff2_out = enable ? 1 : 0;
 
 assign spec_reg_ip_out = z80fi_reg_ip_in + 1;
 

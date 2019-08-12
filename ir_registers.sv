@@ -25,22 +25,14 @@ module ir_registers(
 
     // Interrupt enable flags.
     output logic iff1,
-    output logic iff2
+    output logic iff2,
+    output logic delayed_enable_interrupts
 );
 
 logic [7:0] _i;
 logic [7:0] _r;
 assign reg_i = _i;
 assign reg_r = _r;
-
-// When delayed_enable_interrupts is 1 and next_insn_done
-// (i.e. instruction is about to complete), set internal iff1 and iff2.
-logic delayed_enable_interrupts;
-
-logic int_iff1;
-logic int_iff2;
-assign iff1 = int_iff1 & !reset & !disable_interrupts & !enable_interrupts & !delayed_enable_interrupts;
-assign iff2 = int_iff2 & !reset & !disable_interrupts & !enable_interrupts & !delayed_enable_interrupts;
 
 // * disable_interrupts must disable interrupts during its execution.
 //   We implement this by gating the "internal" iff1 and iff2 signals
@@ -54,8 +46,8 @@ always @(posedge clk or posedge reset) begin
   if (reset) begin
     _i <= 0;
     _r <= 0;
-    int_iff1 <= 0;
-    int_iff2 <= 0;
+    iff1 <= 0;
+    iff2 <= 0;
     delayed_enable_interrupts <= 0;
 
   end else begin
@@ -63,22 +55,22 @@ always @(posedge clk or posedge reset) begin
     if (r_wr) _r <= r_in;
 
     if (disable_interrupts) begin
-      int_iff1 <= 0;
-      int_iff2 <= 0;
+      iff1 <= 0;
+      iff2 <= 0;
       delayed_enable_interrupts <= 0;
 
     end else if (enable_interrupts) begin
-      int_iff1 <= 1;
-      int_iff2 <= 1;
+      iff1 <= 1;
+      iff2 <= 1;
       delayed_enable_interrupts <= 1;
 
     end else if (accept_nmi) begin
-      int_iff1 <= 0;
-      int_iff2 <= int_iff1;
+      iff1 <= 0;
+      iff2 <= iff1;
       delayed_enable_interrupts <= 0;
 
     end else if (ret_from_nmi) begin
-      int_iff1 <= int_iff2;
+      iff1 <= iff2;
       delayed_enable_interrupts <= 0;
 
     end else if (next_insn_done && delayed_enable_interrupts) begin
@@ -155,29 +147,24 @@ always @(posedge clk) begin
 
       // Ensure that the EI instruction enables interrupts. Note that
       // the internal signals are gated!
-      if (instrs_since_ei == 1) assert(int_iff1 && int_iff2);
+      if (instrs_since_ei == 1) assert(iff1 && iff2);
 
       // Ensure that the EI instruction enables interrupts after
       // the next instruction.
-      if (instrs_since_ei == 2) assert(int_iff1 && int_iff2);
+      if (instrs_since_ei == 2) assert(iff1 && iff2);
     end
 
     if (testing_di) begin
       // State that we somehow end up in a state where iff1 or iff2 are set.
-      if (!reset && !disable_interrupts) assume(int_iff1 || int_iff2);
+      if (!reset && !disable_interrupts) assume(iff1 || iff2);
 
       // Ensure that DI causes iff1 and iff2 to reset.
-      if (disable_interrupts) assert(!int_iff1 && !int_iff2);
+      if (disable_interrupts) assert(!iff1 && !iff2);
     end
 
     // Show us how to enable interrupts.
     cover(iff1 && iff2);
   end
-end
-
-always @(*) begin
-  if (disable_interrupts) assert(!iff1 && !iff2);
-  if (enable_interrupts) assert(!iff1 && !iff2);
 end
 
 

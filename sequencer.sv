@@ -27,6 +27,12 @@ module sequencer(
 `endif
 );
 
+logic gated_iff1;
+logic gated_iff2;
+logic delayed_enable_interrupts;
+assign gated_iff1 = z80_reg_iff1 & !reset & !disable_interrupts & !enable_interrupts & !delayed_enable_interrupts;
+assign gated_iff2 = z80_reg_iff2 & !reset & !disable_interrupts & !enable_interrupts & !delayed_enable_interrupts;
+
 logic [7:0] mem_rdata;
 logic [7:0] mem_wdata;
 logic mem_wr;
@@ -245,7 +251,8 @@ ir_registers ir_registers(
     .next_insn_done(next_done),
 
     .iff1(z80_reg_iff1),
-    .iff2(z80_reg_iff2)
+    .iff2(z80_reg_iff2),
+    .delayed_enable_interrupts(delayed_enable_interrupts)
 );
 
 logic [7:0] alu8_x;
