@@ -204,6 +204,9 @@ endfunction
 `define INSN_GROUP_HALT 55             /* HALT             */
 `define INSN_GROUP_EI_DI 56            /* EI/DI            */
 `define INSN_GROUP_ADD_HL_DD 57        /* ADD HL, dd       */
+`define INSN_GROUP_ADC_SBC_HL_DD 58    /* ADC/SBC HL, dd   */
+`define INSN_GROUP_ADD_IXIY_SS 59      /* ADD IX/IY, ss    */
+`define INSN_GROUP_INC_DEC_DD 60       /* INC/DEC dd       */
 
 `define Z80_REGS_OUTPUTS \
 output [7:0] z80_reg_a, \

@@ -1063,6 +1063,16 @@ always @(*) begin
                     end
                 endcase
 
+            `INSN_GROUP_INC_DEC_DD:  /* INC/DEC dd */
+                case (state)
+                    0: begin
+                        task_read_reg(1, {`REG_SET_DD, instr_for_decoder[5:4]});
+                        task_alu16_op(instr_for_decoder[3] ? `ALU_FUNC_SUB : `ALU_FUNC_ADD, reg1_rdata, 8'b1);
+                        task_write_reg({`REG_SET_DD, instr_for_decoder[5:4]}, alu16_out);
+                        task_done();
+                    end
+                endcase
+
             `INSN_GROUP_ALU_A_N:  /* ADD/ADC/SUB/SBC/AND/XOR/OR/CP A, n */
                 case (state)
                     0: begin
@@ -1156,6 +1166,36 @@ always @(*) begin
                         task_write_f(`FLAG_N_MASK &
                             _combine_flags(alu16_f_out, f_rdata,
                                 `FLAG_H_BIT | `FLAG_C_BIT));
+                        task_write_reg(`DD_REG_HL, alu16_out);
+                        task_done();
+                    end
+                endcase
+
+            `INSN_GROUP_ADD_IXIY_SS:  /* ADD IX/IY, ss */
+                case (state)
+                    0: begin
+                        task_read_reg(1, instr_for_decoder[5] ? `IDX_REG_IY : `IDX_REG_IX);
+                        if (instr_for_decoder[13:12] == `REG_HL)
+                            task_read_reg(2, instr_for_decoder[5] ? `IDX_REG_IY : `IDX_REG_IX);
+                        else
+                            task_read_reg(2, {`REG_SET_DD, instr_for_decoder[13:12]});
+                        task_alu16_op(`ALU_FUNC_ADD, reg1_rdata, reg2_rdata);
+                        // N is reset, and only H and C are used.
+                        task_write_f(`FLAG_N_MASK &
+                            _combine_flags(alu16_f_out, f_rdata,
+                                `FLAG_H_BIT | `FLAG_C_BIT));
+                        task_write_reg(instr_for_decoder[5] ? `IDX_REG_IY : `IDX_REG_IX, alu16_out);
+                        task_done();
+                    end
+                endcase
+
+            `INSN_GROUP_ADC_SBC_HL_DD:  /* ADC/SBC HL, dd */
+                case (state)
+                    0: begin
+                        task_read_reg(1, `DD_REG_HL);
+                        task_read_reg(2, {`REG_SET_DD, instr_for_decoder[13:12]});
+                        task_alu16_op(instr_for_decoder[11] ? `ALU_FUNC_ADC : `ALU_FUNC_SBC, reg1_rdata, reg2_rdata);
+                        task_write_f(alu16_f_out);
                         task_write_reg(`DD_REG_HL, alu16_out);
                         task_done();
                     end
