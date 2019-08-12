@@ -48,6 +48,24 @@ function overflow8(input [7:0] x, input [7:0] y, input carry);
   overflow8 = carry8(x, y, carry) ^ out[7];
 endfunction
 
+function halfcarry16(input [15:0] x, input [15:0] y, input carry);
+  reg [12:0] out;
+  out = x[11:0] + y[11:0] + carry;
+  halfcarry16 = out[12];
+endfunction
+
+function carry16(input [15:0] x, input [15:0] y, input carry);
+  reg [16:0] out;
+  out = x + y + carry;
+  carry16 = out[16];
+endfunction
+
+function overflow16(input [15:0] x, input [15:0] y, input carry);
+  reg [15:0] out;
+  out = x[14:0] + y[14:0] + carry;
+  overflow16 = carry16(x, y, carry) ^ out[15];
+endfunction
+
 // Z80FI signal definitions:
 //
 // z80fi_valid:

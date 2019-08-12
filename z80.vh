@@ -203,6 +203,7 @@ endfunction
 `define INSN_GROUP_SCF 54              /* SCF              */
 `define INSN_GROUP_HALT 55             /* HALT             */
 `define INSN_GROUP_EI_DI 56            /* EI/DI            */
+`define INSN_GROUP_ADD_HL_DD 57        /* ADD HL, dd       */
 
 `define Z80_REGS_OUTPUTS \
 output [7:0] z80_reg_a, \

@@ -31,7 +31,7 @@ endfunction
 module adc8(
     input logic [7:0] x,
     input logic [7:0] y,
-    input logic carry,
+    input logic carry_in,
     input logic sub_y,
     output logic [7:0] out,
     output logic [7:0] f
@@ -52,17 +52,21 @@ logic [4:0] out_lo;
 logic [3:0] out_hi1;
 logic [1:0] out_hi2;
 
+wire half_carry = out_lo[4];
+wire penult_carry_out = out_hi1[3];
+wire carry_out = out_hi2[1];
+
 always @(*) begin
-      out_lo = x[3:0] + y[3:0] + carry;
-      out_hi1 = x[6:4] + y[6:4] + out_lo[4];
-      out_hi2 = x[7] + y[7] + out_hi1[3];
+      out_lo = x[3:0] + y[3:0] + carry_in;
+      out_hi1 = x[6:4] + y[6:4] + half_carry;
+      out_hi2 = x[7] + y[7] + penult_carry_out;
       out = {out_hi2[0], out_hi1[2:0], out_lo[3:0]};
       flag_s = out[7];
       flag_z = out == 0 ? 1 : 0;
-      flag_h = out_lo[4];
+      flag_h = half_carry;
       flag_n = sub_y;
-      flag_c = out_hi2[1];
-      flag_v = out_hi2[1] ^ out_hi1[3];
+      flag_c = carry_out;
+      flag_v = carry_out ^ penult_carry_out;
       flag_5 = 0; // will be overwritten in the parent alu
       flag_3 = 0; // will be overwritten in the parent alu
 end
@@ -72,8 +76,8 @@ endmodule
 module adc16(
     input logic [15:0] x,
     input logic [15:0] y,
+    input logic carry_in,
     input logic sub_y,
-    input logic [7:0] f_in,
     output logic [15:0] out,
     output logic [7:0] f
 );
@@ -90,18 +94,24 @@ logic flag_c; // carry
 assign f = {flag_s, flag_z, flag_5, flag_h, flag_3, flag_v, flag_n, flag_c};
 
 logic [12:0] out_lo;
-logic [4:0] out_hi;
+logic [3:0] out_hi1;
+logic [1:0] out_hi2;
+
+wire half_carry = out_lo[12];
+wire penult_carry_out = out_hi1[3];
+wire carry_out = out_hi2[1];
 
 always @(*) begin
-      out_lo = x[11:0] + y[11:0] + f_in[0];
-      out_hi = x[15:10] + y[15:10] + out_lo[12];
-      out = {out_hi[3:0], out_lo[11:0]};
-      flag_s = f_in[7];
-      flag_z = f_in[6];
-      flag_h = out_lo[12];
-      flag_v = f_in[2];
+      out_lo = {1'b0, x[11:0]} + {1'b0, y[11:0]} + carry_in;
+      out_hi1 = x[14:12] + y[14:12] + half_carry;
+      out_hi2 = x[15] + y[15] + penult_carry_out;
+      out = {out_hi2[0], out_hi1[2:0], out_lo[11:0]};
+      flag_s = out[15];
+      flag_z = (out == 0);
+      flag_h = half_carry;
+      flag_v = carry_out ^ penult_carry_out;
       flag_n = sub_y;
-      flag_c = out_hi[4];
+      flag_c = carry_out;
       flag_5 = 0; // will be overwritten in the parent alu
       flag_3 = 0; // will be overwritten in the parent alu
 end
@@ -129,7 +139,7 @@ logic [7:0] add_out, add_f;
 adc8 add8(
     .x(x),
     .y(y),
-    .carry(1'b0),
+    .carry_in(1'b0),
     .sub_y(1'b0),
     .out(add_out),
     .f(add_f)
@@ -139,7 +149,7 @@ logic [7:0] adc_out, adc_f;
 adc8 adc8(
     .x(x),
     .y(y),
-    .carry(carry),
+    .carry_in(carry),
     .sub_y(1'b0),
     .out(adc_out),
     .f(adc_f)
@@ -149,7 +159,7 @@ logic [7:0] sub_out, sub_f;
 adc8 sub8(
     .x(x),
     .y(~y),
-    .carry(1'b1),
+    .carry_in(1'b1),
     .sub_y(1'b1),
     .out(sub_out),
     .f(sub_f)
@@ -159,7 +169,7 @@ logic [7:0] sbc_out, sbc_f;
 adc8 sbc8(
     .x(x),
     .y(~y),
-    .carry(~carry),
+    .carry_in(~carry),
     .sub_y(1'b1),
     .out(sbc_out),
     .f(sbc_f)
@@ -247,6 +257,9 @@ module alu16(
     output logic [7:0] f
 );
 
+logic carry;
+assign carry = f_in[0];
+
 logic [7:0] flag_5;
 logic [7:0] flag_3;
 assign flag_5 = f_in & `FLAG_5_BIT;
@@ -257,8 +270,8 @@ logic [7:0] add_f;
 adc16 add16(
     .x(x),
     .y(y),
+    .carry_in(1'b0),
     .sub_y(1'b0),
-    .f_in(f),
     .out(add_out),
     .f(add_f)
 );
@@ -268,8 +281,8 @@ logic [7:0] adc_f;
 adc16 adc16(
     .x(x),
     .y(y),
+    .carry_in(carry),
     .sub_y(1'b0),
-    .f_in(f_in),
     .out(adc_out),
     .f(adc_f)
 );
@@ -279,8 +292,8 @@ logic [7:0] sub_f;
 adc16 sub16(
     .x(x),
     .y(~y),
+    .carry_in(1'b1),
     .sub_y(1'b1),
-    .f_in({f_in[7:1], 1'b1}), // set carry
     .out(sub_out),
     .f(sub_f)
 );
@@ -290,36 +303,37 @@ logic [7:0] sbc_f;
 adc16 sbc16(
     .x(x),
     .y(~y),
+    .carry_in(~carry),
     .sub_y(1'b1),
-    .f_in({f_in[7:1], ~f_in[0]}), // invert carry
     .out(sbc_out),
     .f(sbc_f)
 );
 
 always @(*) begin
   case (func)
-    // ADD. Use also for INC (set y = 1, ignore flags).
     `ALU_FUNC_ADD: begin
         out = add_out;
         f = add_f;
     end
 
-    // ADC
     `ALU_FUNC_ADC: begin
         out = adc_out;
         f = adc_f;
     end
 
-    // SUB. Use also for DEC (set y = 1, ignore flags) and CP (ignore out).
-    `ALU_FUNC_SUB: begin
+    `ALU_FUNC_SUB, `ALU_FUNC_CP: begin
         out = sub_out;
         f = sub_f;
     end
 
-    // SBC
     `ALU_FUNC_SBC: begin
         out = sbc_out;
         f = sbc_f;
+    end
+
+    default: begin
+      out = 0;
+      f = f_in;
     end
   endcase
 

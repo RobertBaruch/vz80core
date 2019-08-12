@@ -22,8 +22,8 @@
 // task_ex_de_hl()
 // task_ex_af_af2()
 // task_exx()
-// task_alu8_compare(x, y)
-// task_alu8_add(x, y)
+// task_alu8_op(func, x, y)
+// task_alu16_op(func, x, y)
 
 // task_read_mem(n, addr)
 // Set up to read memory at the given address. n is the
@@ -218,7 +218,6 @@ task task_alu8_compare;
 begin
     alu8_x = local_x;
     alu8_y = local_y;
-    alu8_f_in = f_rdata;
     alu8_func = `ALU_FUNC_SUB;
 end
 endtask
@@ -230,8 +229,18 @@ task task_alu8_op;
 begin
     alu8_x = local_x;
     alu8_y = local_y;
-    alu8_f_in = f_rdata;
     alu8_func = local_op;
+end
+endtask
+
+task task_alu16_op;
+    input [2:0] local_op;
+    input [15:0] local_x;
+    input [15:0] local_y;
+begin
+    alu16_x = local_x;
+    alu16_y = local_y;
+    alu16_func = local_op;
 end
 endtask
 

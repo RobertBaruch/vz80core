@@ -251,7 +251,6 @@ ir_registers ir_registers(
 logic [7:0] alu8_x;
 logic [7:0] alu8_y;
 logic [7:0] alu8_out;
-logic [7:0] alu8_f_in;
 logic [7:0] alu8_f_out;
 logic [3:0] alu8_func;
 
@@ -259,9 +258,24 @@ alu8 alu8(
     .x(alu8_x),
     .y(alu8_y),
     .func(alu8_func),
-    .f_in(alu8_f_in),
+    .f_in(f_rdata),
     .out(alu8_out),
     .f(alu8_f_out)
+);
+
+logic [15:0] alu16_x;
+logic [15:0] alu16_y;
+logic [3:0] alu16_func;
+logic [7:0] alu16_f_out;
+logic [15:0] alu16_out;
+
+alu16 alu16(
+    .x(alu16_x),
+    .y(alu16_y),
+    .func(alu16_func),
+    .f_in(f_rdata),
+    .out(alu16_out),
+    .f(alu16_f_out)
 );
 
 logic [31:0] instr_for_decoder;
@@ -322,8 +336,10 @@ always @(*) begin
 
     alu8_x = 0;
     alu8_y = 0;
-    alu8_f_in = f_rdata;
     alu8_func = 0;
+    alu16_x = 0;
+    alu16_y = 0;
+    alu16_func = 0;
 
     next_collected_insn_len = 0;
     next_collected_insn = 0;
@@ -1119,6 +1135,21 @@ always @(*) begin
                     end
                     2: begin
                         task_write_mem_done(1);
+                        task_done();
+                    end
+                endcase
+
+            `INSN_GROUP_ADD_HL_DD:  /* ADD HL, dd */
+                case (state)
+                    0: begin
+                        task_read_reg(1, `DD_REG_HL);
+                        task_read_reg(2, {`REG_SET_DD, instr_for_decoder[5:4]});
+                        task_alu16_op(`ALU_FUNC_ADD, reg1_rdata, reg2_rdata);
+                        // N is reset, and only H and C are used.
+                        task_write_f(`FLAG_N_MASK &
+                            _combine_flags(alu16_f_out, f_rdata,
+                                `FLAG_H_BIT | `FLAG_C_BIT));
+                        task_write_reg(`DD_REG_HL, alu16_out);
                         task_done();
                     end
                 endcase
