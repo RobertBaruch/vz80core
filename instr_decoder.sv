@@ -43,6 +43,10 @@ always @(*) begin
                 group <= `INSN_GROUP_INC_DEC_REG;
                 len <= 1;
             end
+            8'h07, 8'h17, 8'h0F, 8'h1F: begin
+                group <= `INSN_GROUP_RR_RLCA;
+                len <= 1;
+            end
             8'h09, 8'h19, 8'h29, 8'h39: begin
                 group <= `INSN_GROUP_ADD_HL_DD;
                 len <= 1;
@@ -175,6 +179,17 @@ always @(*) begin
         endcase
     end else begin
         case (instr[15:0])
+            16'h00CB, 16'h01CB, 16'h02CB, 16'h03CB,
+            16'h04CB, 16'h05CB, 16'h07CB,
+            16'h08CB, 16'h09CB, 16'h0ACB, 16'h0BCB,
+            16'h0CCB, 16'h0DCB, 16'h0FCB,
+            16'h10CB, 16'h11CB, 16'h12CB, 16'h13CB,
+            16'h14CB, 16'h15CB, 16'h17CB,
+            16'h18CB, 16'h19CB, 16'h1ACB, 16'h1BCB,
+            16'h1CCB, 16'h1DCB, 16'h1FCB: begin
+                group <= `INSN_GROUP_RR_RLC_REG;
+                len <= 2;
+            end
             16'h42ED, 16'h52ED, 16'h62ED, 16'h72ED,
             16'h4AED, 16'h5AED, 16'h6AED, 16'h7AED: begin
                 group <= `INSN_GROUP_ADC_SBC_HL_DD;
@@ -195,6 +210,10 @@ always @(*) begin
             16'h09DD, 16'h19DD, 16'h29DD, 16'h39DD,
             16'h09FD, 16'h19FD, 16'h29FD, 16'h39FD: begin
                 group <= `INSN_GROUP_ADD_IXIY_SS;
+                len <= 2;
+            end
+            16'h23DD, 16'h2BDD, 16'h23FD, 16'h2BFD: begin
+                group <= `INSN_GROUP_INC_DEC_IXIY;
                 len <= 2;
             end
             16'h46DD, 16'h4EDD, 16'h56DD, 16'h5EDD,

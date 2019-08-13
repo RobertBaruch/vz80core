@@ -114,11 +114,9 @@ endfunction
 // Note that this is the whole raison d'etre of the half-carry
 // flag.
 function [7:0] _daa_adjustment(input flag_c, input flag_h, input [7:0] a);
-begin
     _daa_adjustment =
         ((flag_h || (a[3:0] > 4'h9)) ? 8'h6 : 0) +
         ((flag_c || (a[7:4] > 4'h9)) ? 8'h60 : 0);
-end
 endfunction
 
 // These are numbered and ordered in the same way as instructions
@@ -131,6 +129,18 @@ endfunction
 `define ALU_FUNC_XOR 5
 `define ALU_FUNC_OR 6
 `define ALU_FUNC_CP 7
+
+// The following are ordered in the same way as the
+// 'through_c' and 'right' bits in instructions are designated.
+
+// Rotate left, copy to carry
+`define ALU_FUNC_RLC 8
+// Rotate right, copy to carry
+`define ALU_FUNC_RRC 9
+// Rotate left through carry
+`define ALU_FUNC_RL 10
+// Rotate right through carry
+`define ALU_FUNC_RR 11
 
 `define INSN_GROUP_NEED_MORE_BYTES 254
 `define INSN_GROUP_ILLEGAL_INSTR 255
@@ -207,6 +217,9 @@ endfunction
 `define INSN_GROUP_ADC_SBC_HL_DD 58    /* ADC/SBC HL, dd   */
 `define INSN_GROUP_ADD_IXIY_SS 59      /* ADD IX/IY, ss    */
 `define INSN_GROUP_INC_DEC_DD 60       /* INC/DEC dd       */
+`define INSN_GROUP_INC_DEC_IXIY 61     /* INC/DEC IX/IY    */
+`define INSN_GROUP_RR_RLCA 62          /* RLCA/RLA/RRCA/RRA   */
+`define INSN_GROUP_RR_RLC_REG 63       /* RLCA/RLA/RRCA/RRA r */
 
 `define Z80_REGS_OUTPUTS \
 output [7:0] z80_reg_a, \

@@ -26,8 +26,10 @@
 `define SPEC_REG_AF2 (`SPEC_REG_A2 | `SPEC_REG_F2)
 
 // Functions useful for checking flags
+
+// Parity is set if parity is even (i.e. 0).
 function parity8(input [7:0] x);
-  parity8 = x[0] ^ x[1] ^ x[2] ^ x[3] ^ x[4] ^ x[5] ^ x[6] ^ x[7];
+  parity8 = ~(x[0] ^ x[1] ^ x[2] ^ x[3] ^ x[4] ^ x[5] ^ x[6] ^ x[7]);
 endfunction
 
 function halfcarry8(input [7:0] x, input [7:0] y, input carry);

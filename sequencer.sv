@@ -1073,6 +1073,16 @@ always @(*) begin
                     end
                 endcase
 
+            `INSN_GROUP_INC_DEC_IXIY:  /* INC/DEC IX/IY */
+                case (state)
+                    0: begin
+                        task_read_reg(1, {`REG_SET_IDX, instr_for_decoder[5]});
+                        task_alu16_op(instr_for_decoder[11] ? `ALU_FUNC_SUB : `ALU_FUNC_ADD, reg1_rdata, 8'b1);
+                        task_write_reg({`REG_SET_IDX, instr_for_decoder[5]}, alu16_out);
+                        task_done();
+                    end
+                endcase
+
             `INSN_GROUP_ALU_A_N:  /* ADD/ADC/SUB/SBC/AND/XOR/OR/CP A, n */
                 case (state)
                     0: begin
@@ -1256,6 +1266,29 @@ always @(*) begin
                     1'b0,       // n
                     1'b1        // c
                     });
+                task_done();
+            end
+
+            `INSN_GROUP_RR_RLCA: begin  /* RLCA/RLC/RRCA/RRA */
+                task_read_reg(1, `REG_A);
+                task_alu8_op(
+                    {2'b10, instr_for_decoder[4:3]},
+                    reg1_rdata,
+                    0);
+                task_write_f(`FLAG_H_MASK & `FLAG_N_MASK &
+                    _combine_flags(alu8_f_out, f_rdata, `FLAG_C_BIT));
+                task_write_reg(`REG_A, alu8_out);
+                task_done();
+            end
+
+            `INSN_GROUP_RR_RLC_REG: begin  /* RLCA/RLC/RRCA/RRA r */
+                task_read_reg(1, instr_for_decoder[10:8]);
+                task_alu8_op(
+                    {2'b10, instr_for_decoder[12:11]},
+                    reg1_rdata,
+                    0);
+                task_write_f(`FLAG_H_MASK & `FLAG_N_MASK & alu8_f_out);
+                task_write_reg(instr_for_decoder[10:8], alu8_out);
                 task_done();
             end
 

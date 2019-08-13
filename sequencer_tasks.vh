@@ -223,7 +223,7 @@ end
 endtask
 
 task task_alu8_op;
-    input [2:0] local_op;
+    input [3:0] local_op;
     input [7:0] local_x;
     input [7:0] local_y;
 begin

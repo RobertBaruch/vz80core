@@ -19,7 +19,7 @@ wire [2:0] insn_fixed2 = z80fi_insn[2:0];
 assign spec_valid = z80fi_valid &&
     z80fi_insn_len == 1 &&
     insn_fixed1 == 2'b00 &&
-    insn_fixed2 == 4'b011;
+    insn_fixed2 == 3'b011;
 
 `Z80FI_SPEC_SIGNALS
 assign spec_signals = `SPEC_REG_IP | `SPEC_REG_BC | `SPEC_REG_DE |

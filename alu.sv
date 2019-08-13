@@ -10,8 +10,25 @@ function _alu_iszero8(input [7:0] x);
   _alu_iszero8 = (x == 0);
 endfunction
 
+// Parity flag is set on parity even (i.e. 0).
 function _alu_parity8(input [7:0] x);
-  _alu_parity8 = x[0] ^ x[1] ^ x[2] ^ x[3] ^ x[4] ^ x[5] ^ x[6] ^ x[7];
+  _alu_parity8 = ~(x[0] ^ x[1] ^ x[2] ^ x[3] ^ x[4] ^ x[5] ^ x[6] ^ x[7]);
+endfunction
+
+// Rotates left or right, through carry or copy into carry.
+// The output's 8th bit is the carry out.
+function [8:0] _rotate8(input through_c, input right, input carry_in, input [7:0] x);
+  logic pushed_bit;
+  logic shove_bit;
+
+  // pushed_bit is the bit pushed off the end of the input data.
+  pushed_bit = x[right ? 0 : 7];
+  // shove_bit is the bit to be shoved into the other end of the input data.
+  shove_bit = through_c ? carry_in : pushed_bit;
+
+  _rotate8 = right ?
+    {pushed_bit, shove_bit, x[7:1]} :
+    {pushed_bit, x[6:0], shove_bit};
 endfunction
 
 // adc8 is an 8-bit adder module, with special code
@@ -234,6 +251,20 @@ always @(*) begin
         _alu_parity8(out), // parity
         2'b00 // n, c
       };
+    end
+
+    `ALU_FUNC_RR, `ALU_FUNC_RRC, `ALU_FUNC_RL, `ALU_FUNC_RLC: begin
+      {f[`FLAG_C_NUM], out} = _rotate8(
+        /* through_c=*/ func == `ALU_FUNC_RR || func == `ALU_FUNC_RL,
+        /* right=*/     func == `ALU_FUNC_RR || func == `ALU_FUNC_RRC,
+        f_in[`FLAG_C_NUM], x);
+      f[`FLAG_S_NUM] = out[7];
+      f[`FLAG_Z_NUM] = (out == 0);
+      f[`FLAG_5_NUM] = 0; // overwritten later
+      f[`FLAG_H_NUM] = 0;
+      f[`FLAG_3_NUM] = 0; // overwritten later
+      f[`FLAG_PV_NUM] = _alu_parity8(out);
+      f[`FLAG_N_NUM] = 0;
     end
 
     default: begin

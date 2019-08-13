@@ -1,8 +1,9 @@
 `default_nettype none
 `include "alu.sv"
 
+// Even parity -> flag PV = 1.
 function parity8(input [7:0] x);
-  parity8 = x[0] ^ x[1] ^ x[2] ^ x[3] ^ x[4] ^ x[5] ^ x[6] ^ x[7];
+  parity8 = ~(x[0] ^ x[1] ^ x[2] ^ x[3] ^ x[4] ^ x[5] ^ x[6] ^ x[7]);
 endfunction
 
 function halfcarry8(input [7:0] x, input [7:0] y, input carry);
@@ -252,6 +253,54 @@ always @(*) begin
     assert(flag_v == parity8(out));
     assert(flag_5 == flag_in_5);
     assert(flag_3 == flag_in_3);
+  end
+
+  if (func == `ALU_FUNC_RR) begin
+    assert(out == {flag_in_c, x[7:1]});
+    assert(flag_s == out[7]);
+    assert(flag_z == (out == 0));
+    assert(flag_5 == flag_in_5);
+    assert(flag_h == 0);
+    assert(flag_3 == flag_in_3);
+    assert(flag_v == parity8(out));
+    assert(flag_n == 0);
+    assert(flag_c == x[0]);
+  end
+
+  if (func == `ALU_FUNC_RRC) begin
+    assert(out == {x[0], x[7:1]});
+    assert(flag_s == out[7]);
+    assert(flag_z == (out == 0));
+    assert(flag_5 == flag_in_5);
+    assert(flag_h == 0);
+    assert(flag_3 == flag_in_3);
+    assert(flag_v == parity8(out));
+    assert(flag_n == 0);
+    assert(flag_c == x[0]);
+  end
+
+  if (func == `ALU_FUNC_RL) begin
+    assert(out == {x[6:0], flag_in_c});
+    assert(flag_s == out[7]);
+    assert(flag_z == (out == 0));
+    assert(flag_5 == flag_in_5);
+    assert(flag_h == 0);
+    assert(flag_3 == flag_in_3);
+    assert(flag_v == parity8(out));
+    assert(flag_n == 0);
+    assert(flag_c == x[7]);
+  end
+
+  if (func == `ALU_FUNC_RLC) begin
+    assert(out == {x[6:0], x[7]});
+    assert(flag_s == out[7]);
+    assert(flag_z == (out == 0));
+    assert(flag_5 == flag_in_5);
+    assert(flag_h == 0);
+    assert(flag_3 == flag_in_3);
+    assert(flag_v == parity8(out));
+    assert(flag_n == 0);
+    assert(flag_c == x[7]);
   end
 end
 
