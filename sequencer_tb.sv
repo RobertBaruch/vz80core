@@ -35,10 +35,10 @@ sequencer sequencer(
 always #1 clk=~clk;
 
 always @(*) begin
-    if (addr == 0) mem_data = 8'hED;
-    else if (addr == 1) mem_data = 8'hB0;
+    if (addr == 0) mem_data = 8'hFD;
+    else if (addr == 1) mem_data = 8'hCB;
     else if (addr == 2) mem_data = 8'h34;
-    else if (addr == 3) mem_data = 8'h00;
+    else if (addr == 3) mem_data = 8'h06;
     else if (addr == 4) mem_data = 8'h00;
     else if (addr == 5) mem_data = 8'h00;
     else mem_data = addr[7:0]^addr[15:8];
@@ -51,7 +51,7 @@ initial begin
     #2
     reset = 0;
 
-    #20
+    #12
     $finish;
 end
 

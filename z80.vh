@@ -133,6 +133,8 @@ endfunction
 // The following are ordered in the same way as the
 // 'through_c' and 'right' bits in instructions are designated.
 
+// Prefix to cancatenate with through_c and right bits to get func.
+`define ALU_ROT 2'b10
 // Rotate left, copy to carry
 `define ALU_FUNC_RLC 8
 // Rotate right, copy to carry
@@ -142,6 +144,7 @@ endfunction
 // Rotate right through carry
 `define ALU_FUNC_RR 11
 
+`define INSN_GROUP_IDX_IXIY_BITS 253
 `define INSN_GROUP_NEED_MORE_BYTES 254
 `define INSN_GROUP_ILLEGAL_INSTR 255
 `define INSN_GROUP_LD_REG_REG 0        /* LD  r, r'        */
@@ -218,8 +221,12 @@ endfunction
 `define INSN_GROUP_ADD_IXIY_SS 59      /* ADD IX/IY, ss    */
 `define INSN_GROUP_INC_DEC_DD 60       /* INC/DEC dd       */
 `define INSN_GROUP_INC_DEC_IXIY 61     /* INC/DEC IX/IY    */
-`define INSN_GROUP_RR_RLCA 62          /* RLCA/RLA/RRCA/RRA   */
-`define INSN_GROUP_RR_RLC_REG 63       /* RLCA/RLA/RRCA/RRA r */
+`define INSN_GROUP_RR_RLCA 62          /* RLCA/RLA/RRCA/RRA       */
+`define INSN_GROUP_RR_RLC_REG 63       /* RLCA/RLA/RRCA/RRA r     */
+`define INSN_GROUP_RR_RLC_IND_HL 64    /* RLCA/RLA/RRCA/RRA (HL)  */
+
+// These are the INSN_GROUP_IDX_IXIY_BITS groups
+`define INSN_GROUP_RR_RLC_IDX_IXIY 0   /* RLCA/RLA/RRCA/RRA (IX/IY + d) */
 
 `define Z80_REGS_OUTPUTS \
 output [7:0] z80_reg_a, \

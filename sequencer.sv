@@ -299,6 +299,12 @@ instr_decoder instr_decoder(
 
 `include "sequencer_tasks.vh"
 
+logic [7:0] ixiy_bits_group;
+instr_ixiy_bits_decoder ixiy_bits_decoder(
+    .instr(instr_for_decoder[31:24]),
+    .group(ixiy_bits_group)
+);
+
 always @(*) begin
     if (reset || done) begin
         `ifdef Z80_FORMAL
@@ -1272,7 +1278,7 @@ always @(*) begin
             `INSN_GROUP_RR_RLCA: begin  /* RLCA/RLC/RRCA/RRA */
                 task_read_reg(1, `REG_A);
                 task_alu8_op(
-                    {2'b10, instr_for_decoder[4:3]},
+                    {`ALU_ROT, instr_for_decoder[4:3]},
                     reg1_rdata,
                     0);
                 task_write_f(`FLAG_H_MASK & `FLAG_N_MASK &
@@ -1284,13 +1290,65 @@ always @(*) begin
             `INSN_GROUP_RR_RLC_REG: begin  /* RLCA/RLC/RRCA/RRA r */
                 task_read_reg(1, instr_for_decoder[10:8]);
                 task_alu8_op(
-                    {2'b10, instr_for_decoder[12:11]},
+                    {`ALU_ROT, instr_for_decoder[12:11]},
                     reg1_rdata,
                     0);
                 task_write_f(`FLAG_H_MASK & `FLAG_N_MASK & alu8_f_out);
                 task_write_reg(instr_for_decoder[10:8], alu8_out);
                 task_done();
             end
+
+            `INSN_GROUP_RR_RLC_IND_HL:  /* RLCA/RLC/RRCA/RRA (HL) */
+                case (state)
+                    0: begin
+                        task_read_reg(1, `DD_REG_HL);
+                        task_read_mem(1, reg1_rdata);
+                    end
+                    1: begin
+                        task_read_reg(1, `DD_REG_HL);
+                        task_collect_data(1);
+                        task_alu8_op(
+                            {`ALU_ROT, instr_for_decoder[12:11]},
+                            next_collected_data[7:0],
+                            0);
+                        task_write_f(`FLAG_H_MASK & `FLAG_N_MASK & alu8_f_out);
+                        task_write_mem(1, reg1_rdata, alu8_out);
+                    end
+                    2: begin
+                        task_write_mem_done(1);
+                        task_done();
+                    end
+                endcase
+
+            `INSN_GROUP_IDX_IXIY_BITS:
+                // Handles all the DDCB / FDCB instructions
+                case (ixiy_bits_group)
+                    `INSN_GROUP_RR_RLC_IDX_IXIY: /* RLCA/RLC/RRCA/RRA (IX/IY + d) */
+                        case (state)
+                            0: begin
+                                task_read_reg(1, {`REG_SET_IDX, instr_for_decoder[5]});
+                                task_read_mem(1, reg1_rdata + { {8{insn_operand[7]}}, insn_operand[7:0]});
+                            end
+                            1: begin
+                                task_read_reg(1, {`REG_SET_IDX, instr_for_decoder[5]});
+                                task_collect_data(1);
+                                task_alu8_op(
+                                    {`ALU_ROT, instr_for_decoder[28:27]},
+                                    next_collected_data[7:0],
+                                    0);
+                                task_write_f(`FLAG_H_MASK & `FLAG_N_MASK & alu8_f_out);
+                                task_write_mem(1, reg1_rdata + { {8{insn_operand[7]}}, insn_operand[7:0]}, alu8_out);
+                            end
+                            2: begin
+                                task_write_mem_done(1);
+                                task_done();
+                            end
+                        endcase
+
+                    default: begin // For illegal instructions, just assume done
+                        task_done();
+                    end
+                endcase
 
             default: begin // For illegal instructions, just assume done
                 task_done();
@@ -1319,6 +1377,7 @@ always @(*) begin
         `endif
     end
 end
+
 
 `ifdef SEQUENCER_FORMAL
 

@@ -1,315 +1,1007 @@
 $date
-	Fri Aug 09 17:22:27 2019
+	Tue Aug 13 20:25:49 2019
 $end
 $version
 	Icarus Verilog
 $end
 $timescale
-	1us
+	100ns
 $end
+$scope function _alu_iszero8 $end
+$var reg 1 ! _alu_iszero8 $end
+$var reg 8 " x [7:0] $end
+$upscope $end
+$scope function _alu_parity8 $end
+$var reg 1 # _alu_parity8 $end
+$var reg 8 $ x [7:0] $end
+$upscope $end
+$scope function _combine_flags $end
+$var reg 8 % _combine_flags [7:0] $end
+$var reg 8 & f1 [7:0] $end
+$var reg 8 ' f2 [7:0] $end
+$var reg 8 ( mask1 [7:0] $end
+$upscope $end
+$scope function _daa_adjustment $end
+$var reg 8 ) _daa_adjustment [7:0] $end
+$var reg 8 * a [7:0] $end
+$var reg 1 + flag_c $end
+$var reg 1 , flag_h $end
+$upscope $end
+$scope function _rotate8 $end
+$var reg 9 - _rotate8 [8:0] $end
+$var reg 1 . carry_in $end
+$var reg 1 / pushed_bit $end
+$var reg 1 0 right $end
+$var reg 1 1 shove_bit $end
+$var reg 1 2 through_c $end
+$var reg 8 3 x [7:0] $end
+$upscope $end
+$scope function carry16 $end
+$var reg 1 4 carry $end
+$var reg 1 5 carry16 $end
+$var reg 17 6 out [16:0] $end
+$var reg 16 7 x [15:0] $end
+$var reg 16 8 y [15:0] $end
+$upscope $end
+$scope function carry8 $end
+$var reg 1 9 carry $end
+$var reg 1 : carry8 $end
+$var reg 9 ; out [8:0] $end
+$var reg 8 < x [7:0] $end
+$var reg 8 = y [7:0] $end
+$upscope $end
+$scope function halfcarry16 $end
+$var reg 1 > carry $end
+$var reg 1 ? halfcarry16 $end
+$var reg 13 @ out [12:0] $end
+$var reg 16 A x [15:0] $end
+$var reg 16 B y [15:0] $end
+$upscope $end
+$scope function halfcarry8 $end
+$var reg 1 C carry $end
+$var reg 1 D halfcarry8 $end
+$var reg 5 E out [4:0] $end
+$var reg 8 F x [7:0] $end
+$var reg 8 G y [7:0] $end
+$upscope $end
+$scope function overflow16 $end
+$var reg 1 H carry $end
+$var reg 16 I out [15:0] $end
+$var reg 1 J overflow16 $end
+$var reg 16 K x [15:0] $end
+$var reg 16 L y [15:0] $end
+$upscope $end
+$scope function overflow8 $end
+$var reg 1 M carry $end
+$var reg 8 N out [7:0] $end
+$var reg 1 O overflow8 $end
+$var reg 8 P x [7:0] $end
+$var reg 8 Q y [7:0] $end
+$upscope $end
+$scope function parity8 $end
+$var reg 1 R parity8 $end
+$var reg 8 S x [7:0] $end
+$upscope $end
 $scope module sequencer_tb $end
-$var wire 1 ! write_mem $end
-$var wire 8 " write_data [7:0] $end
-$var wire 1 # read_mem $end
-$var wire 1 $ done $end
-$var wire 16 % addr [15:0] $end
-$var reg 1 & clk $end
-$var reg 8 ' mem_data [7:0] $end
-$var reg 1 ( reset $end
+$var wire 1 T write_mem $end
+$var wire 8 U write_data [7:0] $end
+$var wire 1 V read_mem $end
+$var wire 1 W done $end
+$var wire 16 X addr [15:0] $end
+$var reg 1 Y clk $end
+$var reg 8 Z mem_data [7:0] $end
+$var reg 1 [ reset $end
 $scope module sequencer $end
-$var wire 1 & clk $end
-$var wire 8 ) mem_data [7:0] $end
-$var wire 8 * mem_rdata [7:0] $end
-$var wire 1 # read_mem $end
-$var wire 1 ( reset $end
-$var wire 8 + write_data [7:0] $end
-$var wire 1 ! write_mem $end
-$var wire 8 , z80fi_reg_a_out [7:0] $end
-$var wire 8 - z80fi_reg_b_out [7:0] $end
-$var wire 8 . z80fi_reg_c_out [7:0] $end
-$var wire 8 / z80fi_reg_d_out [7:0] $end
-$var wire 8 0 z80fi_reg_e_out [7:0] $end
-$var wire 8 1 z80fi_reg_f_out [7:0] $end
-$var wire 8 2 z80fi_reg_h_out [7:0] $end
-$var wire 8 3 z80fi_reg_i_out [7:0] $end
-$var wire 1 4 z80fi_reg_iff1_out $end
-$var wire 1 5 z80fi_reg_iff2_out $end
-$var wire 16 6 z80fi_reg_ip_out [15:0] $end
-$var wire 16 7 z80fi_reg_ix_out [15:0] $end
-$var wire 16 8 z80fi_reg_iy_out [15:0] $end
-$var wire 8 9 z80fi_reg_l_out [7:0] $end
-$var wire 8 : z80fi_reg_r_out [7:0] $end
-$var wire 16 ; z80fi_reg_sp_out [15:0] $end
-$var wire 16 < z80_reg_sp [15:0] $end
-$var wire 8 = z80_reg_r [7:0] $end
-$var wire 8 > z80_reg_l2 [7:0] $end
-$var wire 8 ? z80_reg_l [7:0] $end
-$var wire 16 @ z80_reg_iy [15:0] $end
-$var wire 16 A z80_reg_ix [15:0] $end
-$var wire 1 B z80_reg_iff2 $end
-$var wire 1 C z80_reg_iff1 $end
-$var wire 8 D z80_reg_i [7:0] $end
-$var wire 8 E z80_reg_h2 [7:0] $end
-$var wire 8 F z80_reg_h [7:0] $end
-$var wire 8 G z80_reg_f2 [7:0] $end
-$var wire 8 H z80_reg_f [7:0] $end
-$var wire 8 I z80_reg_e2 [7:0] $end
-$var wire 8 J z80_reg_e [7:0] $end
-$var wire 8 K z80_reg_d2 [7:0] $end
-$var wire 8 L z80_reg_d [7:0] $end
-$var wire 8 M z80_reg_c2 [7:0] $end
-$var wire 8 N z80_reg_c [7:0] $end
-$var wire 8 O z80_reg_b2 [7:0] $end
-$var wire 8 P z80_reg_b [7:0] $end
-$var wire 8 Q z80_reg_a2 [7:0] $end
-$var wire 8 R z80_reg_a [7:0] $end
-$var wire 16 S reg2_rdata [15:0] $end
-$var wire 16 T reg1_rdata [15:0] $end
-$var wire 8 U f_rdata [7:0] $end
-$var wire 3 V decoded_len [2:0] $end
-$var wire 8 W decoded_group [7:0] $end
-$var reg 1 X accept_nmi $end
-$var reg 16 Y addr [15:0] $end
-$var reg 1 Z block_dec $end
-$var reg 1 [ block_inc $end
-$var reg 16 \ collected_data [15:0] $end
-$var reg 2 ] collected_data_len [1:0] $end
-$var reg 1 ^ collected_data_ready $end
-$var reg 32 _ collected_insn [31:0] $end
-$var reg 3 ` collected_insn_len [2:0] $end
-$var reg 1 a collected_insn_ready $end
-$var reg 2 b collected_op_len [1:0] $end
-$var reg 1 c collected_op_ready $end
-$var reg 1 d disable_interrupts $end
-$var reg 1 $ done $end
-$var reg 1 e enable_interrupts $end
-$var reg 8 f f_wdata [7:0] $end
-$var reg 1 g f_wr $end
-$var reg 8 h i_wdata [7:0] $end
-$var reg 1 i i_wr $end
-$var reg 3 j insn_len_for_sequencer [2:0] $end
-$var reg 16 k insn_operand [15:0] $end
-$var reg 32 l instr_for_decoder [31:0] $end
-$var reg 1 m mem_rd $end
-$var reg 8 n mem_wdata [7:0] $end
-$var reg 1 o mem_wr $end
-$var reg 16 p next_addr [15:0] $end
-$var reg 16 q next_collected_data [15:0] $end
-$var reg 2 r next_collected_data_len [1:0] $end
-$var reg 1 s next_collected_data_ready $end
-$var reg 32 t next_collected_insn [31:0] $end
-$var reg 3 u next_collected_insn_len [2:0] $end
-$var reg 1 v next_collected_insn_ready $end
-$var reg 2 w next_collected_op_len [1:0] $end
-$var reg 1 x next_collected_op_ready $end
-$var reg 1 y next_done $end
-$var reg 1 z next_mem_rd $end
-$var reg 8 { next_mem_wdata [7:0] $end
-$var reg 1 | next_mem_wr $end
-$var reg 4 } next_state [3:0] $end
-$var reg 16 ~ next_z80_reg_ip [15:0] $end
-$var reg 32 !" next_z80fi_insn [31:0] $end
-$var reg 3 "" next_z80fi_insn_len [2:0] $end
-$var reg 16 #" next_z80fi_mem_raddr [15:0] $end
-$var reg 16 $" next_z80fi_mem_raddr2 [15:0] $end
-$var reg 1 %" next_z80fi_mem_rd $end
-$var reg 1 &" next_z80fi_mem_rd2 $end
-$var reg 8 '" next_z80fi_mem_rdata [7:0] $end
-$var reg 8 (" next_z80fi_mem_rdata2 [7:0] $end
-$var reg 16 )" next_z80fi_mem_waddr [15:0] $end
-$var reg 16 *" next_z80fi_mem_waddr2 [15:0] $end
-$var reg 8 +" next_z80fi_mem_wdata [7:0] $end
-$var reg 8 ," next_z80fi_mem_wdata2 [7:0] $end
-$var reg 1 -" next_z80fi_mem_wr $end
-$var reg 1 ." next_z80fi_mem_wr2 $end
-$var reg 8 /" next_z80fi_reg_a_in [7:0] $end
-$var reg 8 0" next_z80fi_reg_b_in [7:0] $end
-$var reg 8 1" next_z80fi_reg_c_in [7:0] $end
-$var reg 8 2" next_z80fi_reg_d_in [7:0] $end
-$var reg 8 3" next_z80fi_reg_e_in [7:0] $end
-$var reg 8 4" next_z80fi_reg_f_in [7:0] $end
-$var reg 8 5" next_z80fi_reg_h_in [7:0] $end
-$var reg 8 6" next_z80fi_reg_i_in [7:0] $end
-$var reg 1 7" next_z80fi_reg_iff1_in $end
-$var reg 1 8" next_z80fi_reg_iff2_in $end
-$var reg 16 9" next_z80fi_reg_ip_in [15:0] $end
-$var reg 16 :" next_z80fi_reg_ix_in [15:0] $end
-$var reg 16 ;" next_z80fi_reg_iy_in [15:0] $end
-$var reg 8 <" next_z80fi_reg_l_in [7:0] $end
-$var reg 8 =" next_z80fi_reg_r_in [7:0] $end
-$var reg 16 >" next_z80fi_reg_sp_in [15:0] $end
-$var reg 1 ?" next_z80fi_valid $end
-$var reg 2 @" op_len_for_decoder [1:0] $end
-$var reg 8 A" r_wdata [7:0] $end
-$var reg 1 B" r_wr $end
-$var reg 5 C" reg1_rnum [4:0] $end
-$var reg 5 D" reg2_rnum [4:0] $end
-$var reg 16 E" reg_wdata [15:0] $end
-$var reg 5 F" reg_wnum [4:0] $end
-$var reg 1 G" reg_wr $end
-$var reg 1 H" ret_from_nmi $end
-$var reg 4 I" state [3:0] $end
-$var reg 16 J" z80_reg_ip [15:0] $end
-$var reg 32 K" z80fi_insn [31:0] $end
-$var reg 3 L" z80fi_insn_len [2:0] $end
-$var reg 16 M" z80fi_mem_raddr [15:0] $end
-$var reg 16 N" z80fi_mem_raddr2 [15:0] $end
-$var reg 1 O" z80fi_mem_rd $end
-$var reg 1 P" z80fi_mem_rd2 $end
-$var reg 8 Q" z80fi_mem_rdata [7:0] $end
-$var reg 8 R" z80fi_mem_rdata2 [7:0] $end
-$var reg 16 S" z80fi_mem_waddr [15:0] $end
-$var reg 16 T" z80fi_mem_waddr2 [15:0] $end
-$var reg 8 U" z80fi_mem_wdata [7:0] $end
-$var reg 8 V" z80fi_mem_wdata2 [7:0] $end
-$var reg 1 W" z80fi_mem_wr $end
-$var reg 1 X" z80fi_mem_wr2 $end
-$var reg 8 Y" z80fi_reg_a_in [7:0] $end
-$var reg 8 Z" z80fi_reg_b_in [7:0] $end
-$var reg 8 [" z80fi_reg_c_in [7:0] $end
-$var reg 8 \" z80fi_reg_d_in [7:0] $end
-$var reg 8 ]" z80fi_reg_e_in [7:0] $end
-$var reg 8 ^" z80fi_reg_f_in [7:0] $end
-$var reg 8 _" z80fi_reg_h_in [7:0] $end
-$var reg 8 `" z80fi_reg_i_in [7:0] $end
-$var reg 1 a" z80fi_reg_iff1_in $end
-$var reg 1 b" z80fi_reg_iff2_in $end
-$var reg 16 c" z80fi_reg_ip_in [15:0] $end
-$var reg 16 d" z80fi_reg_ix_in [15:0] $end
-$var reg 16 e" z80fi_reg_iy_in [15:0] $end
-$var reg 8 f" z80fi_reg_l_in [7:0] $end
-$var reg 8 g" z80fi_reg_r_in [7:0] $end
-$var reg 16 h" z80fi_reg_sp_in [15:0] $end
-$var reg 1 i" z80fi_valid $end
+$var wire 1 Y clk $end
+$var wire 1 \ gated_iff1 $end
+$var wire 1 ] gated_iff2 $end
+$var wire 8 ^ mem_data [7:0] $end
+$var wire 8 _ mem_rdata [7:0] $end
+$var wire 1 V read_mem $end
+$var wire 1 [ reset $end
+$var wire 8 ` write_data [7:0] $end
+$var wire 1 T write_mem $end
+$var wire 8 a z80fi_reg_a2_out [7:0] $end
+$var wire 8 b z80fi_reg_a_out [7:0] $end
+$var wire 8 c z80fi_reg_b2_out [7:0] $end
+$var wire 8 d z80fi_reg_b_out [7:0] $end
+$var wire 8 e z80fi_reg_c2_out [7:0] $end
+$var wire 8 f z80fi_reg_c_out [7:0] $end
+$var wire 8 g z80fi_reg_d2_out [7:0] $end
+$var wire 8 h z80fi_reg_d_out [7:0] $end
+$var wire 8 i z80fi_reg_e2_out [7:0] $end
+$var wire 8 j z80fi_reg_e_out [7:0] $end
+$var wire 8 k z80fi_reg_f2_out [7:0] $end
+$var wire 8 l z80fi_reg_f_out [7:0] $end
+$var wire 8 m z80fi_reg_h2_out [7:0] $end
+$var wire 8 n z80fi_reg_h_out [7:0] $end
+$var wire 8 o z80fi_reg_i_out [7:0] $end
+$var wire 1 p z80fi_reg_iff1_out $end
+$var wire 1 q z80fi_reg_iff2_out $end
+$var wire 16 r z80fi_reg_ip_out [15:0] $end
+$var wire 16 s z80fi_reg_ix_out [15:0] $end
+$var wire 16 t z80fi_reg_iy_out [15:0] $end
+$var wire 8 u z80fi_reg_l2_out [7:0] $end
+$var wire 8 v z80fi_reg_l_out [7:0] $end
+$var wire 8 w z80fi_reg_r_out [7:0] $end
+$var wire 16 x z80fi_reg_sp_out [15:0] $end
+$var wire 16 y z80_reg_sp [15:0] $end
+$var wire 8 z z80_reg_r [7:0] $end
+$var wire 8 { z80_reg_l2 [7:0] $end
+$var wire 8 | z80_reg_l [7:0] $end
+$var wire 16 } z80_reg_iy [15:0] $end
+$var wire 16 ~ z80_reg_ix [15:0] $end
+$var wire 1 !" z80_reg_iff2 $end
+$var wire 1 "" z80_reg_iff1 $end
+$var wire 8 #" z80_reg_i [7:0] $end
+$var wire 8 $" z80_reg_h2 [7:0] $end
+$var wire 8 %" z80_reg_h [7:0] $end
+$var wire 8 &" z80_reg_f2 [7:0] $end
+$var wire 8 '" z80_reg_f [7:0] $end
+$var wire 8 (" z80_reg_e2 [7:0] $end
+$var wire 8 )" z80_reg_e [7:0] $end
+$var wire 8 *" z80_reg_d2 [7:0] $end
+$var wire 8 +" z80_reg_d [7:0] $end
+$var wire 8 ," z80_reg_c2 [7:0] $end
+$var wire 8 -" z80_reg_c [7:0] $end
+$var wire 8 ." z80_reg_b2 [7:0] $end
+$var wire 8 /" z80_reg_b [7:0] $end
+$var wire 8 0" z80_reg_a2 [7:0] $end
+$var wire 8 1" z80_reg_a [7:0] $end
+$var wire 16 2" reg2_rdata [15:0] $end
+$var wire 16 3" reg1_rdata [15:0] $end
+$var wire 8 4" ixiy_bits_group [7:0] $end
+$var wire 1 5" flag_z $end
+$var wire 1 6" flag_s $end
+$var wire 1 7" flag_pv $end
+$var wire 1 8" flag_n $end
+$var wire 1 9" flag_h $end
+$var wire 1 :" flag_c $end
+$var wire 1 ;" flag_5 $end
+$var wire 1 <" flag_3 $end
+$var wire 8 =" f_rdata [7:0] $end
+$var wire 1 >" delayed_enable_interrupts $end
+$var wire 3 ?" decoded_len [2:0] $end
+$var wire 8 @" decoded_group [7:0] $end
+$var wire 8 A" alu8_out [7:0] $end
+$var wire 8 B" alu8_f_out [7:0] $end
+$var wire 16 C" alu16_out [15:0] $end
+$var wire 8 D" alu16_f_out [7:0] $end
+$var reg 1 E" accept_nmi $end
+$var reg 16 F" addr [15:0] $end
+$var reg 4 G" alu16_func [3:0] $end
+$var reg 16 H" alu16_x [15:0] $end
+$var reg 16 I" alu16_y [15:0] $end
+$var reg 4 J" alu8_func [3:0] $end
+$var reg 8 K" alu8_x [7:0] $end
+$var reg 8 L" alu8_y [7:0] $end
+$var reg 1 M" block_compare $end
+$var reg 1 N" block_dec $end
+$var reg 1 O" block_inc $end
+$var reg 16 P" collected_data [15:0] $end
+$var reg 2 Q" collected_data_len [1:0] $end
+$var reg 1 R" collected_data_ready $end
+$var reg 32 S" collected_insn [31:0] $end
+$var reg 3 T" collected_insn_len [2:0] $end
+$var reg 1 U" collected_insn_ready $end
+$var reg 2 V" collected_op_len [1:0] $end
+$var reg 1 W" collected_op_ready $end
+$var reg 1 X" disable_interrupts $end
+$var reg 1 W done $end
+$var reg 1 Y" enable_interrupts $end
+$var reg 1 Z" ex_af_af2 $end
+$var reg 1 [" ex_de_hl $end
+$var reg 1 \" exx $end
+$var reg 8 ]" f_wdata [7:0] $end
+$var reg 1 ^" f_wr $end
+$var reg 8 _" i_wdata [7:0] $end
+$var reg 1 `" i_wr $end
+$var reg 3 a" insn_len_for_sequencer [2:0] $end
+$var reg 16 b" insn_operand [15:0] $end
+$var reg 32 c" instr_for_decoder [31:0] $end
+$var reg 1 d" mem_rd $end
+$var reg 8 e" mem_wdata [7:0] $end
+$var reg 1 f" mem_wr $end
+$var reg 16 g" next_addr [15:0] $end
+$var reg 16 h" next_collected_data [15:0] $end
+$var reg 2 i" next_collected_data_len [1:0] $end
+$var reg 1 j" next_collected_data_ready $end
+$var reg 32 k" next_collected_insn [31:0] $end
+$var reg 3 l" next_collected_insn_len [2:0] $end
+$var reg 1 m" next_collected_insn_ready $end
+$var reg 2 n" next_collected_op_len [1:0] $end
+$var reg 1 o" next_collected_op_ready $end
+$var reg 1 p" next_done $end
+$var reg 1 q" next_mem_rd $end
+$var reg 8 r" next_mem_wdata [7:0] $end
+$var reg 1 s" next_mem_wr $end
+$var reg 4 t" next_state [3:0] $end
+$var reg 16 u" next_z80_reg_ip [15:0] $end
+$var reg 32 v" next_z80fi_insn [31:0] $end
+$var reg 3 w" next_z80fi_insn_len [2:0] $end
+$var reg 16 x" next_z80fi_mem_raddr [15:0] $end
+$var reg 16 y" next_z80fi_mem_raddr2 [15:0] $end
+$var reg 1 z" next_z80fi_mem_rd $end
+$var reg 1 {" next_z80fi_mem_rd2 $end
+$var reg 8 |" next_z80fi_mem_rdata [7:0] $end
+$var reg 8 }" next_z80fi_mem_rdata2 [7:0] $end
+$var reg 16 ~" next_z80fi_mem_waddr [15:0] $end
+$var reg 16 !# next_z80fi_mem_waddr2 [15:0] $end
+$var reg 8 "# next_z80fi_mem_wdata [7:0] $end
+$var reg 8 ## next_z80fi_mem_wdata2 [7:0] $end
+$var reg 1 $# next_z80fi_mem_wr $end
+$var reg 1 %# next_z80fi_mem_wr2 $end
+$var reg 8 &# next_z80fi_reg_a2_in [7:0] $end
+$var reg 8 '# next_z80fi_reg_a_in [7:0] $end
+$var reg 8 (# next_z80fi_reg_b2_in [7:0] $end
+$var reg 8 )# next_z80fi_reg_b_in [7:0] $end
+$var reg 8 *# next_z80fi_reg_c2_in [7:0] $end
+$var reg 8 +# next_z80fi_reg_c_in [7:0] $end
+$var reg 8 ,# next_z80fi_reg_d2_in [7:0] $end
+$var reg 8 -# next_z80fi_reg_d_in [7:0] $end
+$var reg 8 .# next_z80fi_reg_e2_in [7:0] $end
+$var reg 8 /# next_z80fi_reg_e_in [7:0] $end
+$var reg 8 0# next_z80fi_reg_f2_in [7:0] $end
+$var reg 8 1# next_z80fi_reg_f_in [7:0] $end
+$var reg 8 2# next_z80fi_reg_h2_in [7:0] $end
+$var reg 8 3# next_z80fi_reg_h_in [7:0] $end
+$var reg 8 4# next_z80fi_reg_i_in [7:0] $end
+$var reg 1 5# next_z80fi_reg_iff1_in $end
+$var reg 1 6# next_z80fi_reg_iff2_in $end
+$var reg 16 7# next_z80fi_reg_ip_in [15:0] $end
+$var reg 16 8# next_z80fi_reg_ix_in [15:0] $end
+$var reg 16 9# next_z80fi_reg_iy_in [15:0] $end
+$var reg 8 :# next_z80fi_reg_l2_in [7:0] $end
+$var reg 8 ;# next_z80fi_reg_l_in [7:0] $end
+$var reg 8 <# next_z80fi_reg_r_in [7:0] $end
+$var reg 16 =# next_z80fi_reg_sp_in [15:0] $end
+$var reg 1 ># next_z80fi_valid $end
+$var reg 2 ?# op_len_for_decoder [1:0] $end
+$var reg 8 @# r_wdata [7:0] $end
+$var reg 1 A# r_wr $end
+$var reg 5 B# reg1_rnum [4:0] $end
+$var reg 5 C# reg2_rnum [4:0] $end
+$var reg 16 D# reg_wdata [15:0] $end
+$var reg 5 E# reg_wnum [4:0] $end
+$var reg 1 F# reg_wr $end
+$var reg 1 G# ret_from_nmi $end
+$var reg 4 H# state [3:0] $end
+$var reg 16 I# z80_reg_ip [15:0] $end
+$var reg 32 J# z80fi_insn [31:0] $end
+$var reg 3 K# z80fi_insn_len [2:0] $end
+$var reg 16 L# z80fi_mem_raddr [15:0] $end
+$var reg 16 M# z80fi_mem_raddr2 [15:0] $end
+$var reg 1 N# z80fi_mem_rd $end
+$var reg 1 O# z80fi_mem_rd2 $end
+$var reg 8 P# z80fi_mem_rdata [7:0] $end
+$var reg 8 Q# z80fi_mem_rdata2 [7:0] $end
+$var reg 16 R# z80fi_mem_waddr [15:0] $end
+$var reg 16 S# z80fi_mem_waddr2 [15:0] $end
+$var reg 8 T# z80fi_mem_wdata [7:0] $end
+$var reg 8 U# z80fi_mem_wdata2 [7:0] $end
+$var reg 1 V# z80fi_mem_wr $end
+$var reg 1 W# z80fi_mem_wr2 $end
+$var reg 8 X# z80fi_reg_a2_in [7:0] $end
+$var reg 8 Y# z80fi_reg_a_in [7:0] $end
+$var reg 8 Z# z80fi_reg_b2_in [7:0] $end
+$var reg 8 [# z80fi_reg_b_in [7:0] $end
+$var reg 8 \# z80fi_reg_c2_in [7:0] $end
+$var reg 8 ]# z80fi_reg_c_in [7:0] $end
+$var reg 8 ^# z80fi_reg_d2_in [7:0] $end
+$var reg 8 _# z80fi_reg_d_in [7:0] $end
+$var reg 8 `# z80fi_reg_e2_in [7:0] $end
+$var reg 8 a# z80fi_reg_e_in [7:0] $end
+$var reg 8 b# z80fi_reg_f2_in [7:0] $end
+$var reg 8 c# z80fi_reg_f_in [7:0] $end
+$var reg 8 d# z80fi_reg_h2_in [7:0] $end
+$var reg 8 e# z80fi_reg_h_in [7:0] $end
+$var reg 8 f# z80fi_reg_i_in [7:0] $end
+$var reg 1 g# z80fi_reg_iff1_in $end
+$var reg 1 h# z80fi_reg_iff2_in $end
+$var reg 16 i# z80fi_reg_ip_in [15:0] $end
+$var reg 16 j# z80fi_reg_ix_in [15:0] $end
+$var reg 16 k# z80fi_reg_iy_in [15:0] $end
+$var reg 8 l# z80fi_reg_l2_in [7:0] $end
+$var reg 8 m# z80fi_reg_l_in [7:0] $end
+$var reg 8 n# z80fi_reg_r_in [7:0] $end
+$var reg 16 o# z80fi_reg_sp_in [15:0] $end
+$var reg 1 p# z80fi_valid $end
+$scope module alu16 $end
+$var wire 8 q# flag_3 [7:0] $end
+$var wire 8 r# flag_5 [7:0] $end
+$var wire 4 s# func [3:0] $end
+$var wire 16 t# x [15:0] $end
+$var wire 16 u# y [15:0] $end
+$var wire 16 v# sub_out [15:0] $end
+$var wire 8 w# sub_f [7:0] $end
+$var wire 16 x# sbc_out [15:0] $end
+$var wire 8 y# sbc_f [7:0] $end
+$var wire 8 z# f_in [7:0] $end
+$var wire 1 {# carry $end
+$var wire 16 |# add_out [15:0] $end
+$var wire 8 }# add_f [7:0] $end
+$var wire 16 ~# adc_out [15:0] $end
+$var wire 8 !$ adc_f [7:0] $end
+$var reg 8 "$ f [7:0] $end
+$var reg 16 #$ out [15:0] $end
+$scope module adc16 $end
+$var wire 1 {# carry_in $end
+$var wire 1 $$ sub_y $end
+$var wire 16 %$ x [15:0] $end
+$var wire 16 &$ y [15:0] $end
+$var wire 1 '$ penult_carry_out $end
+$var wire 1 ($ half_carry $end
+$var wire 8 )$ f [7:0] $end
+$var wire 1 *$ carry_out $end
+$var reg 1 +$ flag_3 $end
+$var reg 1 ,$ flag_5 $end
+$var reg 1 -$ flag_c $end
+$var reg 1 .$ flag_h $end
+$var reg 1 /$ flag_n $end
+$var reg 1 0$ flag_s $end
+$var reg 1 1$ flag_v $end
+$var reg 1 2$ flag_z $end
+$var reg 16 3$ out [15:0] $end
+$var reg 4 4$ out_hi1 [3:0] $end
+$var reg 2 5$ out_hi2 [1:0] $end
+$var reg 13 6$ out_lo [12:0] $end
+$upscope $end
+$scope module add16 $end
+$var wire 1 7$ carry_in $end
+$var wire 1 8$ sub_y $end
+$var wire 16 9$ x [15:0] $end
+$var wire 16 :$ y [15:0] $end
+$var wire 1 ;$ penult_carry_out $end
+$var wire 1 <$ half_carry $end
+$var wire 8 =$ f [7:0] $end
+$var wire 1 >$ carry_out $end
+$var reg 1 ?$ flag_3 $end
+$var reg 1 @$ flag_5 $end
+$var reg 1 A$ flag_c $end
+$var reg 1 B$ flag_h $end
+$var reg 1 C$ flag_n $end
+$var reg 1 D$ flag_s $end
+$var reg 1 E$ flag_v $end
+$var reg 1 F$ flag_z $end
+$var reg 16 G$ out [15:0] $end
+$var reg 4 H$ out_hi1 [3:0] $end
+$var reg 2 I$ out_hi2 [1:0] $end
+$var reg 13 J$ out_lo [12:0] $end
+$upscope $end
+$scope module sbc16 $end
+$var wire 1 K$ carry_in $end
+$var wire 1 L$ sub_y $end
+$var wire 16 M$ x [15:0] $end
+$var wire 16 N$ y [15:0] $end
+$var wire 1 O$ penult_carry_out $end
+$var wire 1 P$ half_carry $end
+$var wire 8 Q$ f [7:0] $end
+$var wire 1 R$ carry_out $end
+$var reg 1 S$ flag_3 $end
+$var reg 1 T$ flag_5 $end
+$var reg 1 U$ flag_c $end
+$var reg 1 V$ flag_h $end
+$var reg 1 W$ flag_n $end
+$var reg 1 X$ flag_s $end
+$var reg 1 Y$ flag_v $end
+$var reg 1 Z$ flag_z $end
+$var reg 16 [$ out [15:0] $end
+$var reg 4 \$ out_hi1 [3:0] $end
+$var reg 2 ]$ out_hi2 [1:0] $end
+$var reg 13 ^$ out_lo [12:0] $end
+$upscope $end
+$scope module sub16 $end
+$var wire 1 _$ carry_in $end
+$var wire 1 `$ sub_y $end
+$var wire 16 a$ x [15:0] $end
+$var wire 16 b$ y [15:0] $end
+$var wire 1 c$ penult_carry_out $end
+$var wire 1 d$ half_carry $end
+$var wire 8 e$ f [7:0] $end
+$var wire 1 f$ carry_out $end
+$var reg 1 g$ flag_3 $end
+$var reg 1 h$ flag_5 $end
+$var reg 1 i$ flag_c $end
+$var reg 1 j$ flag_h $end
+$var reg 1 k$ flag_n $end
+$var reg 1 l$ flag_s $end
+$var reg 1 m$ flag_v $end
+$var reg 1 n$ flag_z $end
+$var reg 16 o$ out [15:0] $end
+$var reg 4 p$ out_hi1 [3:0] $end
+$var reg 2 q$ out_hi2 [1:0] $end
+$var reg 13 r$ out_lo [12:0] $end
+$upscope $end
+$upscope $end
+$scope module alu8 $end
+$var wire 8 s$ flag_3 [7:0] $end
+$var wire 8 t$ flag_5 [7:0] $end
+$var wire 4 u$ func [3:0] $end
+$var wire 8 v$ x [7:0] $end
+$var wire 8 w$ y [7:0] $end
+$var wire 8 x$ sub_out [7:0] $end
+$var wire 8 y$ sub_f [7:0] $end
+$var wire 8 z$ sbc_out [7:0] $end
+$var wire 8 {$ sbc_f [7:0] $end
+$var wire 8 |$ f_in [7:0] $end
+$var wire 1 }$ carry $end
+$var wire 8 ~$ add_out [7:0] $end
+$var wire 8 !% add_f [7:0] $end
+$var wire 8 "% adc_out [7:0] $end
+$var wire 8 #% adc_f [7:0] $end
+$var reg 8 $% f [7:0] $end
+$var reg 8 %% out [7:0] $end
+$scope module adc8 $end
+$var wire 1 }$ carry_in $end
+$var wire 1 &% sub_y $end
+$var wire 8 '% x [7:0] $end
+$var wire 8 (% y [7:0] $end
+$var wire 1 )% penult_carry_out $end
+$var wire 1 *% half_carry $end
+$var wire 8 +% f [7:0] $end
+$var wire 1 ,% carry_out $end
+$var reg 1 -% flag_3 $end
+$var reg 1 .% flag_5 $end
+$var reg 1 /% flag_c $end
+$var reg 1 0% flag_h $end
+$var reg 1 1% flag_n $end
+$var reg 1 2% flag_s $end
+$var reg 1 3% flag_v $end
+$var reg 1 4% flag_z $end
+$var reg 8 5% out [7:0] $end
+$var reg 4 6% out_hi1 [3:0] $end
+$var reg 2 7% out_hi2 [1:0] $end
+$var reg 5 8% out_lo [4:0] $end
+$upscope $end
+$scope module add8 $end
+$var wire 1 9% carry_in $end
+$var wire 1 :% sub_y $end
+$var wire 8 ;% x [7:0] $end
+$var wire 8 <% y [7:0] $end
+$var wire 1 =% penult_carry_out $end
+$var wire 1 >% half_carry $end
+$var wire 8 ?% f [7:0] $end
+$var wire 1 @% carry_out $end
+$var reg 1 A% flag_3 $end
+$var reg 1 B% flag_5 $end
+$var reg 1 C% flag_c $end
+$var reg 1 D% flag_h $end
+$var reg 1 E% flag_n $end
+$var reg 1 F% flag_s $end
+$var reg 1 G% flag_v $end
+$var reg 1 H% flag_z $end
+$var reg 8 I% out [7:0] $end
+$var reg 4 J% out_hi1 [3:0] $end
+$var reg 2 K% out_hi2 [1:0] $end
+$var reg 5 L% out_lo [4:0] $end
+$upscope $end
+$scope module sbc8 $end
+$var wire 1 M% carry_in $end
+$var wire 1 N% sub_y $end
+$var wire 8 O% x [7:0] $end
+$var wire 8 P% y [7:0] $end
+$var wire 1 Q% penult_carry_out $end
+$var wire 1 R% half_carry $end
+$var wire 8 S% f [7:0] $end
+$var wire 1 T% carry_out $end
+$var reg 1 U% flag_3 $end
+$var reg 1 V% flag_5 $end
+$var reg 1 W% flag_c $end
+$var reg 1 X% flag_h $end
+$var reg 1 Y% flag_n $end
+$var reg 1 Z% flag_s $end
+$var reg 1 [% flag_v $end
+$var reg 1 \% flag_z $end
+$var reg 8 ]% out [7:0] $end
+$var reg 4 ^% out_hi1 [3:0] $end
+$var reg 2 _% out_hi2 [1:0] $end
+$var reg 5 `% out_lo [4:0] $end
+$upscope $end
+$scope module sub8 $end
+$var wire 1 a% carry_in $end
+$var wire 1 b% sub_y $end
+$var wire 8 c% x [7:0] $end
+$var wire 8 d% y [7:0] $end
+$var wire 1 e% penult_carry_out $end
+$var wire 1 f% half_carry $end
+$var wire 8 g% f [7:0] $end
+$var wire 1 h% carry_out $end
+$var reg 1 i% flag_3 $end
+$var reg 1 j% flag_5 $end
+$var reg 1 k% flag_c $end
+$var reg 1 l% flag_h $end
+$var reg 1 m% flag_n $end
+$var reg 1 n% flag_s $end
+$var reg 1 o% flag_v $end
+$var reg 1 p% flag_z $end
+$var reg 8 q% out [7:0] $end
+$var reg 4 r% out_hi1 [3:0] $end
+$var reg 2 s% out_hi2 [1:0] $end
+$var reg 5 t% out_lo [4:0] $end
+$upscope $end
+$upscope $end
 $scope module instr_decoder $end
-$var wire 32 j" instr [31:0] $end
-$var wire 2 k" op_len [1:0] $end
-$var reg 8 l" group [7:0] $end
-$var reg 3 m" len [2:0] $end
+$var wire 32 u% instr [31:0] $end
+$var wire 2 v% op_len [1:0] $end
+$var reg 8 w% group [7:0] $end
+$var reg 3 x% len [2:0] $end
 $upscope $end
 $scope module ir_registers $end
-$var wire 1 X accept_nmi $end
-$var wire 1 & clk $end
-$var wire 1 d disable_interrupts $end
-$var wire 1 e enable_interrupts $end
-$var wire 8 n" i_in [7:0] $end
-$var wire 1 i i_wr $end
-$var wire 8 o" r_in [7:0] $end
-$var wire 1 B" r_wr $end
-$var wire 8 p" reg_i [7:0] $end
-$var wire 8 q" reg_r [7:0] $end
-$var wire 1 ( reset $end
-$var wire 1 H" ret_from_nmi $end
-$var reg 8 r" _i [7:0] $end
-$var reg 8 s" _r [7:0] $end
-$var reg 1 C iff1 $end
-$var reg 1 B iff2 $end
+$var wire 1 E" accept_nmi $end
+$var wire 1 Y clk $end
+$var wire 1 X" disable_interrupts $end
+$var wire 1 Y" enable_interrupts $end
+$var wire 8 y% i_in [7:0] $end
+$var wire 1 `" i_wr $end
+$var wire 1 p" next_insn_done $end
+$var wire 8 z% r_in [7:0] $end
+$var wire 1 A# r_wr $end
+$var wire 8 {% reg_i [7:0] $end
+$var wire 8 |% reg_r [7:0] $end
+$var wire 1 [ reset $end
+$var wire 1 G# ret_from_nmi $end
+$var reg 8 }% _i [7:0] $end
+$var reg 8 ~% _r [7:0] $end
+$var reg 1 >" delayed_enable_interrupts $end
+$var reg 1 "" iff1 $end
+$var reg 1 !" iff2 $end
+$upscope $end
+$scope module ixiy_bits_decoder $end
+$var wire 8 !& instr [7:0] $end
+$var reg 8 "& group [7:0] $end
 $upscope $end
 $scope module registers $end
-$var wire 1 Z block_dec $end
-$var wire 1 [ block_inc $end
-$var wire 1 & clk $end
-$var wire 5 t" dest [4:0] $end
-$var wire 8 u" f_in [7:0] $end
-$var wire 1 g f_wr $end
-$var wire 1 v" f_wr2 $end
-$var wire 16 w" in [15:0] $end
-$var wire 1 ( reset $end
-$var wire 5 x" src1 [4:0] $end
-$var wire 5 y" src2 [4:0] $end
-$var wire 1 G" write_en $end
-$var wire 1 z" write_en2 $end
-$var wire 16 {" z80_reg_ix [15:0] $end
-$var wire 16 |" z80_reg_iy [15:0] $end
-$var wire 16 }" z80_reg_sp [15:0] $end
-$var wire 8 ~" z80_reg_l2 [7:0] $end
-$var wire 8 !# z80_reg_l [7:0] $end
-$var wire 8 "# z80_reg_h2 [7:0] $end
-$var wire 8 ## z80_reg_h [7:0] $end
-$var wire 8 $# z80_reg_f2 [7:0] $end
-$var wire 8 %# z80_reg_f [7:0] $end
-$var wire 8 &# z80_reg_e2 [7:0] $end
-$var wire 8 '# z80_reg_e [7:0] $end
-$var wire 8 (# z80_reg_d2 [7:0] $end
-$var wire 8 )# z80_reg_d [7:0] $end
-$var wire 8 *# z80_reg_c2 [7:0] $end
-$var wire 8 +# z80_reg_c [7:0] $end
-$var wire 8 ,# z80_reg_b2 [7:0] $end
-$var wire 8 -# z80_reg_b [7:0] $end
-$var wire 8 .# z80_reg_a2 [7:0] $end
-$var wire 8 /# z80_reg_a [7:0] $end
-$var wire 8 0# reg_f [7:0] $end
-$var reg 16 1# _af [15:0] $end
-$var reg 16 2# _af2 [15:0] $end
-$var reg 16 3# _bc [15:0] $end
-$var reg 16 4# _bc2 [15:0] $end
-$var reg 16 5# _de [15:0] $end
-$var reg 16 6# _de2 [15:0] $end
-$var reg 16 7# _hl [15:0] $end
-$var reg 16 8# _hl2 [15:0] $end
-$var reg 16 9# _ix [15:0] $end
-$var reg 16 :# _iy [15:0] $end
-$var reg 16 ;# _sp [15:0] $end
-$var reg 16 <# out1 [15:0] $end
-$var reg 16 =# out2 [15:0] $end
+$var wire 1 #& _block_dec $end
+$var wire 1 $& _block_inc $end
+$var wire 1 %& _ex_af_af2 $end
+$var wire 1 && _ex_de_hl $end
+$var wire 1 '& _exx $end
+$var wire 1 (& _f_wr $end
+$var wire 1 )& _write_en $end
+$var wire 1 *& _writing_flags $end
+$var wire 1 M" block_compare $end
+$var wire 1 N" block_dec $end
+$var wire 1 O" block_inc $end
+$var wire 1 Y clk $end
+$var wire 5 +& dest [4:0] $end
+$var wire 1 Z" ex_af_af2 $end
+$var wire 1 [" ex_de_hl $end
+$var wire 1 \" exx $end
+$var wire 8 ,& f_in [7:0] $end
+$var wire 1 ^" f_wr $end
+$var wire 16 -& in [15:0] $end
+$var wire 1 [ reset $end
+$var wire 5 .& src1 [4:0] $end
+$var wire 5 /& src2 [4:0] $end
+$var wire 1 F# write_en $end
+$var wire 16 0& z80_reg_ix [15:0] $end
+$var wire 16 1& z80_reg_iy [15:0] $end
+$var wire 16 2& z80_reg_sp [15:0] $end
+$var wire 8 3& z80_reg_l2 [7:0] $end
+$var wire 8 4& z80_reg_l [7:0] $end
+$var wire 8 5& z80_reg_h2 [7:0] $end
+$var wire 8 6& z80_reg_h [7:0] $end
+$var wire 8 7& z80_reg_f2 [7:0] $end
+$var wire 8 8& z80_reg_f [7:0] $end
+$var wire 8 9& z80_reg_e2 [7:0] $end
+$var wire 8 :& z80_reg_e [7:0] $end
+$var wire 8 ;& z80_reg_d2 [7:0] $end
+$var wire 8 <& z80_reg_d [7:0] $end
+$var wire 8 =& z80_reg_c2 [7:0] $end
+$var wire 8 >& z80_reg_c [7:0] $end
+$var wire 8 ?& z80_reg_b2 [7:0] $end
+$var wire 8 @& z80_reg_b [7:0] $end
+$var wire 8 A& z80_reg_a2 [7:0] $end
+$var wire 8 B& z80_reg_a [7:0] $end
+$var wire 8 C& reg_f [7:0] $end
+$var reg 16 D& _af [15:0] $end
+$var reg 16 E& _af2 [15:0] $end
+$var reg 16 F& _bc [15:0] $end
+$var reg 16 G& _bc2 [15:0] $end
+$var reg 16 H& _de [15:0] $end
+$var reg 16 I& _de2 [15:0] $end
+$var reg 16 J& _hl [15:0] $end
+$var reg 16 K& _hl2 [15:0] $end
+$var reg 16 L& _ix [15:0] $end
+$var reg 16 M& _iy [15:0] $end
+$var reg 16 N& _sp [15:0] $end
+$var reg 16 O& out1 [15:0] $end
+$var reg 16 P& out2 [15:0] $end
+$upscope $end
+$scope task task_alu16_op $end
+$var reg 3 Q& local_op [2:0] $end
+$var reg 16 R& local_x [15:0] $end
+$var reg 16 S& local_y [15:0] $end
+$upscope $end
+$scope task task_alu8_compare $end
+$var reg 8 T& local_x [7:0] $end
+$var reg 8 U& local_y [7:0] $end
+$upscope $end
+$scope task task_alu8_op $end
+$var reg 4 V& local_op [3:0] $end
+$var reg 8 W& local_x [7:0] $end
+$var reg 8 X& local_y [7:0] $end
 $upscope $end
 $scope task task_block_dec $end
 $upscope $end
 $scope task task_block_inc $end
 $upscope $end
 $scope task task_collect_data $end
-$var reg 2 ># local_n [1:0] $end
+$var reg 2 Y& local_n [1:0] $end
+$upscope $end
+$scope task task_compare_block_dec $end
+$upscope $end
+$scope task task_compare_block_inc $end
+$upscope $end
+$scope task task_disable_interrupts $end
 $upscope $end
 $scope task task_done $end
 $upscope $end
+$scope task task_enable_interrupts $end
+$upscope $end
+$scope task task_ex_af_af2 $end
+$upscope $end
+$scope task task_ex_de_hl $end
+$upscope $end
+$scope task task_exx $end
+$upscope $end
 $scope task task_read_mem $end
-$var reg 16 ?# local_addr [15:0] $end
-$var reg 2 @# local_n [1:0] $end
+$var reg 16 Z& local_addr [15:0] $end
+$var reg 2 [& local_n [1:0] $end
 $upscope $end
 $scope task task_read_reg $end
-$var reg 2 A# local_n [1:0] $end
-$var reg 5 B# local_rnum [4:0] $end
+$var reg 2 \& local_n [1:0] $end
+$var reg 5 ]& local_rnum [4:0] $end
 $upscope $end
 $scope task task_write_f $end
-$var reg 8 C# local_data [7:0] $end
+$var reg 8 ^& local_data [7:0] $end
 $upscope $end
 $scope task task_write_i $end
-$var reg 8 D# local_data [7:0] $end
+$var reg 8 _& local_data [7:0] $end
 $upscope $end
 $scope task task_write_mem $end
-$var reg 16 E# local_addr [15:0] $end
-$var reg 8 F# local_data [7:0] $end
-$var reg 2 G# local_n [1:0] $end
+$var reg 16 `& local_addr [15:0] $end
+$var reg 8 a& local_data [7:0] $end
+$var reg 2 b& local_n [1:0] $end
 $upscope $end
 $scope task task_write_mem_done $end
-$var reg 2 H# local_n [1:0] $end
+$var reg 2 c& local_n [1:0] $end
 $upscope $end
 $scope task task_write_r $end
-$var reg 8 I# local_data [7:0] $end
+$var reg 8 d& local_data [7:0] $end
 $upscope $end
 $scope task task_write_reg $end
-$var reg 16 J# local_data [15:0] $end
-$var reg 5 K# local_wnum [4:0] $end
+$var reg 16 e& local_data [15:0] $end
+$var reg 5 f& local_wnum [4:0] $end
 $upscope $end
 $upscope $end
 $upscope $end
 $enddefinitions $end
 #0
 $dumpvars
-bx K#
-bx J#
-bx I#
-bx H#
-bx G#
-bx F#
-bx E#
-bx D#
-bx C#
-bx B#
-bx A#
-bx @#
-bx ?#
-bx >#
+bx f&
+bx e&
+bx d&
+bx c&
+bx b&
+bx a&
+bx `&
+bx _&
+bx ^&
+bx ]&
+bx \&
+bx [&
+bx Z&
+bx Y&
+bx X&
+bx W&
+bx V&
+bx U&
+bx T&
+bx S&
+bx R&
+bx Q&
+b0 P&
+b0 O&
+b0 N&
+b0 M&
+b0 L&
+b0 K&
+b0 J&
+b0 I&
+b0 H&
+b0 G&
+b0 F&
+b0 E&
+b0 D&
+b0 C&
+b0 B&
+b0 A&
+b0 @&
+b0 ?&
+b0 >&
+b0 =&
+b0 <&
+b0 ;&
+b0 :&
+b0 9&
+b0 8&
+b0 7&
+b0 6&
+b0 5&
+b0 4&
+b0 3&
+b0 2&
+b0 1&
+b0 0&
+b0 /&
+b0 .&
+b0 -&
+b0 ,&
+b0 +&
+0*&
+0)&
+0(&
+0'&
+0&&
+0%&
+0$&
+0#&
+b11111111 "&
+b0 !&
+b0 ~%
+b0 }%
+b0 |%
+b0 {%
+b0 z%
+b0 y%
+b10 x%
+b11111110 w%
+b1 v%
+b11111101 u%
+b10000 t%
+b10 s%
+b1000 r%
+b0 q%
+1p%
+0o%
+0n%
+1m%
+1l%
+1k%
+0j%
+0i%
+1h%
+b1010011 g%
+1f%
+1e%
+b11111111 d%
+b0 c%
+1b%
+1a%
+b10000 `%
+b10 _%
+b1000 ^%
+b0 ]%
+1\%
+0[%
+0Z%
+1Y%
+1X%
+1W%
+0V%
+0U%
+1T%
+b1010011 S%
+1R%
+1Q%
+b11111111 P%
+b0 O%
+1N%
+1M%
+b0 L%
+b0 K%
+b0 J%
+b0 I%
+1H%
+0G%
+0F%
+0E%
+0D%
+0C%
+0B%
+0A%
+0@%
+b1000000 ?%
+0>%
+0=%
+b0 <%
+b0 ;%
+0:%
+09%
+b0 8%
+b0 7%
+b0 6%
+b0 5%
+14%
+03%
+02%
+01%
+00%
+0/%
+0.%
+0-%
+0,%
+b1000000 +%
+0*%
+0)%
+b0 (%
+b0 '%
+0&%
+b0 %%
+b1000000 $%
+b1000000 #%
+b0 "%
+b1000000 !%
+b0 ~$
+0}$
+b0 |$
+b1010011 {$
+b0 z$
+b1010011 y$
+b0 x$
+b0 w$
+b0 v$
+b0 u$
+b0 t$
+b0 s$
+b1000000000000 r$
+b10 q$
+b1000 p$
+b0 o$
+1n$
+0m$
+0l$
+1k$
+1j$
+1i$
+0h$
+0g$
+1f$
+b1010011 e$
+1d$
+1c$
+b1111111111111111 b$
+b0 a$
+1`$
+1_$
+b1000000000000 ^$
+b10 ]$
+b1000 \$
+b0 [$
+1Z$
+0Y$
+0X$
+1W$
+1V$
+1U$
+0T$
+0S$
+1R$
+b1010011 Q$
+1P$
+1O$
+b1111111111111111 N$
+b0 M$
+1L$
+1K$
+b0 J$
+b0 I$
+b0 H$
+b0 G$
+1F$
+0E$
+0D$
+0C$
+0B$
+0A$
+0@$
+0?$
+0>$
+b1000000 =$
+0<$
+0;$
+b0 :$
+b0 9$
+08$
+07$
+b0 6$
+b0 5$
+b0 4$
+b0 3$
+12$
+01$
+00$
+0/$
+0.$
+0-$
+0,$
+0+$
+0*$
+b1000000 )$
+0($
+0'$
+b0 &$
+b0 %$
+0$$
+b0 #$
+b1000000 "$
+b1000000 !$
+b0 ~#
+b1000000 }#
+b0 |#
+0{#
+b0 z#
+b1010011 y#
+b0 x#
+b1010011 w#
+b0 v#
+b0 u#
+b0 t#
+b0 s#
+b0 r#
+b0 q#
+0p#
+b0 o#
+b0 n#
+b0 m#
+b0 l#
+b0 k#
+b0 j#
+b0 i#
+0h#
+0g#
+b0 f#
+b0 e#
+b0 d#
+b0 c#
+b0 b#
+b0 a#
+b0 `#
+b0 _#
+b0 ^#
+b0 ]#
+b0 \#
+b0 [#
+b0 Z#
+b0 Y#
+b0 X#
+0W#
+0V#
+b0 U#
+b0 T#
+b0 S#
+b0 R#
+b0 Q#
+b0 P#
+0O#
+0N#
+b0 M#
+b0 L#
+b0 K#
+b0 J#
+b0 I#
+b0 H#
+0G#
+0F#
+b0 E#
+b0 D#
+b0 C#
+b0 B#
+0A#
+b0 @#
+b1 ?#
+0>#
 b0 =#
 b0 <#
 b0 ;#
@@ -317,8 +1009,8 @@ b0 :#
 b0 9#
 b0 8#
 b0 7#
-b0 6#
-b0 5#
+06#
+05#
 b0 4#
 b0 3#
 b0 2#
@@ -334,401 +1026,543 @@ b0 )#
 b0 (#
 b0 '#
 b0 &#
-b0 %#
-b0 $#
+0%#
+0$#
 b0 ##
 b0 "#
 b0 !#
 b0 ~"
 b0 }"
 b0 |"
-b0 {"
+0{"
 0z"
 b0 y"
 b0 x"
 b0 w"
-0v"
-b0 u"
+b0 v"
+b1 u"
 b0 t"
-b0 s"
+0s"
 b0 r"
-b0 q"
-b0 p"
-b0 o"
-b0 n"
-b10 m"
-b11111110 l"
-b1 k"
-b11101101 j"
-0i"
+1q"
+0p"
+0o"
+b1 n"
+0m"
+b1 l"
+b11111101 k"
+xj"
+bx i"
 b0 h"
-b0 g"
-b0 f"
+b1 g"
+0f"
 b0 e"
-b0 d"
-b0 c"
-0b"
-0a"
-b0 `"
+1d"
+b11111101 c"
+bx b"
+b1 a"
+0`"
 b0 _"
-b0 ^"
+0^"
 b0 ]"
-b0 \"
-b0 ["
-b0 Z"
-b0 Y"
-0X"
+0\"
+0["
+0Z"
+0Y"
+1X"
 0W"
 b0 V"
-b0 U"
+0U"
 b0 T"
 b0 S"
-b0 R"
+0R"
 b0 Q"
-0P"
+b0 P"
 0O"
-b0 N"
-b0 M"
+0N"
+0M"
 b0 L"
 b0 K"
 b0 J"
 b0 I"
-0H"
-0G"
+b0 H"
+b0 G"
 b0 F"
-b0 E"
-b0 D"
+0E"
+b1000000 D"
 b0 C"
-0B"
+b1000000 B"
 b0 A"
-b1 @"
-0?"
-b0 >"
+b11111110 @"
+b10 ?"
+0>"
 b0 ="
-b0 <"
-b0 ;"
-b0 :"
-b0 9"
+0<"
+0;"
+0:"
+09"
 08"
 07"
-b0 6"
-b0 5"
-b0 4"
+06"
+05"
+b11111111 4"
 b0 3"
 b0 2"
 b0 1"
 b0 0"
 b0 /"
-0."
-0-"
+b0 ."
+b0 -"
 b0 ,"
 b0 +"
 b0 *"
 b0 )"
 b0 ("
 b0 '"
-0&"
-0%"
+b0 &"
+b0 %"
 b0 $"
 b0 #"
-b0 ""
-b0 !"
-b1 ~
-b0 }
-0|
-b0 {
-1z
-0y
-0x
-b1 w
-0v
-b1 u
-b11101101 t
-xs
-bx r
-b0 q
-b1 p
-0o
-b0 n
-1m
-b11101101 l
-bx k
-b1 j
-0i
-b0 h
-0g
-b0 f
-0e
-0d
-0c
-b0 b
-0a
-b0 `
-b0 _
-0^
-b0 ]
-b0 \
-0[
-0Z
-b0 Y
-0X
-b11111110 W
-b10 V
-b0 U
-b0 T
-b0 S
-b0 R
-b0 Q
-b0 P
-b0 O
-b0 N
-b0 M
-b0 L
-b0 K
-b0 J
-b0 I
-b0 H
-b0 G
-b0 F
-b0 E
-b0 D
-0C
-0B
-b0 A
-b0 @
-b0 ?
-b0 >
-b0 =
-b0 <
-b0 ;
-b0 :
-b0 9
-b0 8
-b0 7
-b0 6
-05
-04
-b0 3
-b0 2
-b0 1
-b0 0
-b0 /
-b0 .
-b0 -
-b0 ,
-b0 +
-b11101101 *
-b11101101 )
-1(
-b11101101 '
-0&
-b0 %
-0$
-1#
-b0 "
-0!
-$end
-#1
-1&
-#2
-1z
-b1 ~
-b1 p
-b1 w
-b11101101 t
-b1 u
-0&
-0(
-#3
-1%"
-b0 ?#
-b1 @#
-b1010 C"
-b1010 x"
-b1010 B#
-b1 A#
-1v
-1x
-b100001 W
-b100001 l"
-b0 ""
-b0 !"
-0?"
-0y
-b0 k
-b1 }
-b10 j
-b10 @"
-b10 k"
-b10 ~
-b0 p
-b1011000011101101 l
-b1011000011101101 j"
-1z
-b10 w
-b1011000011101101 t
-b10 u
-b10110000 *
-b10110000 '
-b10110000 )
-b1 6
-b1 J"
-bx ]
-x^
-b1 b
-b1 `
-b11101101 _
-b1 %
-b1 Y
-1&
-#4
-0&
-#5
-1[
-b11101101 {
-1|
-b11101101 F#
-b0 E#
-b1 G#
-b1001 B#
-b11101101 '"
-b11101101 q
-b1 >#
-b10 }
-0z
-1x
-b10 w
-1v
-b1011000011101101 t
-b10 u
-b1001 C"
-b1001 x"
-b11101101 *
-b11101101 '
-b11101101 )
-1O"
-b1 I"
-b10 6
-b10 J"
-b10 b
-1c
-1a
-b10 `
-b1011000011101101 _
-b0 %
-b0 Y
-1&
-#6
-0&
-#7
-b100 1
-b100 H
-b100 %#
-b100 U
-b100 0#
-b11111111 -
-b11111111 P
-b11111111 -#
-b11111111 .
-b11111111 N
-b11111111 +#
-b1 9
-b1 ?
-b1 !#
-b11111111 S
-b11111111 =#
-b11111111 T
-b11111111 <#
-b1 0
-b1 J
-b1 '#
-b10 ""
-b1011000011101101 !"
-1?"
-1z
-b0 q
-1y
+0""
+0!"
 b0 ~
-b11101101 +"
-1-"
-b1 H#
 b0 }
-0x
-b0 w
-0v
-b1011000011101101 t
-b0 u
-0[
-b0 C"
-b0 x"
+b0 |
 b0 {
-0|
-b100 1#
-b1111111111111111 3#
-b1 7#
-b1 5#
-b11101101 Q"
-b10 I"
-b11101101 \
-b11101101 "
-b11101101 +
-b11101101 n
-1!
-1o
-0#
-0m
-1&
-#8
-0&
-#9
-b11111110 W
-b11111110 l"
-0x
-b1 w
-b1 u
-b1 j
-b1 @"
-b1 k"
-b1 ~
-b1 p
-b11101101 l
-b11101101 j"
-1z
-b11101101 t
-0y
-b100 4"
-b1 <"
-b1 3"
-b11111111 1"
-b11111111 0"
-b0 +"
-0-"
-b0 '"
-0%"
-b0 ""
-b0 !"
-0?"
-b11101101 U"
-1W"
-b10 L"
-b1011000011101101 K"
-1i"
-b0 I"
-b0 6
-b0 J"
-b0 \
-b0 b
-0c
-0a
-b0 `
-b0 "
-b0 +
+b0 z
+b0 y
+b0 x
+b0 w
+b0 v
+b0 u
+b0 t
+b0 s
+b0 r
+0q
+0p
+b0 o
 b0 n
-0!
-0o
-1#
-1m
-1$
-1&
+b0 m
+b0 l
+b0 k
+b0 j
+b0 i
+b0 h
+b0 g
+b0 f
+b0 e
+b0 d
+b0 c
+b0 b
+b0 a
+b0 `
+b11111101 _
+b11111101 ^
+0]
+0\
+1[
+b11111101 Z
+0Y
+b0 X
+0W
+1V
+b0 U
+0T
+bx S
+xR
+bx Q
+bx P
+xO
+bx N
+xM
+bx L
+bx K
+xJ
+bx I
+xH
+bx G
+bx F
+bx E
+xD
+xC
+bx B
+bx A
+bx @
+x?
+x>
+bx =
+bx <
+bx ;
+x:
+x9
+bx 8
+bx 7
+bx 6
+x5
+x4
+bx 3
+x2
+x1
+x0
+x/
+x.
+bx -
+x,
+x+
+bx *
+bx )
+bx (
+bx '
+bx &
+bx %
+bx $
+x#
+bx "
+x!
+$end
 #10
-0&
+1Y
+#20
+1q"
+b1 u"
+b1 g"
+b1 n"
+b11111101 k"
+b1 l"
+0X"
+0Y
+0[
+#30
+1o"
+b100 ?"
+b100 x%
+b11111101 @"
+b11111101 w%
+b0 w"
+b0 v"
+0>#
+0p"
+b0 b"
+b0 t"
+b10 a"
+b10 ?#
+b10 v%
+b10 u"
+b10 g"
+b1100101111111101 c"
+b1100101111111101 u%
+1q"
+b10 n"
+b1100101111111101 k"
+b10 l"
+b11001011 _
+b11001011 Z
+b11001011 ^
+b1 r
+b1 I#
+bx Q"
+xR"
+b1 V"
+b1 T"
+b11111101 S"
+b1 X
+b1 F"
+1Y
+#40
+0Y
+#50
+b11 a"
+b11 u"
+b11 g"
+b1101001100101111111101 c"
+b1101001100101111111101 u%
+1q"
+1o"
+b10 n"
+b1101001100101111111101 k"
+b11 l"
+b110100 _
+b110100 Z
+b110100 ^
+b10 r
+b10 I#
+b10 V"
+1W"
+b10 T"
+b1100101111111101 S"
+b10 X
+b10 F"
+1Y
+#60
+0Y
+#70
+b110100 x"
+1z"
+b110100 Z&
+b1 [&
+b11001 B#
+b11001 .&
+b11001 ]&
+b1 \&
+b0 4"
+b0 "&
+b110 !&
+b0 w"
+b0 v"
+0>#
+0p"
+b11000110100 b"
+b1 t"
+1m"
+b100 a"
+b100 u"
+b110100 g"
+b110001101001100101111111101 c"
+b110001101001100101111111101 u%
+1q"
+1o"
+b10 n"
+b110001101001100101111111101 k"
+b100 l"
+b110 _
+b110 Z
+b110 ^
+b11 r
+b11 I#
+b11 T"
+b1101001100101111111101 S"
+b11 X
+b11 F"
+1Y
+#80
+0Y
+#90
+1(&
+b11010 r"
+b0 #%
+b0 +%
+04%
+b110100 "%
+b110100 5%
+b11 6%
+b100 8%
+b0 !%
+b0 ?%
+0H%
+b110100 ~$
+b110100 I%
+b11 J%
+b100 L%
+b10011 {$
+b10011 S%
+0\%
+b110100 z$
+b110100 ]%
+b1011 ^%
+b10100 `%
+b10011 y$
+b10011 g%
+0p%
+b110100 x$
+b110100 q%
+b1011 r%
+b10100 t%
+0#
+b11010 $
+b0 B"
+b0 $%
+b11010 A"
+b11010 %%
+b11010 -
+01
+0/
+02
+10
+0.
+b110100 3
+1s"
+b11010 a&
+b110100 `&
+b1 b&
+b0 ]"
+b0 ,&
+1^"
+b0 ^&
+b1001 J"
+b1001 u$
+b110100 K"
+b110100 v$
+b110100 '%
+b110100 ;%
+b110100 O%
+b110100 c%
+b0 X&
+b110100 W&
+b1001 V&
+b110100 |"
+b110100 h"
+b1 Y&
+b10 t"
+0q"
+1o"
+b10 n"
+1m"
+b110001101001100101111111101 k"
+b100 l"
+b11001 B#
+b11001 .&
+b110100 _
+b110100 Z
+b110100 ^
+b110100 L#
+1N#
+b1 H#
+b100 r
+b100 I#
+1U"
+b100 T"
+b110001101001100101111111101 S"
+b110100 X
+b110100 F"
+1Y
+#100
+0Y
+#110
+0(&
+b1000000 B"
+b1000000 $%
+b1000000 #%
+b1000000 +%
+14%
+b0 "%
+b0 5%
+b0 6%
+b0 8%
+b1000000 !%
+b1000000 ?%
+1H%
+b0 ~$
+b0 I%
+b0 J%
+b0 L%
+b1010011 {$
+b1010011 S%
+1\%
+b0 z$
+b0 ]%
+b1000 ^%
+b10000 `%
+b1010011 y$
+b1010011 g%
+1p%
+b0 x$
+b0 q%
+b1000 r%
+b10000 t%
+b0 A"
+b0 %%
+b100 w"
+b110001101001100101111111101 v"
+1>#
+1q"
+b0 h"
+b100 g"
+1p"
+b11010 "#
+b110100 ~"
+1$#
+b1 c&
+b0 t"
+0o"
+b0 n"
+0m"
+b110001101001100101111111101 k"
+b0 l"
+b0 J"
+b0 u$
+b0 K"
+b0 v$
+b0 '%
+b0 ;%
+b0 O%
+b0 c%
+0^"
+b0 B#
+b0 .&
+b0 r"
+0s"
+b110100 P#
+b10 H#
+b110100 P"
+b11010 U
+b11010 `
+b11010 e"
+1T
+1f"
+0V
+0d"
+1Y
+#120
+0Y
+#130
+b0 b"
+b0 t"
+0m"
+b11111111 4"
+b11111111 "&
+b1 ?"
+b1 x%
+b10110 @"
+b10110 w%
+b0 !&
+b0 _
+b0 Z
+b0 ^
+0o"
+b0 n"
+b0 l"
+b1 a"
+b1 ?#
+b1 v%
+b101 u"
+b101 g"
+b0 c"
+b0 u%
+1q"
+b0 k"
+1p"
+b100 7#
+b0 "#
+b0 ~"
+0$#
+b0 |"
+b0 x"
+0z"
+b1 w"
+b0 v"
+1>#
+b11010 T#
+b110100 R#
+1V#
+b100 K#
+b110001101001100101111111101 J#
+1p#
+b0 H#
+b0 P"
+b0 V"
+0W"
+0U"
+b0 T"
+b0 U
+b0 `
+b0 e"
+0T
+0f"
+1V
+1d"
+b100 X
+b100 F"
+1W
+1Y
+#140
+0Y

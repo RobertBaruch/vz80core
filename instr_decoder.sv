@@ -190,6 +190,10 @@ always @(*) begin
                 group <= `INSN_GROUP_RR_RLC_REG;
                 len <= 2;
             end
+            16'h06CB, 16'h16CB, 16'h0ECB, 16'h1ECB: begin
+                group <= `INSN_GROUP_RR_RLC_IND_HL;
+                len <= 2;
+            end
             16'h42ED, 16'h52ED, 16'h62ED, 16'h72ED,
             16'h4AED, 16'h5AED, 16'h6AED, 16'h7AED: begin
                 group <= `INSN_GROUP_ADC_SBC_HL_DD;
@@ -321,12 +325,37 @@ always @(*) begin
                 group <= `INSN_GROUP_CPDR;
                 len <= 2;
             end
+            16'hCBDD, 16'hCBFD: begin
+                // This group is a whole section where the next
+                // byte is the index offset, and the byte after
+                // that is the instruction.
+                group <= `INSN_GROUP_IDX_IXIY_BITS;
+                len <= 4;
+            end
             default: begin
                 group <= `INSN_GROUP_ILLEGAL_INSTR;
                 len <= 2;
             end
         endcase
     end
+end
+
+endmodule
+
+// Give the fourth byte in an INSN_GROUP_IDX_IXIY_BITS
+// instruction, determine what its IDX_IXIY group is.
+module instr_ixiy_bits_decoder(
+    input logic [7:0] instr,
+    output logic [7:0] group
+);
+
+always @(*) begin
+    case (instr)
+        8'h06, 8'h16, 8'h0E, 8'h1E:
+            group <= `INSN_GROUP_RR_RLC_IDX_IXIY;
+        default:
+            group <= `INSN_GROUP_ILLEGAL_INSTR;
+    endcase
 end
 
 endmodule
