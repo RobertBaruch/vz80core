@@ -267,6 +267,67 @@ always @(*) begin
       f[`FLAG_N_NUM] = 0;
     end
 
+    `ALU_FUNC_SRA: begin
+      out = {x[7], x[7:1]};
+      f[`FLAG_S_NUM] = out[7];
+      f[`FLAG_Z_NUM] = (out == 0);
+      f[`FLAG_5_NUM] = 0; // overwritten later
+      f[`FLAG_H_NUM] = 0;
+      f[`FLAG_3_NUM] = 0; // overwritten later
+      f[`FLAG_PV_NUM] = _alu_parity8(out);
+      f[`FLAG_N_NUM] = 0;
+      f[`FLAG_C_NUM] = x[0];
+    end
+
+    `ALU_FUNC_SLA: begin
+      out = {x[6:0], 1'b0};
+      f[`FLAG_S_NUM] = out[7];
+      f[`FLAG_Z_NUM] = (out == 0);
+      f[`FLAG_5_NUM] = 0; // overwritten later
+      f[`FLAG_H_NUM] = 0;
+      f[`FLAG_3_NUM] = 0; // overwritten later
+      f[`FLAG_PV_NUM] = _alu_parity8(out);
+      f[`FLAG_N_NUM] = 0;
+      f[`FLAG_C_NUM] = x[7];
+    end
+
+    `ALU_FUNC_SRA: begin
+      out = {x[7], x[7:1]};
+      f[`FLAG_S_NUM] = out[7];
+      f[`FLAG_Z_NUM] = (out == 0);
+      f[`FLAG_5_NUM] = 0; // overwritten later
+      f[`FLAG_H_NUM] = 0;
+      f[`FLAG_3_NUM] = 0; // overwritten later
+      f[`FLAG_PV_NUM] = _alu_parity8(out);
+      f[`FLAG_N_NUM] = 0;
+      f[`FLAG_C_NUM] = x[0];
+    end
+
+    // This is undocumented.
+    `ALU_FUNC_SLL: begin
+      out = {x[6:0], 1'b1};
+      f[`FLAG_S_NUM] = out[7];
+      f[`FLAG_Z_NUM] = (out == 0);
+      f[`FLAG_5_NUM] = 0; // overwritten later
+      f[`FLAG_H_NUM] = 0;
+      f[`FLAG_3_NUM] = 0; // overwritten later
+      f[`FLAG_PV_NUM] = _alu_parity8(out);
+      f[`FLAG_N_NUM] = 0;
+      f[`FLAG_C_NUM] = x[7];
+    end
+
+    `ALU_FUNC_SRL: begin
+      out = {1'b0, x[7:1]};
+      f[`FLAG_S_NUM] = out[7];
+      f[`FLAG_Z_NUM] = (out == 0);
+      f[`FLAG_5_NUM] = 0; // overwritten later
+      f[`FLAG_H_NUM] = 0;
+      f[`FLAG_3_NUM] = 0; // overwritten later
+      f[`FLAG_PV_NUM] = _alu_parity8(out);
+      f[`FLAG_N_NUM] = 0;
+      f[`FLAG_C_NUM] = x[0];
+    end
+
     default: begin
       out = 0;
       f = f_in;

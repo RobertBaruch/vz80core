@@ -338,6 +338,28 @@ begin
                 end
             endcase
 
+        `INSN_GROUP_SHIFT_IDX_IXIY: /* SRA/SRL/SLA (IX/IY + d) */
+            case (state)
+                0: begin
+                    task_read_reg(1, {`REG_SET_IDX, instr_for_decoder[5]});
+                    task_read_mem(1, reg1_rdata + { {8{insn_operand[7]}}, insn_operand[7:0]});
+                end
+                1: begin
+                    task_read_reg(1, {`REG_SET_IDX, instr_for_decoder[5]});
+                    task_collect_data(1);
+                    task_alu8_op(
+                        {`ALU_SHIFT, instr_for_decoder[28:27]},
+                        next_collected_data[7:0],
+                        0);
+                    task_write_f(`FLAG_H_MASK & `FLAG_N_MASK & alu8_f_out);
+                    task_write_mem(1, reg1_rdata + { {8{insn_operand[7]}}, insn_operand[7:0]}, alu8_out);
+                end
+                2: begin
+                    task_write_mem_done(1);
+                    task_done();
+                end
+            endcase
+
         default: begin // For illegal instructions, just assume done
             task_done();
         end
@@ -1349,6 +1371,39 @@ always @(*) begin
                         task_collect_data(1);
                         task_alu8_op(
                             {`ALU_ROT, instr_for_decoder[12:11]},
+                            next_collected_data[7:0],
+                            0);
+                        task_write_f(`FLAG_H_MASK & `FLAG_N_MASK & alu8_f_out);
+                        task_write_mem(1, reg1_rdata, alu8_out);
+                    end
+                    2: begin
+                        task_write_mem_done(1);
+                        task_done();
+                    end
+                endcase
+
+            `INSN_GROUP_SHIFT_REG: begin  /* SRA/SRL/SLA r */
+                task_read_reg(1, instr_for_decoder[10:8]);
+                task_alu8_op(
+                    {`ALU_SHIFT, instr_for_decoder[12:11]},
+                    reg1_rdata,
+                    0);
+                task_write_f(`FLAG_H_MASK & `FLAG_N_MASK & alu8_f_out);
+                task_write_reg(instr_for_decoder[10:8], alu8_out);
+                task_done();
+            end
+
+            `INSN_GROUP_SHIFT_IND_HL:  /* SRA/SRL/SLA (HL) */
+                case (state)
+                    0: begin
+                        task_read_reg(1, `DD_REG_HL);
+                        task_read_mem(1, reg1_rdata);
+                    end
+                    1: begin
+                        task_read_reg(1, `DD_REG_HL);
+                        task_collect_data(1);
+                        task_alu8_op(
+                            {`ALU_SHIFT, instr_for_decoder[12:11]},
                             next_collected_data[7:0],
                             0);
                         task_write_f(`FLAG_H_MASK & `FLAG_N_MASK & alu8_f_out);

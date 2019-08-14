@@ -144,6 +144,15 @@ endfunction
 // Rotate right through carry
 `define ALU_FUNC_RR 11
 
+// Same, for shift left/right arithmetic/logical.
+`define ALU_SHIFT 2'b11
+`define ALU_FUNC_SLA 12
+`define ALU_FUNC_SRA 13
+// Note: SLL is undocumented.
+`define ALU_FUNC_SLL 14
+`define ALU_FUNC_SRL 15
+
+
 `define INSN_GROUP_IDX_IXIY_BITS 253
 `define INSN_GROUP_NEED_MORE_BYTES 254
 `define INSN_GROUP_ILLEGAL_INSTR 255
@@ -224,9 +233,12 @@ endfunction
 `define INSN_GROUP_RR_RLCA 62          /* RLCA/RLA/RRCA/RRA       */
 `define INSN_GROUP_RR_RLC_REG 63       /* RLCA/RLA/RRCA/RRA r     */
 `define INSN_GROUP_RR_RLC_IND_HL 64    /* RLCA/RLA/RRCA/RRA (HL)  */
+`define INSN_GROUP_SHIFT_REG 65        /* SRA/SRL/SLA r    */
+`define INSN_GROUP_SHIFT_IND_HL 66     /* SRA/SRL/SLA (HL) */
 
 // These are the INSN_GROUP_IDX_IXIY_BITS groups
 `define INSN_GROUP_RR_RLC_IDX_IXIY 0   /* RLCA/RLA/RRCA/RRA (IX/IY + d) */
+`define INSN_GROUP_SHIFT_IDX_IXIY 1    /* SRA/SRL/SLA (IX/IY + d)       */
 
 `define Z80_REGS_OUTPUTS \
 output [7:0] z80_reg_a, \
