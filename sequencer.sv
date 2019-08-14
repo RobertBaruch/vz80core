@@ -305,6 +305,46 @@ instr_ixiy_bits_decoder ixiy_bits_decoder(
     .group(ixiy_bits_group)
 );
 
+// handle_ixiy_bits_group handles the ixiy_bits group.
+//
+// ixiy_bits_group has to be an input to this task, as opposed to
+// all the other signals this task, because this task is the only place
+// ixiy_bits_group is used, and so the always @(*) cannot figure out
+// that ixiy_bits_group is part of its sensitivity list. Therefore,
+// we have to mention it somewhere in the always block.
+task handle_ixiy_bits_group;
+    input [7:0] ixiy_bits_group;
+begin
+    case (ixiy_bits_group)
+        `INSN_GROUP_RR_RLC_IDX_IXIY: /* RLCA/RLC/RRCA/RRA (IX/IY + d) */
+            case (state)
+                0: begin
+                    task_read_reg(1, {`REG_SET_IDX, instr_for_decoder[5]});
+                    task_read_mem(1, reg1_rdata + { {8{insn_operand[7]}}, insn_operand[7:0]});
+                end
+                1: begin
+                    task_read_reg(1, {`REG_SET_IDX, instr_for_decoder[5]});
+                    task_collect_data(1);
+                    task_alu8_op(
+                        {`ALU_ROT, instr_for_decoder[28:27]},
+                        next_collected_data[7:0],
+                        0);
+                    task_write_f(`FLAG_H_MASK & `FLAG_N_MASK & alu8_f_out);
+                    task_write_mem(1, reg1_rdata + { {8{insn_operand[7]}}, insn_operand[7:0]}, alu8_out);
+                end
+                2: begin
+                    task_write_mem_done(1);
+                    task_done();
+                end
+            endcase
+
+        default: begin // For illegal instructions, just assume done
+            task_done();
+        end
+    endcase
+end
+endtask
+
 always @(*) begin
     if (reset || done) begin
         `ifdef Z80_FORMAL
@@ -1322,33 +1362,7 @@ always @(*) begin
 
             `INSN_GROUP_IDX_IXIY_BITS:
                 // Handles all the DDCB / FDCB instructions
-                case (ixiy_bits_group)
-                    `INSN_GROUP_RR_RLC_IDX_IXIY: /* RLCA/RLC/RRCA/RRA (IX/IY + d) */
-                        case (state)
-                            0: begin
-                                task_read_reg(1, {`REG_SET_IDX, instr_for_decoder[5]});
-                                task_read_mem(1, reg1_rdata + { {8{insn_operand[7]}}, insn_operand[7:0]});
-                            end
-                            1: begin
-                                task_read_reg(1, {`REG_SET_IDX, instr_for_decoder[5]});
-                                task_collect_data(1);
-                                task_alu8_op(
-                                    {`ALU_ROT, instr_for_decoder[28:27]},
-                                    next_collected_data[7:0],
-                                    0);
-                                task_write_f(`FLAG_H_MASK & `FLAG_N_MASK & alu8_f_out);
-                                task_write_mem(1, reg1_rdata + { {8{insn_operand[7]}}, insn_operand[7:0]}, alu8_out);
-                            end
-                            2: begin
-                                task_write_mem_done(1);
-                                task_done();
-                            end
-                        endcase
-
-                    default: begin // For illegal instructions, just assume done
-                        task_done();
-                    end
-                endcase
+                handle_ixiy_bits_group(ixiy_bits_group);
 
             default: begin // For illegal instructions, just assume done
                 task_done();
