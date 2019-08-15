@@ -623,6 +623,15 @@ always @(*) begin
                 task_done();
             end
 
+            `INSN_GROUP_DJNZ: begin /* DJNZ e */
+                task_read_reg(1, `REG_B);
+                task_alu8_op(`ALU_FUNC_SUB, reg1_rdata[7:0], 8'b1);
+                task_write_reg(`REG_B, alu8_out);
+                if (!alu8_f_out[`FLAG_Z_NUM])
+                    task_jump_relative({ {8{insn_operand[7]}}, insn_operand[7:0]});
+                task_done();
+            end
+
             `INSN_GROUP_EI_DI: begin  /* EI/DI */
                 if (!instr_for_decoder[3]) task_disable_interrupts();
                 else task_enable_interrupts();
