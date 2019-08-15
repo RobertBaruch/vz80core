@@ -5,17 +5,17 @@ input [0:0] z80fi_valid, \
 input [31:0] z80fi_insn, \
 input [2:0] z80fi_insn_len, \
 input [0:0] z80fi_mem_rd, \
-input [15:0] z80fi_mem_raddr, \
-input [7:0] z80fi_mem_rdata, \
+input [15:0] z80fi_bus_raddr, \
+input [7:0] z80fi_bus_rdata, \
 input [0:0] z80fi_mem_rd2, \
-input [15:0] z80fi_mem_raddr2, \
-input [7:0] z80fi_mem_rdata2, \
+input [15:0] z80fi_bus_raddr2, \
+input [7:0] z80fi_bus_rdata2, \
 input [0:0] z80fi_mem_wr, \
-input [15:0] z80fi_mem_waddr, \
-input [7:0] z80fi_mem_wdata, \
+input [15:0] z80fi_bus_waddr, \
+input [7:0] z80fi_bus_wdata, \
 input [0:0] z80fi_mem_wr2, \
-input [15:0] z80fi_mem_waddr2, \
-input [7:0] z80fi_mem_wdata2, \
+input [15:0] z80fi_bus_waddr2, \
+input [7:0] z80fi_bus_wdata2, \
 input [15:0] z80fi_reg_ip_in, \
 input [7:0] z80fi_reg_a_in, \
 input [7:0] z80fi_reg_f_in, \
@@ -70,17 +70,17 @@ output logic [0:0] z80fi_valid, \
 output logic [31:0] z80fi_insn, \
 output logic [2:0] z80fi_insn_len, \
 output logic [0:0] z80fi_mem_rd, \
-output logic [15:0] z80fi_mem_raddr, \
-output logic [7:0] z80fi_mem_rdata, \
+output logic [15:0] z80fi_bus_raddr, \
+output logic [7:0] z80fi_bus_rdata, \
 output logic [0:0] z80fi_mem_rd2, \
-output logic [15:0] z80fi_mem_raddr2, \
-output logic [7:0] z80fi_mem_rdata2, \
+output logic [15:0] z80fi_bus_raddr2, \
+output logic [7:0] z80fi_bus_rdata2, \
 output logic [0:0] z80fi_mem_wr, \
-output logic [15:0] z80fi_mem_waddr, \
-output logic [7:0] z80fi_mem_wdata, \
+output logic [15:0] z80fi_bus_waddr, \
+output logic [7:0] z80fi_bus_wdata, \
 output logic [0:0] z80fi_mem_wr2, \
-output logic [15:0] z80fi_mem_waddr2, \
-output logic [7:0] z80fi_mem_wdata2, \
+output logic [15:0] z80fi_bus_waddr2, \
+output logic [7:0] z80fi_bus_wdata2, \
 output logic [15:0] z80fi_reg_ip_in, \
 output logic [7:0] z80fi_reg_a_in, \
 output logic [7:0] z80fi_reg_f_in, \
@@ -135,17 +135,17 @@ logic [0:0] z80fi_valid; \
 logic [31:0] z80fi_insn; \
 logic [2:0] z80fi_insn_len; \
 logic [0:0] z80fi_mem_rd; \
-logic [15:0] z80fi_mem_raddr; \
-logic [7:0] z80fi_mem_rdata; \
+logic [15:0] z80fi_bus_raddr; \
+logic [7:0] z80fi_bus_rdata; \
 logic [0:0] z80fi_mem_rd2; \
-logic [15:0] z80fi_mem_raddr2; \
-logic [7:0] z80fi_mem_rdata2; \
+logic [15:0] z80fi_bus_raddr2; \
+logic [7:0] z80fi_bus_rdata2; \
 logic [0:0] z80fi_mem_wr; \
-logic [15:0] z80fi_mem_waddr; \
-logic [7:0] z80fi_mem_wdata; \
+logic [15:0] z80fi_bus_waddr; \
+logic [7:0] z80fi_bus_wdata; \
 logic [0:0] z80fi_mem_wr2; \
-logic [15:0] z80fi_mem_waddr2; \
-logic [7:0] z80fi_mem_wdata2; \
+logic [15:0] z80fi_bus_waddr2; \
+logic [7:0] z80fi_bus_wdata2; \
 logic [15:0] z80fi_reg_ip_in; \
 logic [7:0] z80fi_reg_a_in; \
 logic [7:0] z80fi_reg_f_in; \
@@ -200,17 +200,17 @@ logic [0:0] next_z80fi_valid; \
 logic [31:0] next_z80fi_insn; \
 logic [2:0] next_z80fi_insn_len; \
 logic [0:0] next_z80fi_mem_rd; \
-logic [15:0] next_z80fi_mem_raddr; \
-logic [7:0] next_z80fi_mem_rdata; \
+logic [15:0] next_z80fi_bus_raddr; \
+logic [7:0] next_z80fi_bus_rdata; \
 logic [0:0] next_z80fi_mem_rd2; \
-logic [15:0] next_z80fi_mem_raddr2; \
-logic [7:0] next_z80fi_mem_rdata2; \
+logic [15:0] next_z80fi_bus_raddr2; \
+logic [7:0] next_z80fi_bus_rdata2; \
 logic [0:0] next_z80fi_mem_wr; \
-logic [15:0] next_z80fi_mem_waddr; \
-logic [7:0] next_z80fi_mem_wdata; \
+logic [15:0] next_z80fi_bus_waddr; \
+logic [7:0] next_z80fi_bus_wdata; \
 logic [0:0] next_z80fi_mem_wr2; \
-logic [15:0] next_z80fi_mem_waddr2; \
-logic [7:0] next_z80fi_mem_wdata2; \
+logic [15:0] next_z80fi_bus_waddr2; \
+logic [7:0] next_z80fi_bus_wdata2; \
 logic [15:0] next_z80fi_reg_ip_in; \
 logic [7:0] next_z80fi_reg_a_in; \
 logic [7:0] next_z80fi_reg_f_in; \
@@ -241,17 +241,17 @@ z80fi_valid <= 0; \
 z80fi_insn <= 0; \
 z80fi_insn_len <= 0; \
 z80fi_mem_rd <= 0; \
-z80fi_mem_raddr <= 0; \
-z80fi_mem_rdata <= 0; \
+z80fi_bus_raddr <= 0; \
+z80fi_bus_rdata <= 0; \
 z80fi_mem_rd2 <= 0; \
-z80fi_mem_raddr2 <= 0; \
-z80fi_mem_rdata2 <= 0; \
+z80fi_bus_raddr2 <= 0; \
+z80fi_bus_rdata2 <= 0; \
 z80fi_mem_wr <= 0; \
-z80fi_mem_waddr <= 0; \
-z80fi_mem_wdata <= 0; \
+z80fi_bus_waddr <= 0; \
+z80fi_bus_wdata <= 0; \
 z80fi_mem_wr2 <= 0; \
-z80fi_mem_waddr2 <= 0; \
-z80fi_mem_wdata2 <= 0; \
+z80fi_bus_waddr2 <= 0; \
+z80fi_bus_wdata2 <= 0; \
 z80fi_reg_ip_in <= 0; \
 z80fi_reg_a_in <= 0; \
 z80fi_reg_f_in <= 0; \
@@ -282,17 +282,17 @@ z80fi_valid <= next_z80fi_valid; \
 z80fi_insn <= next_z80fi_insn; \
 z80fi_insn_len <= next_z80fi_insn_len; \
 z80fi_mem_rd <= next_z80fi_mem_rd; \
-z80fi_mem_raddr <= next_z80fi_mem_raddr; \
-z80fi_mem_rdata <= next_z80fi_mem_rdata; \
+z80fi_bus_raddr <= next_z80fi_bus_raddr; \
+z80fi_bus_rdata <= next_z80fi_bus_rdata; \
 z80fi_mem_rd2 <= next_z80fi_mem_rd2; \
-z80fi_mem_raddr2 <= next_z80fi_mem_raddr2; \
-z80fi_mem_rdata2 <= next_z80fi_mem_rdata2; \
+z80fi_bus_raddr2 <= next_z80fi_bus_raddr2; \
+z80fi_bus_rdata2 <= next_z80fi_bus_rdata2; \
 z80fi_mem_wr <= next_z80fi_mem_wr; \
-z80fi_mem_waddr <= next_z80fi_mem_waddr; \
-z80fi_mem_wdata <= next_z80fi_mem_wdata; \
+z80fi_bus_waddr <= next_z80fi_bus_waddr; \
+z80fi_bus_wdata <= next_z80fi_bus_wdata; \
 z80fi_mem_wr2 <= next_z80fi_mem_wr2; \
-z80fi_mem_waddr2 <= next_z80fi_mem_waddr2; \
-z80fi_mem_wdata2 <= next_z80fi_mem_wdata2; \
+z80fi_bus_waddr2 <= next_z80fi_bus_waddr2; \
+z80fi_bus_wdata2 <= next_z80fi_bus_wdata2; \
 z80fi_reg_ip_in <= next_z80fi_reg_ip_in; \
 z80fi_reg_a_in <= next_z80fi_reg_a_in; \
 z80fi_reg_f_in <= next_z80fi_reg_f_in; \
@@ -323,17 +323,17 @@ next_z80fi_valid = 0; \
 next_z80fi_insn = z80fi_insn; \
 next_z80fi_insn_len = z80fi_insn_len; \
 next_z80fi_mem_rd = z80fi_mem_rd; \
-next_z80fi_mem_raddr = z80fi_mem_raddr; \
-next_z80fi_mem_rdata = z80fi_mem_rdata; \
+next_z80fi_bus_raddr = z80fi_bus_raddr; \
+next_z80fi_bus_rdata = z80fi_bus_rdata; \
 next_z80fi_mem_rd2 = z80fi_mem_rd2; \
-next_z80fi_mem_raddr2 = z80fi_mem_raddr2; \
-next_z80fi_mem_rdata2 = z80fi_mem_rdata2; \
+next_z80fi_bus_raddr2 = z80fi_bus_raddr2; \
+next_z80fi_bus_rdata2 = z80fi_bus_rdata2; \
 next_z80fi_mem_wr = z80fi_mem_wr; \
-next_z80fi_mem_waddr = z80fi_mem_waddr; \
-next_z80fi_mem_wdata = z80fi_mem_wdata; \
+next_z80fi_bus_waddr = z80fi_bus_waddr; \
+next_z80fi_bus_wdata = z80fi_bus_wdata; \
 next_z80fi_mem_wr2 = z80fi_mem_wr2; \
-next_z80fi_mem_waddr2 = z80fi_mem_waddr2; \
-next_z80fi_mem_wdata2 = z80fi_mem_wdata2; \
+next_z80fi_bus_waddr2 = z80fi_bus_waddr2; \
+next_z80fi_bus_wdata2 = z80fi_bus_wdata2; \
 next_z80fi_reg_ip_in = z80fi_reg_ip_in; \
 next_z80fi_reg_a_in = z80fi_reg_a_in; \
 next_z80fi_reg_f_in = z80fi_reg_f_in; \
@@ -364,17 +364,17 @@ next_z80fi_valid = 0; \
 next_z80fi_insn = 0; \
 next_z80fi_insn_len = 0; \
 next_z80fi_mem_rd = 0; \
-next_z80fi_mem_raddr = 0; \
-next_z80fi_mem_rdata = 0; \
+next_z80fi_bus_raddr = 0; \
+next_z80fi_bus_rdata = 0; \
 next_z80fi_mem_rd2 = 0; \
-next_z80fi_mem_raddr2 = 0; \
-next_z80fi_mem_rdata2 = 0; \
+next_z80fi_bus_raddr2 = 0; \
+next_z80fi_bus_rdata2 = 0; \
 next_z80fi_mem_wr = 0; \
-next_z80fi_mem_waddr = 0; \
-next_z80fi_mem_wdata = 0; \
+next_z80fi_bus_waddr = 0; \
+next_z80fi_bus_wdata = 0; \
 next_z80fi_mem_wr2 = 0; \
-next_z80fi_mem_waddr2 = 0; \
-next_z80fi_mem_wdata2 = 0; \
+next_z80fi_bus_waddr2 = 0; \
+next_z80fi_bus_wdata2 = 0; \
 next_z80fi_reg_ip_in = z80_reg_ip; \
 next_z80fi_reg_a_in = z80_reg_a; \
 next_z80fi_reg_f_in = z80_reg_f; \
@@ -431,17 +431,17 @@ assign z80fi_reg_iff2_out = z80_reg_iff2;
 .z80fi_insn (z80fi_insn), \
 .z80fi_insn_len (z80fi_insn_len), \
 .z80fi_mem_rd (z80fi_mem_rd), \
-.z80fi_mem_raddr (z80fi_mem_raddr), \
-.z80fi_mem_rdata (z80fi_mem_rdata), \
+.z80fi_bus_raddr (z80fi_bus_raddr), \
+.z80fi_bus_rdata (z80fi_bus_rdata), \
 .z80fi_mem_rd2 (z80fi_mem_rd2), \
-.z80fi_mem_raddr2 (z80fi_mem_raddr2), \
-.z80fi_mem_rdata2 (z80fi_mem_rdata2), \
+.z80fi_bus_raddr2 (z80fi_bus_raddr2), \
+.z80fi_bus_rdata2 (z80fi_bus_rdata2), \
 .z80fi_mem_wr (z80fi_mem_wr), \
-.z80fi_mem_waddr (z80fi_mem_waddr), \
-.z80fi_mem_wdata (z80fi_mem_wdata), \
+.z80fi_bus_waddr (z80fi_bus_waddr), \
+.z80fi_bus_wdata (z80fi_bus_wdata), \
 .z80fi_mem_wr2 (z80fi_mem_wr2), \
-.z80fi_mem_waddr2 (z80fi_mem_waddr2), \
-.z80fi_mem_wdata2 (z80fi_mem_wdata2), \
+.z80fi_bus_waddr2 (z80fi_bus_waddr2), \
+.z80fi_bus_wdata2 (z80fi_bus_wdata2), \
 .z80fi_reg_ip_in (z80fi_reg_ip_in), \
 .z80fi_reg_a_in (z80fi_reg_a_in), \
 .z80fi_reg_f_in (z80fi_reg_f_in), \
@@ -497,17 +497,17 @@ input [0:0] z80fi_valid, \
 input [31:0] z80fi_insn, \
 input [2:0] z80fi_insn_len, \
 output logic [0:0] spec_mem_rd, \
-output logic [15:0] spec_mem_raddr, \
-input [7:0] z80fi_mem_rdata, \
+output logic [15:0] spec_bus_raddr, \
+input [7:0] z80fi_bus_rdata, \
 output logic [0:0] spec_mem_rd2, \
-output logic [15:0] spec_mem_raddr2, \
-input [7:0] z80fi_mem_rdata2, \
+output logic [15:0] spec_bus_raddr2, \
+input [7:0] z80fi_bus_rdata2, \
 output logic [0:0] spec_mem_wr, \
-output logic [15:0] spec_mem_waddr, \
-output logic [7:0] spec_mem_wdata, \
+output logic [15:0] spec_bus_waddr, \
+output logic [7:0] spec_bus_wdata, \
 output logic [0:0] spec_mem_wr2, \
-output logic [15:0] spec_mem_waddr2, \
-output logic [7:0] spec_mem_wdata2, \
+output logic [15:0] spec_bus_waddr2, \
+output logic [7:0] spec_bus_wdata2, \
 input [15:0] z80fi_reg_ip_in, \
 input [7:0] z80fi_reg_a_in, \
 input [7:0] z80fi_reg_f_in, \
@@ -654,17 +654,17 @@ wire [0:0] valid = !reset && z80fi_valid; \
 wire [31:0] insn = z80fi_insn; \
 wire [2:0] insn_len = z80fi_insn_len; \
 wire [0:0] mem_rd = z80fi_mem_rd; \
-wire [15:0] mem_raddr = z80fi_mem_raddr; \
-wire [7:0] mem_rdata = z80fi_mem_rdata; \
+wire [15:0] bus_raddr = z80fi_bus_raddr; \
+wire [7:0] bus_rdata = z80fi_bus_rdata; \
 wire [0:0] mem_rd2 = z80fi_mem_rd2; \
-wire [15:0] mem_raddr2 = z80fi_mem_raddr2; \
-wire [7:0] mem_rdata2 = z80fi_mem_rdata2; \
+wire [15:0] bus_raddr2 = z80fi_bus_raddr2; \
+wire [7:0] bus_rdata2 = z80fi_bus_rdata2; \
 wire [0:0] mem_wr = z80fi_mem_wr; \
-wire [15:0] mem_waddr = z80fi_mem_waddr; \
-wire [7:0] mem_wdata = z80fi_mem_wdata; \
+wire [15:0] bus_waddr = z80fi_bus_waddr; \
+wire [7:0] bus_wdata = z80fi_bus_wdata; \
 wire [0:0] mem_wr2 = z80fi_mem_wr2; \
-wire [15:0] mem_waddr2 = z80fi_mem_waddr2; \
-wire [7:0] mem_wdata2 = z80fi_mem_wdata2; \
+wire [15:0] bus_waddr2 = z80fi_bus_waddr2; \
+wire [7:0] bus_wdata2 = z80fi_bus_wdata2; \
 wire [15:0] reg_ip_in = z80fi_reg_ip_in; \
 wire [7:0] reg_a_in = z80fi_reg_a_in; \
 wire [7:0] reg_f_in = z80fi_reg_f_in; \
@@ -718,17 +718,17 @@ logic [0:0] spec_valid; \
 logic [31:0] spec_insn; \
 logic [2:0] spec_insn_len; \
 logic [0:0] spec_mem_rd; \
-logic [15:0] spec_mem_raddr; \
-logic [7:0] spec_mem_rdata; \
+logic [15:0] spec_bus_raddr; \
+logic [7:0] spec_bus_rdata; \
 logic [0:0] spec_mem_rd2; \
-logic [15:0] spec_mem_raddr2; \
-logic [7:0] spec_mem_rdata2; \
+logic [15:0] spec_bus_raddr2; \
+logic [7:0] spec_bus_rdata2; \
 logic [0:0] spec_mem_wr; \
-logic [15:0] spec_mem_waddr; \
-logic [7:0] spec_mem_wdata; \
+logic [15:0] spec_bus_waddr; \
+logic [7:0] spec_bus_wdata; \
 logic [0:0] spec_mem_wr2; \
-logic [15:0] spec_mem_waddr2; \
-logic [7:0] spec_mem_wdata2; \
+logic [15:0] spec_bus_waddr2; \
+logic [7:0] spec_bus_wdata2; \
 logic [15:0] spec_reg_ip_out; \
 logic [7:0] spec_reg_a_out; \
 logic [7:0] spec_reg_f_out; \
@@ -783,17 +783,17 @@ logic [0:0] spec_reg_iff2;
 .z80fi_insn (insn), \
 .z80fi_insn_len (insn_len), \
 .spec_mem_rd (spec_mem_rd), \
-.spec_mem_raddr (spec_mem_raddr), \
-.z80fi_mem_rdata (mem_rdata), \
+.spec_bus_raddr (spec_bus_raddr), \
+.z80fi_bus_rdata (bus_rdata), \
 .spec_mem_rd2 (spec_mem_rd2), \
-.spec_mem_raddr2 (spec_mem_raddr2), \
-.z80fi_mem_rdata2 (mem_rdata2), \
+.spec_bus_raddr2 (spec_bus_raddr2), \
+.z80fi_bus_rdata2 (bus_rdata2), \
 .spec_mem_wr (spec_mem_wr), \
-.spec_mem_waddr (spec_mem_waddr), \
-.spec_mem_wdata (spec_mem_wdata), \
+.spec_bus_waddr (spec_bus_waddr), \
+.spec_bus_wdata (spec_bus_wdata), \
 .spec_mem_wr2 (spec_mem_wr2), \
-.spec_mem_waddr2 (spec_mem_waddr2), \
-.spec_mem_wdata2 (spec_mem_wdata2), \
+.spec_bus_waddr2 (spec_bus_waddr2), \
+.spec_bus_wdata2 (spec_bus_wdata2), \
 .spec_valid (spec_valid), \
 .z80fi_reg_ip_in (z80fi_reg_ip_in), \
 .z80fi_reg_a_in (z80fi_reg_a_in), \

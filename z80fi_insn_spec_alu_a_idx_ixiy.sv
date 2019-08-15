@@ -23,7 +23,7 @@ assign spec_valid = z80fi_valid &&
 `Z80FI_SPEC_SIGNALS
 assign spec_signals = `SPEC_REG_IP | `SPEC_REG_AF | `SPEC_MEM_RD;
 
-wire [7:0] operand = z80fi_mem_rdata;
+wire [7:0] operand = z80fi_bus_rdata;
 
 wire carry_in =
     (op != `ALU_FUNC_ADD && op != `ALU_FUNC_SUB && op != `ALU_FUNC_CP) &&
@@ -54,7 +54,7 @@ wire flag_n = is_sub;
 wire flag_c = is_logical ? 1'b0 :
     carry8(z80fi_reg_a_in, is_sub ? ~operand : operand, is_sub ^ carry_in);
 
-assign spec_mem_raddr = (iy ? z80fi_reg_iy_in : z80fi_reg_ix_in) + d;
+assign spec_bus_raddr = (iy ? z80fi_reg_iy_in : z80fi_reg_ix_in) + d;
 assign spec_reg_a_out = op == `ALU_FUNC_CP ? z80fi_reg_a_in : result;
 assign spec_reg_f_out =
     {flag_s, flag_z, flag_5, flag_h, flag_3, flag_v, flag_n, flag_c};

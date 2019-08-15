@@ -21,10 +21,10 @@ assign spec_valid = z80fi_valid &&
 `Z80FI_SPEC_SIGNALS
 assign spec_signals = `SPEC_REG_IP | `SPEC_MEM_WR | `SPEC_MEM_WR2;
 
-assign spec_mem_waddr = nn;
-assign spec_mem_waddr2 = nn + 1;
-assign spec_mem_wdata = z80fi_reg_l_in;
-assign spec_mem_wdata2 = z80fi_reg_h_in;
+assign spec_bus_waddr = nn;
+assign spec_bus_waddr2 = nn + 1;
+assign spec_bus_wdata = z80fi_reg_l_in;
+assign spec_bus_wdata2 = z80fi_reg_h_in;
 
 assign spec_reg_ip_out = z80fi_reg_ip_in + 3;
 

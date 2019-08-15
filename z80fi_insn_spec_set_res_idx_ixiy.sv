@@ -23,13 +23,13 @@ assign spec_valid = z80fi_valid &&
 `Z80FI_SPEC_SIGNALS
 assign spec_signals = `SPEC_REG_IP | `SPEC_MEM_RD | `SPEC_MEM_WR;
 
-wire [7:0] rdata = z80fi_mem_rdata;
+wire [7:0] rdata = z80fi_bus_rdata;
 wire [7:0] wdata = set ? (rdata | (8'b1 << b)) : (rdata & ~(8'b1 << b));
 
 wire [15:0] offset = {{8{d[7]}}, d[7:0]};
-assign spec_mem_raddr = (iy ? z80fi_reg_iy_in : z80fi_reg_ix_in) + offset;
-assign spec_mem_waddr = (iy ? z80fi_reg_iy_in : z80fi_reg_ix_in) + offset;
-assign spec_mem_wdata = wdata;
+assign spec_bus_raddr = (iy ? z80fi_reg_iy_in : z80fi_reg_ix_in) + offset;
+assign spec_bus_waddr = (iy ? z80fi_reg_iy_in : z80fi_reg_ix_in) + offset;
+assign spec_bus_wdata = wdata;
 
 assign spec_reg_ip_out = z80fi_reg_ip_in + 4;
 

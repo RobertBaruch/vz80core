@@ -26,16 +26,16 @@ assign spec_signals = `SPEC_REG_IP |
     `SPEC_REG_BC | `SPEC_REG_DE | `SPEC_REG_HL | `SPEC_REG_SP |
     `SPEC_MEM_RD | `SPEC_MEM_RD2;
 
-assign spec_reg_b_out = (dd == `REG_BC) ? z80fi_mem_rdata2 : z80fi_reg_b_in;
-assign spec_reg_c_out = (dd == `REG_BC) ? z80fi_mem_rdata : z80fi_reg_c_in;
-assign spec_reg_d_out = (dd == `REG_DE) ? z80fi_mem_rdata2 : z80fi_reg_d_in;
-assign spec_reg_e_out = (dd == `REG_DE) ? z80fi_mem_rdata : z80fi_reg_e_in;
-assign spec_reg_h_out = (dd == `REG_HL) ? z80fi_mem_rdata2 : z80fi_reg_h_in;
-assign spec_reg_l_out = (dd == `REG_HL) ? z80fi_mem_rdata : z80fi_reg_l_in;
-assign spec_reg_sp_out = (dd == `REG_SP) ? {z80fi_mem_rdata2, z80fi_mem_rdata} : z80fi_reg_sp_in;
+assign spec_reg_b_out = (dd == `REG_BC) ? z80fi_bus_rdata2 : z80fi_reg_b_in;
+assign spec_reg_c_out = (dd == `REG_BC) ? z80fi_bus_rdata : z80fi_reg_c_in;
+assign spec_reg_d_out = (dd == `REG_DE) ? z80fi_bus_rdata2 : z80fi_reg_d_in;
+assign spec_reg_e_out = (dd == `REG_DE) ? z80fi_bus_rdata : z80fi_reg_e_in;
+assign spec_reg_h_out = (dd == `REG_HL) ? z80fi_bus_rdata2 : z80fi_reg_h_in;
+assign spec_reg_l_out = (dd == `REG_HL) ? z80fi_bus_rdata : z80fi_reg_l_in;
+assign spec_reg_sp_out = (dd == `REG_SP) ? {z80fi_bus_rdata2, z80fi_bus_rdata} : z80fi_reg_sp_in;
 assign spec_reg_ip_out = z80fi_reg_ip_in + 4;
 
-assign spec_mem_raddr = addr;
-assign spec_mem_raddr2 = addr + 1;
+assign spec_bus_raddr = addr;
+assign spec_bus_raddr2 = addr + 1;
 
 endmodule

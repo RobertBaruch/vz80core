@@ -47,10 +47,10 @@ begin
     `ifdef Z80_FORMAL
         if (local_n == 1) begin
             next_z80fi_mem_rd = 1;
-            next_z80fi_mem_raddr = local_addr;
+            next_z80fi_bus_raddr = local_addr;
         end else begin
             next_z80fi_mem_rd2 = 1;
-            next_z80fi_mem_raddr2 = local_addr;
+            next_z80fi_bus_raddr2 = local_addr;
         end
     `endif
 end
@@ -63,12 +63,12 @@ endtask
 task task_collect_data;
     input [1:0] local_n;
 begin
-    if (local_n == 1) next_collected_data[7:0] = mem_rdata;
-    else next_collected_data[15:8] = mem_rdata;
+    if (local_n == 1) next_collected_data[7:0] = bus_rdata;
+    else next_collected_data[15:8] = bus_rdata;
 
     `ifdef Z80_FORMAL
-        if (local_n == 1) next_z80fi_mem_rdata = mem_rdata;
-        else next_z80fi_mem_rdata2 = mem_rdata;
+        if (local_n == 1) next_z80fi_bus_rdata = bus_rdata;
+        else next_z80fi_bus_rdata2 = bus_rdata;
     `endif
 end
 endtask
@@ -85,7 +85,7 @@ begin
     next_addr = local_addr;
     next_mem_rd = 0;
     next_mem_wr = 1;
-    next_mem_wdata = local_data;
+    next_bus_wdata = local_data;
 end
 endtask
 
@@ -97,12 +97,12 @@ begin
     `ifdef Z80_FORMAL
         if (local_n == 1) begin
             next_z80fi_mem_wr = 1;
-            next_z80fi_mem_waddr = addr;
-            next_z80fi_mem_wdata = mem_wdata;
+            next_z80fi_bus_waddr = addr;
+            next_z80fi_bus_wdata = bus_wdata;
         end else begin
             next_z80fi_mem_wr2 = 1;
-            next_z80fi_mem_waddr2 = addr;
-            next_z80fi_mem_wdata2 = mem_wdata;
+            next_z80fi_bus_waddr2 = addr;
+            next_z80fi_bus_wdata2 = bus_wdata;
         end
     `endif
 end

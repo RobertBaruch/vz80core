@@ -26,7 +26,7 @@ assign spec_valid = z80fi_valid &&
 assign spec_signals = `SPEC_REG_IP | `SPEC_REG_BC | `SPEC_REG_DE |
     `SPEC_REG_HL | `SPEC_REG_A | `SPEC_MEM_RD;
 
-wire [7:0] n = z80fi_mem_rdata;
+wire [7:0] n = z80fi_bus_rdata;
 assign spec_reg_a_out = (r == `REG_A) ? n : z80fi_reg_a_in;
 assign spec_reg_b_out = (r == `REG_B) ? n : z80fi_reg_b_in;
 assign spec_reg_c_out = (r == `REG_C) ? n : z80fi_reg_c_in;
@@ -35,7 +35,7 @@ assign spec_reg_e_out = (r == `REG_E) ? n : z80fi_reg_e_in;
 assign spec_reg_h_out = (r == `REG_H) ? n : z80fi_reg_h_in;
 assign spec_reg_l_out = (r == `REG_L) ? n : z80fi_reg_l_in;
 
-assign spec_mem_raddr = (iy ? z80fi_reg_iy_in : z80fi_reg_ix_in) + d;
+assign spec_bus_raddr = (iy ? z80fi_reg_iy_in : z80fi_reg_ix_in) + d;
 
 assign spec_reg_ip_out = z80fi_reg_ip_in + 3;
 

@@ -24,7 +24,7 @@ assign spec_valid = z80fi_valid &&
 assign spec_signals = `SPEC_REG_IP | `SPEC_MEM_WR;
 
 assign spec_reg_ip_out = z80fi_reg_ip_in + 4;
-assign spec_mem_waddr = (iy ? z80fi_reg_iy_in : z80fi_reg_ix_in) + d;
-assign spec_mem_wdata = n;
+assign spec_bus_waddr = (iy ? z80fi_reg_iy_in : z80fi_reg_ix_in) + d;
+assign spec_bus_wdata = n;
 
 endmodule

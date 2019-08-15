@@ -34,10 +34,10 @@ assign spec_signals = cond_met ?
     (`SPEC_REG_IP | `SPEC_REG_SP | `SPEC_MEM_WR | `SPEC_MEM_WR2) :
     `SPEC_REG_IP;
 
-assign spec_mem_waddr = z80fi_reg_sp_in - 16'h1;
-assign spec_mem_waddr2 = z80fi_reg_sp_in - 16'h2;
-assign spec_mem_wdata = retaddr[15:8];
-assign spec_mem_wdata2 = retaddr[7:0];
+assign spec_bus_waddr = z80fi_reg_sp_in - 16'h1;
+assign spec_bus_waddr2 = z80fi_reg_sp_in - 16'h2;
+assign spec_bus_wdata = retaddr[15:8];
+assign spec_bus_wdata2 = retaddr[7:0];
 assign spec_reg_sp_out =
     z80fi_reg_sp_in - (cond_met ? 16'h2 : 0);
 assign spec_reg_ip_out =

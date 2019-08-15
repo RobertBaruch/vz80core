@@ -36,12 +36,12 @@ assign nWR = !write_mem;
 sequencer sequencer(
     .reset(reset),
     .clk(CLK),
-    .mem_data(READ_D),
+    .bus_rdata(READ_D),
     .done(done),
     .addr(A),
     .write_mem(write_mem),
     .read_mem(read_mem),
-    .write_data(WRITE_D)
+    .bus_wdata(WRITE_D)
 
 `ifdef Z80_FORMAL
     ,

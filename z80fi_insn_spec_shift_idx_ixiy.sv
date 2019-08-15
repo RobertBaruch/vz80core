@@ -26,7 +26,7 @@ assign spec_valid = z80fi_valid &&
 assign spec_signals = `SPEC_REG_IP | `SPEC_REG_F | `SPEC_MEM_RD |
     `SPEC_MEM_WR;
 
-wire [7:0] rdata = z80fi_mem_rdata;
+wire [7:0] rdata = z80fi_bus_rdata;
 
 // This is the bit that gets shoved into the register from the right or left.
 // If we're rotating through carry, it's the carry bit. Otherwise
@@ -45,9 +45,9 @@ wire flag_n = 0;
 wire flag_c = rdata[right ? 0 : 7];
 
 wire [15:0] offset = {{8{d[7]}}, d[7:0]};
-assign spec_mem_raddr = (iy ? z80fi_reg_iy_in : z80fi_reg_ix_in) + offset;
-assign spec_mem_waddr = (iy ? z80fi_reg_iy_in : z80fi_reg_ix_in) + offset;
-assign spec_mem_wdata = wdata;
+assign spec_bus_raddr = (iy ? z80fi_reg_iy_in : z80fi_reg_ix_in) + offset;
+assign spec_bus_waddr = (iy ? z80fi_reg_iy_in : z80fi_reg_ix_in) + offset;
+assign spec_bus_wdata = wdata;
 assign spec_reg_f_out =
     {flag_s, flag_z, flag_5, flag_h, flag_3, flag_v, flag_n, flag_c};
 

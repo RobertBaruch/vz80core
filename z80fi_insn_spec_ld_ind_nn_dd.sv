@@ -27,10 +27,10 @@ wire [15:0] wdata =
     (dd == `REG_DE) ? z80fi_reg_de_in :
     (dd == `REG_HL) ? z80fi_reg_hl_in :
     (dd == `REG_SP) ? z80fi_reg_sp_in : 0;
-assign spec_mem_waddr = nn;
-assign spec_mem_waddr2 = nn + 1;
-assign spec_mem_wdata = wdata[7:0];
-assign spec_mem_wdata2 = wdata[15:8];
+assign spec_bus_waddr = nn;
+assign spec_bus_waddr2 = nn + 1;
+assign spec_bus_wdata = wdata[7:0];
+assign spec_bus_wdata2 = wdata[15:8];
 
 assign spec_reg_ip_out = z80fi_reg_ip_in + 4;
 

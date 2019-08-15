@@ -19,15 +19,15 @@ assign spec_valid = z80fi_valid &&
 assign spec_signals = `SPEC_REG_IP | `SPEC_REG_HL |
     `SPEC_MEM_RD | `SPEC_MEM_RD2 | `SPEC_MEM_WR | `SPEC_MEM_WR2;
 
-assign spec_mem_raddr = z80fi_reg_sp_in;
-assign spec_mem_raddr2 = z80fi_reg_sp_in + 1;
-assign spec_mem_waddr = z80fi_reg_sp_in;
-assign spec_mem_waddr2 = z80fi_reg_sp_in + 1;
-assign spec_mem_wdata = z80fi_reg_l_in;
-assign spec_mem_wdata2 = z80fi_reg_h_in;
+assign spec_bus_raddr = z80fi_reg_sp_in;
+assign spec_bus_raddr2 = z80fi_reg_sp_in + 1;
+assign spec_bus_waddr = z80fi_reg_sp_in;
+assign spec_bus_waddr2 = z80fi_reg_sp_in + 1;
+assign spec_bus_wdata = z80fi_reg_l_in;
+assign spec_bus_wdata2 = z80fi_reg_h_in;
 
-assign spec_reg_h_out = z80fi_mem_rdata2;
-assign spec_reg_l_out = z80fi_mem_rdata;
+assign spec_reg_h_out = z80fi_bus_rdata2;
+assign spec_reg_l_out = z80fi_bus_rdata;
 
 assign spec_reg_ip_out = z80fi_reg_ip_in + 1;
 

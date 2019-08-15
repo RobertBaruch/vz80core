@@ -11,13 +11,13 @@
 module sequencer(
     input logic reset,
     input logic clk,
-    input logic [7:0] mem_data,
+    input logic [7:0] bus_rdata,
     output logic done,
 
     output logic [15:0] addr,
     output logic write_mem,
     output logic read_mem,
-    output logic [7:0] write_data
+    output logic [7:0] bus_wdata
 
 `ifdef Z80_FORMAL
     ,
@@ -33,13 +33,9 @@ logic delayed_enable_interrupts;
 assign gated_iff1 = z80_reg_iff1 & !reset & !disable_interrupts & !enable_interrupts & !delayed_enable_interrupts;
 assign gated_iff2 = z80_reg_iff2 & !reset & !disable_interrupts & !enable_interrupts & !delayed_enable_interrupts;
 
-logic [7:0] mem_rdata;
-logic [7:0] mem_wdata;
 logic mem_wr;
 logic mem_rd;
 
-assign mem_rdata = mem_data;
-assign write_data = mem_wdata;
 assign write_mem = mem_wr;
 assign read_mem = mem_rd;
 
@@ -124,7 +120,7 @@ logic next_done;
 logic [15:0] next_addr;
 logic next_mem_rd;
 logic next_mem_wr;
-logic [7:0] next_mem_wdata;
+logic [7:0] next_bus_wdata;
 
 logic [31:0] next_collected_insn;
 logic [2:0] next_collected_insn_len;
@@ -150,7 +146,7 @@ always @(posedge clk or posedge reset) begin
         addr <= 0;
         mem_rd <= 1;
         mem_wr <= 0;
-        mem_wdata <= 0;
+        bus_wdata <= 0;
 
         collected_insn <= 0;
         collected_insn_len <= 0;
@@ -174,7 +170,7 @@ always @(posedge clk or posedge reset) begin
         addr <= next_addr;
         mem_rd <= next_mem_rd;
         mem_wr <= next_mem_wr;
-        mem_wdata <= next_mem_wdata;
+        bus_wdata <= next_bus_wdata;
 
         collected_insn <= next_collected_insn;
         collected_insn_len <= next_collected_insn_len;
@@ -445,7 +441,7 @@ always @(*) begin
     next_z80fi_valid = 0;
 
     next_mem_wr = 0;
-    next_mem_wdata = 0;
+    next_bus_wdata = 0;
 
     reg1_rnum = 0;
     reg2_rnum = 0;
@@ -493,10 +489,10 @@ always @(*) begin
             instr_for_decoder = collected_insn;
         end else begin
             case (collected_insn_len)
-                0: instr_for_decoder = {24'b0, mem_rdata};
-                1: instr_for_decoder = {16'b0, mem_rdata, collected_insn[7:0]};
-                2: instr_for_decoder = {8'b0, mem_rdata, collected_insn[15:0]};
-                3: instr_for_decoder = {mem_rdata, collected_insn[23:0]};
+                0: instr_for_decoder = {24'b0, bus_rdata};
+                1: instr_for_decoder = {16'b0, bus_rdata, collected_insn[7:0]};
+                2: instr_for_decoder = {8'b0, bus_rdata, collected_insn[15:0]};
+                3: instr_for_decoder = {bus_rdata, collected_insn[23:0]};
                 default: instr_for_decoder = collected_insn;
             endcase
             next_addr = z80_reg_ip + 1;
@@ -1875,12 +1871,12 @@ initial mem5 = 0;
 
 
 always @(posedge clk) begin
-if (write_mem && addr == 5) mem5 <= write_data;
-if (addr == 0) assume(mem_data == mem0);
-if (addr == 1) assume(mem_data == mem1);
-if (addr == 2) assume(mem_data == mem2);
-if (addr == 3) assume(mem_data == mem3);
-if (addr == 4) assume(mem_data == mem4);
+if (write_mem && addr == 5) mem5 <= bus_wdata;
+if (addr == 0) assume(bus_rdata == mem0);
+if (addr == 1) assume(bus_rdata == mem1);
+if (addr == 2) assume(bus_rdata == mem2);
+if (addr == 3) assume(bus_rdata == mem3);
+if (addr == 4) assume(bus_rdata == mem4);
 end
 
 initial assume(reset == 1);

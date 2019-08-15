@@ -20,8 +20,8 @@ assign spec_valid = z80fi_valid &&
 `Z80FI_SPEC_SIGNALS
 assign spec_signals = `SPEC_REG_IP |`SPEC_MEM_WR;
 
-assign spec_mem_waddr = de ? z80fi_reg_de_in : z80fi_reg_bc_in;
-assign spec_mem_wdata = z80fi_reg_a_in;
+assign spec_bus_waddr = de ? z80fi_reg_de_in : z80fi_reg_bc_in;
+assign spec_bus_wdata = z80fi_reg_a_in;
 
 assign spec_reg_ip_out = z80fi_reg_ip_in + 1;
 

@@ -21,10 +21,10 @@ assign spec_valid = z80fi_valid &&
 assign spec_signals = `SPEC_REG_IP | `SPEC_REG_SP |
     `SPEC_REG_IX | `SPEC_REG_IY | `SPEC_MEM_RD | `SPEC_MEM_RD2;
 
-wire [15:0] data = {z80fi_mem_rdata2, z80fi_mem_rdata};
+wire [15:0] data = {z80fi_bus_rdata2, z80fi_bus_rdata};
 
-assign spec_mem_raddr = z80fi_reg_sp_in;
-assign spec_mem_raddr2 = z80fi_reg_sp_in + 16'h1;
+assign spec_bus_raddr = z80fi_reg_sp_in;
+assign spec_bus_raddr2 = z80fi_reg_sp_in + 16'h1;
 assign spec_reg_sp_out = z80fi_reg_sp_in + 16'h2;
 assign spec_reg_ix_out = iy ? z80fi_reg_ix_in : data;
 assign spec_reg_iy_out = iy ? data : z80fi_reg_iy_in;

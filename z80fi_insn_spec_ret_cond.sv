@@ -32,12 +32,12 @@ assign spec_signals = cond_met ?
     (`SPEC_REG_IP | `SPEC_REG_SP | `SPEC_MEM_RD | `SPEC_MEM_RD2) :
     `SPEC_REG_IP;
 
-assign spec_mem_raddr = z80fi_reg_sp_in;
-assign spec_mem_raddr2 = z80fi_reg_sp_in + 16'h1;
+assign spec_bus_raddr = z80fi_reg_sp_in;
+assign spec_bus_raddr2 = z80fi_reg_sp_in + 16'h1;
 assign spec_reg_sp_out =
     z80fi_reg_sp_in + (cond_met ? 16'h2 : 16'h0);
 assign spec_reg_ip_out =
-    cond_met ? {z80fi_mem_rdata2, z80fi_mem_rdata} :
+    cond_met ? {z80fi_bus_rdata2, z80fi_bus_rdata} :
     (z80fi_reg_ip_in + 16'h1);
 
 endmodule

@@ -22,7 +22,7 @@ assign spec_valid = z80fi_valid &&
 `Z80FI_SPEC_SIGNALS
 assign spec_signals = `SPEC_REG_IP | `SPEC_REG_F | `SPEC_MEM_RD | `SPEC_MEM_WR;
 
-wire [7:0] operand = z80fi_mem_rdata;
+wire [7:0] operand = z80fi_bus_rdata;
 wire [7:0] result = inc ? (operand + 8'b1) : (operand - 8'b1);
 
 wire flag_s = result[7];
@@ -34,9 +34,9 @@ wire flag_v = overflow8(operand, inc ? 8'b1 : ~8'b1, !inc);
 wire flag_n = !inc;
 wire flag_c = (z80fi_reg_f_in & `FLAG_C_BIT) != 0;
 
-assign spec_mem_raddr = (iy ? z80fi_reg_iy_in : z80fi_reg_ix_in) + d;
-assign spec_mem_waddr = (iy ? z80fi_reg_iy_in : z80fi_reg_ix_in) + d;
-assign spec_mem_wdata = result;
+assign spec_bus_raddr = (iy ? z80fi_reg_iy_in : z80fi_reg_ix_in) + d;
+assign spec_bus_waddr = (iy ? z80fi_reg_iy_in : z80fi_reg_ix_in) + d;
+assign spec_bus_wdata = result;
 assign spec_reg_f_out =
     {flag_s, flag_z, flag_5, flag_h, flag_3, flag_v, flag_n, flag_c};
 

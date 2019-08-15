@@ -30,10 +30,10 @@ def bit(i: int, l: int) -> str:
 
 # Define all the formal interface signals. Format is {name, bits}.
 z80fi_signals = [("valid", 1), ("insn", 32), ("insn_len", 3), ("mem_rd", 1),
-                 ("mem_raddr", 16), ("mem_rdata", 8), ("mem_rd2", 1),
-                 ("mem_raddr2", 16), ("mem_rdata2", 8), ("mem_wr", 1),
-                 ("mem_waddr", 16), ("mem_wdata", 8), ("mem_wr2", 1),
-                 ("mem_waddr2", 16), ("mem_wdata2", 8)]
+                 ("bus_raddr", 16), ("bus_rdata", 8), ("mem_rd2", 1),
+                 ("bus_raddr2", 16), ("bus_rdata2", 8), ("mem_wr", 1),
+                 ("bus_waddr", 16), ("bus_wdata", 8), ("mem_wr2", 1),
+                 ("bus_waddr2", 16), ("bus_wdata2", 8)]
 
 # These are the signals which are registers, so they don't have to be
 # registered again. z80fi signals will be generated for z80fi_{register}_in and
@@ -50,7 +50,7 @@ z80fi_registers_out = [(f"{s[0]}_out", s[1]) for s in z80fi_registers]
 
 # In addition to valid, insn, and insn_len, all _rdata signals need to
 # be listed here.
-z80fi_spec_inputs = ["valid", "insn", "insn_len", "mem_rdata", "mem_rdata2"]
+z80fi_spec_inputs = ["valid", "insn", "insn_len", "bus_rdata", "bus_rdata2"]
 z80fi_spec_outputs = [
     s[0] for s in z80fi_signals if s[0] not in z80fi_spec_inputs
 ]

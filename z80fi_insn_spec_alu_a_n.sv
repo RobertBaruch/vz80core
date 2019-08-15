@@ -52,7 +52,7 @@ wire flag_n = is_sub;
 wire flag_c = is_logical ? 1'b0 :
     carry8(z80fi_reg_a_in, is_sub ? ~operand : operand, is_sub ^ carry_in);
 
-assign spec_mem_raddr = z80fi_reg_hl_in;
+assign spec_bus_raddr = z80fi_reg_hl_in;
 assign spec_reg_a_out = op == `ALU_FUNC_CP ? z80fi_reg_a_in : result;
 assign spec_reg_f_out =
     {flag_s, flag_z, flag_5, flag_h, flag_3, flag_v, flag_n, flag_c};

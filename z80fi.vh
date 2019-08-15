@@ -102,16 +102,16 @@ endfunction
 //   after (z80fi_pc_wdata) the instruction executes. That is, z80fi_pc_rdata is the
 //   address of the instruction just executed, and z80fi_pc_wdata is the address of
 //   the next instructino to execute.
-// z80fi_mem_(r/w)addr(2), z80fi_mem_rd(2), z80fi_mem_wr(2), z80fi_mem_rdata(2), z80fi_mem_wdata(2):
+// z80fi_mem_(r/w)addr(2), z80fi_mem_rd(2), z80fi_mem_wr(2), z80fi_bus_rdata(2), z80fi_bus_wdata(2):
 //   If the instruction did not read from memory (ignoring reads of instruction data)
 //   then z80fi_mem_rd is zero. If the instruction did not write memory, z80fi_mem_wr
 //   is zero. If memory was read or written, z80fi_mem_addr is the address location
-//   accessed, or an arbitrary value otherwise. z80fi_mem_rdata is the contents of the
+//   accessed, or an arbitrary value otherwise. z80fi_bus_rdata is the contents of the
 //   memory location just prior to the instruction starting, or an arbitrary value if
-//   memory was not read. z80fi_mem_wdata is the data written to memory, or an
+//   memory was not read. z80fi_bus_wdata is the data written to memory, or an
 //   arbitrary value if memory was not written.
 //   z80fi_mem_rd is for the first read. If there was a second read, use z80_fi_mem_rd2/
-//   z80fi_mem_addr2/z80fi_mem_rdata2.
+//   z80fi_mem_addr2/z80fi_bus_rdata2.
 // z80fi_rd/i_wr/r/f, z80fi_i/r/f_r/wdata:
 //   As expected, for reading and writing the I, R and Flags registers.
 //

@@ -20,7 +20,7 @@ assign spec_valid = z80fi_valid &&
 `Z80FI_SPEC_SIGNALS
 assign spec_signals = `SPEC_REG_IP | `SPEC_REG_F | `SPEC_MEM_RD;
 
-wire [7:0] rdata = z80fi_mem_rdata;
+wire [7:0] rdata = z80fi_bus_rdata;
 
 // Undocumented value of S flag:
 // Set if bit = 7 and bit 7 in r is set.
@@ -33,7 +33,7 @@ wire flag_v = rdata[b] == 0;
 wire flag_n = 0;
 wire flag_c = z80fi_reg_f_in[`FLAG_C_NUM];
 
-assign spec_mem_raddr = z80fi_reg_hl_in;
+assign spec_bus_raddr = z80fi_reg_hl_in;
 assign spec_reg_f_out =
     {flag_s, flag_z, flag_5, flag_h, flag_3, flag_v, flag_n, flag_c};
 

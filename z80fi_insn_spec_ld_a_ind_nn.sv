@@ -22,9 +22,9 @@ assign spec_valid = z80fi_valid &&
 `Z80FI_SPEC_SIGNALS
 assign spec_signals = `SPEC_REG_IP | `SPEC_REG_A | `SPEC_MEM_RD;
 
-assign spec_reg_a_out = z80fi_mem_rdata;
+assign spec_reg_a_out = z80fi_bus_rdata;
 assign spec_reg_ip_out = z80fi_reg_ip_in + 3;
 
-assign spec_mem_raddr = addr;
+assign spec_bus_raddr = addr;
 
 endmodule

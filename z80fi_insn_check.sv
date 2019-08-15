@@ -47,18 +47,18 @@ always @(*) begin
 
         // Check that we read from the right locations if we
         // were supposed to read from memory.
-        if (spec_mem_rd) assert(spec_mem_raddr == mem_raddr);
-        if (spec_mem_rd2) assert(spec_mem_raddr2 == mem_raddr2);
+        if (spec_mem_rd) assert(spec_bus_raddr == bus_raddr);
+        if (spec_mem_rd2) assert(spec_bus_raddr2 == bus_raddr2);
 
         // Check that we wronte the correct values to the right
         // locations if we were supposed to write memory.
         if (spec_mem_wr) begin
-            assert(spec_mem_waddr == mem_waddr);
-            assert(spec_mem_wdata == mem_wdata);
+            assert(spec_bus_waddr == bus_waddr);
+            assert(spec_bus_wdata == bus_wdata);
         end
         if (spec_mem_wr2) begin
-            assert(spec_mem_waddr2 == mem_waddr2);
-            assert(spec_mem_wdata2 == mem_wdata2);
+            assert(spec_bus_waddr2 == bus_waddr2);
+            assert(spec_bus_wdata2 == bus_wdata2);
         end
 
         // Check that the instruction pointer (aka IP or PC) points

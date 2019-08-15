@@ -21,17 +21,17 @@ assign spec_valid = z80fi_valid &&
 assign spec_signals = `SPEC_REG_IP | `SPEC_REG_BC |
     `SPEC_REG_HL | `SPEC_REG_F | `SPEC_MEM_RD;
 
-wire [7:0] sub = z80fi_reg_a_in - z80fi_mem_rdata;
+wire [7:0] sub = z80fi_reg_a_in - z80fi_bus_rdata;
 wire flag_s = sub[7];
 wire flag_z = (sub == 0);
 wire flag_5 = (z80fi_reg_f_in & `FLAG_5_BIT) != 0;
-wire flag_h = halfcarry8(z80fi_reg_a_in, ~z80fi_mem_rdata, 1);
+wire flag_h = halfcarry8(z80fi_reg_a_in, ~z80fi_bus_rdata, 1);
 wire flag_3 = (z80fi_reg_f_in & `FLAG_3_BIT) != 0;
 wire flag_v = z80fi_reg_bc_in != 16'b1;
 wire flag_n = 1;
 wire flag_c = (z80fi_reg_f_in & `FLAG_C_BIT) != 0;
 
-assign spec_mem_raddr = z80fi_reg_hl_in;
+assign spec_bus_raddr = z80fi_reg_hl_in;
 assign {spec_reg_b_out, spec_reg_c_out} = z80fi_reg_bc_in - 16'h1;
 assign {spec_reg_h_out, spec_reg_l_out} = z80fi_reg_hl_in + 16'h1;
 assign spec_reg_f_out =
