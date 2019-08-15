@@ -575,6 +575,42 @@ always @(*) begin
                 task_done();
             end
 
+            `INSN_GROUP_JP_IND_HL:  /* JP (HL) */
+                case (state)
+                    0: begin
+                        task_read_reg(1, `DD_REG_HL);
+                        task_read_mem(1, reg1_rdata);
+                    end
+                    1: begin
+                        task_collect_data(1);
+                        task_read_reg(1, `DD_REG_HL);
+                        task_read_mem(2, reg1_rdata + 1);
+                    end
+                    2: begin
+                        task_collect_data(2);
+                        task_jump(next_collected_data[15:0]);
+                        task_done();
+                    end
+                endcase
+
+            `INSN_GROUP_JP_IND_IXIY:  /* JP (IX/IY) */
+                case (state)
+                    0: begin
+                        task_read_reg(1, {`REG_SET_IDX, instr_for_decoder[5]});
+                        task_read_mem(1, reg1_rdata);
+                    end
+                    1: begin
+                        task_collect_data(1);
+                        task_read_reg(1, {`REG_SET_IDX, instr_for_decoder[5]});
+                        task_read_mem(2, reg1_rdata + 1);
+                    end
+                    2: begin
+                        task_collect_data(2);
+                        task_jump(next_collected_data[15:0]);
+                        task_done();
+                    end
+                endcase
+
             `INSN_GROUP_JR: begin /* JR e */
                 task_jump_relative({ {8{insn_operand[7]}}, insn_operand[7:0]});
                 task_done();
