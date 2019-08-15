@@ -1,6 +1,6 @@
 // JP nn
 //
-// Jumps to the given address.
+// Jumps to the given absolute address.
 
 `default_nettype none
 

@@ -561,6 +561,20 @@ always @(*) begin
                 task_done();
             end
 
+            `INSN_GROUP_JP_COND: begin /* JP */
+                case (instr_for_decoder[5:3])
+                    0, 1: if (f_rdata[`FLAG_Z_NUM] == instr_for_decoder[3])
+                        task_jump(insn_operand[15:0]);
+                    2, 3: if (f_rdata[`FLAG_C_NUM] == instr_for_decoder[3])
+                        task_jump(insn_operand[15:0]);
+                    4, 5: if (f_rdata[`FLAG_PV_NUM] == instr_for_decoder[3])
+                        task_jump(insn_operand[15:0]);
+                    6, 7: if (f_rdata[`FLAG_S_NUM] == instr_for_decoder[3])
+                        task_jump(insn_operand[15:0]);
+                endcase
+                task_done();
+            end
+
             `INSN_GROUP_EI_DI: begin  /* EI/DI */
                 if (!instr_for_decoder[3]) task_disable_interrupts();
                 else task_enable_interrupts();
