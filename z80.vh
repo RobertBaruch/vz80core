@@ -253,6 +253,8 @@ endfunction
 `define INSN_GROUP_CALL_COND 82        /* CALL CC, nn      */
 `define INSN_GROUP_RET 83              /* RET              */
 `define INSN_GROUP_RET_COND 84         /* RET CC           */
+`define INSN_GROUP_RETI 85             /* RETI             */
+`define INSN_GROUP_RETN 86             /* RETN             */
 
 // These are the INSN_GROUP_IDX_IXIY_BITS groups
 `define INSN_GROUP_RR_RLC_IDX_IXIY 0   /* RLCA/RLA/RRCA/RRA (IX/IY + d) */

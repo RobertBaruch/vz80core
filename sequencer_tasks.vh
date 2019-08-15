@@ -27,6 +27,10 @@
 // task_rotate_decimal(left, acc, mem, addr) // For RRD/RLD insns.
 // task_jump(addr)
 // task_jump_relative(offset)
+// task_enable_interrupts()
+// task_disable_interrupts()
+// task_accept_nmi()
+// task_ret_from_nmi()
 
 // task_read_mem(n, addr)
 // Set up to read memory at the given address. n is the
@@ -277,6 +281,18 @@ endtask
 task task_enable_interrupts;
 begin
     enable_interrupts = 1;
+end
+endtask
+
+task task_accept_nmi;
+begin
+    accept_nmi = 1;
+end
+endtask
+
+task task_ret_from_nmi;
+begin
+    ret_from_nmi = 1;
 end
 endtask
 

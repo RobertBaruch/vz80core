@@ -306,6 +306,14 @@ always @(*) begin
                 group <= `INSN_GROUP_LD_IND_NN_DD;
                 len <= 4;
             end
+            16'h45ED: begin
+                group <= `INSN_GROUP_RETN;
+                len <= 2;
+            end
+            16'h4DED: begin
+                group <= `INSN_GROUP_RETI;
+                len <= 2;
+            end
             16'h09DD, 16'h19DD, 16'h29DD, 16'h39DD,
             16'h09FD, 16'h19FD, 16'h29FD, 16'h39FD: begin
                 group <= `INSN_GROUP_ADD_IXIY_SS;

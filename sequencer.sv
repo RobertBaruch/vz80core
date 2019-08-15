@@ -701,6 +701,47 @@ always @(*) begin
                     end
                 endcase
 
+            // TODO: Hook this into interrupt signals.
+            `INSN_GROUP_RETI:  /* RETI */
+                case (state)
+                    0: begin
+                        task_read_reg(1, `DD_REG_SP);
+                        task_read_mem(1, reg1_rdata);
+                    end
+                    1: begin
+                        task_collect_data(1);
+                        task_read_reg(1, `DD_REG_SP);
+                        task_read_mem(2, reg1_rdata + 16'h1);
+                        task_write_reg(`DD_REG_SP, reg1_rdata + 16'h2);
+                    end
+                    2: begin
+                        task_collect_data(2);
+                        task_jump(next_collected_data[15:0]);
+                        task_done();
+                    end
+                endcase
+
+            // TODO: Hook this into interrupt signals.
+            `INSN_GROUP_RETN:  /* RETN */
+                case (state)
+                    0: begin
+                        task_read_reg(1, `DD_REG_SP);
+                        task_read_mem(1, reg1_rdata);
+                    end
+                    1: begin
+                        task_collect_data(1);
+                        task_read_reg(1, `DD_REG_SP);
+                        task_read_mem(2, reg1_rdata + 16'h1);
+                        task_write_reg(`DD_REG_SP, reg1_rdata + 16'h2);
+                    end
+                    2: begin
+                        task_collect_data(2);
+                        task_ret_from_nmi();
+                        task_jump(next_collected_data[15:0]);
+                        task_done();
+                    end
+                endcase
+
             `INSN_GROUP_RET_COND:  /* RET CC */
                 case (state)
                     0: begin
