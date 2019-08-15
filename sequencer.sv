@@ -360,6 +360,31 @@ begin
                 end
             endcase
 
+        `INSN_GROUP_BIT_IDX_IXIY: /* BIT b, (IX/IY + d) */
+            case (state)
+                0: begin
+                    task_read_reg(1, {`REG_SET_IDX, instr_for_decoder[5]});
+                    task_read_mem(1, reg1_rdata + { {8{insn_operand[7]}}, insn_operand[7:0]});
+                end
+                1: begin
+                    task_collect_data(1);
+                    task_write_f({
+                        // Undocumented value of S flag:
+                        // Set if bit = 7 and bit 7 in r is set.
+                        instr_for_decoder[29:27] == 3'b111 && next_collected_data[7] == 1'b1, // S ("unknown")
+                        ~next_collected_data[instr_for_decoder[29:27]], // Z
+                        f_rdata[`FLAG_5_NUM],
+                        1'b1, // H
+                        f_rdata[`FLAG_3_NUM],
+                        // Undocumented value of PV flag: Same as Z.
+                        ~next_collected_data[instr_for_decoder[29:27]],  // PV ("unknown")
+                        1'b0, // N
+                        f_rdata[`FLAG_C_NUM]
+                    });
+                    task_done();
+                end
+            endcase
+
         default: begin // For illegal instructions, just assume done
             task_done();
         end
@@ -1431,6 +1456,49 @@ always @(*) begin
                     end
                     2: begin
                         task_write_mem_done(1);
+                        task_done();
+                    end
+                endcase
+
+            `INSN_GROUP_BIT_REG: begin  /* BIT b, r */
+                task_read_reg(1, instr_for_decoder[10:8]);
+                task_write_f({
+                    // Undocumented value of S flag:
+                    // Set if bit = 7 and bit 7 in r is set.
+                    instr_for_decoder[13:11] == 3'b111 && reg1_rdata[7] == 1'b1, // S ("unknown")
+                    ~reg1_rdata[instr_for_decoder[13:11]], // Z
+                    f_rdata[`FLAG_5_NUM],
+                    1'b1, // H
+                    f_rdata[`FLAG_3_NUM],
+                    // Undocumented value of PV flag: Same as Z.
+                    ~reg1_rdata[instr_for_decoder[13:11]],  // PV ("unknown")
+                    1'b0, // N
+                    f_rdata[`FLAG_C_NUM]
+                });
+                task_done();
+                end
+
+            `INSN_GROUP_BIT_IND_HL:  /* BIT b, (HL) */
+                case (state)
+                    0: begin
+                        task_read_reg(1, `DD_REG_HL);
+                        task_read_mem(1, reg1_rdata);
+                    end
+                    1: begin
+                        task_collect_data(1);
+                        task_write_f({
+                            // Undocumented value of S flag:
+                            // Set if bit = 7 and bit 7 in r is set.
+                            instr_for_decoder[13:11] == 3'b111 && next_collected_data[7] == 1'b1, // S ("unknown")
+                            ~next_collected_data[instr_for_decoder[13:11]], // Z
+                            f_rdata[`FLAG_5_NUM],
+                            1'b1, // H
+                            f_rdata[`FLAG_3_NUM],
+                            // Undocumented value of PV flag: Same as Z.
+                            ~next_collected_data[instr_for_decoder[13:11]],  // PV ("unknown")
+                            1'b0, // N
+                            f_rdata[`FLAG_C_NUM]
+                        });
                         task_done();
                     end
                 endcase

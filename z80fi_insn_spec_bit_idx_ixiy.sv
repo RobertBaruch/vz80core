@@ -1,0 +1,55 @@
+// BIT b, (IX/IY + d)
+//
+// Sets the Z flag if bit b of the byte at memory location
+// IX/IY + d is zero.
+
+`default_nettype none
+
+`include "z80.vh"
+`include "z80fi.vh"
+
+module z80fi_insn_spec_bit_idx_ixiy(
+    `Z80FI_INSN_SPEC_IO
+);
+
+wire [1:0] insn_fixed1 = z80fi_insn[31:30];
+wire [2:0] b           = z80fi_insn[29:27];
+wire [2:0] insn_fixed2 = z80fi_insn[26:24];
+wire [7:0] d           = z80fi_insn[23:16];
+wire [7:0] insn_fixed3 = z80fi_insn[15:8];
+wire [1:0] insn_fixed4 = z80fi_insn[7:6];
+wire [0:0] iy          = z80fi_insn[5];
+wire [4:0] insn_fixed5 = z80fi_insn[4:0];
+
+assign spec_valid = z80fi_valid &&
+    z80fi_insn_len == 4 &&
+    insn_fixed1 == 2'b01 &&
+    insn_fixed2 == 3'b110 &&
+    insn_fixed3 == 8'hCB &&
+    insn_fixed4 == 2'b11 &&
+    insn_fixed5 == 5'b11101;
+
+`Z80FI_SPEC_SIGNALS
+assign spec_signals = `SPEC_REG_IP | `SPEC_REG_F | `SPEC_MEM_RD;
+
+wire [7:0] rdata = z80fi_mem_rdata;
+
+// Undocumented value of S flag:
+// Set if bit = 7 and bit 7 in r is set.
+wire flag_s = b == 7 && rdata[7] == 1;
+wire flag_z = rdata[b] == 0;
+wire flag_5 = z80fi_reg_f_in[`FLAG_5_NUM];
+wire flag_h = 1;
+wire flag_3 = z80fi_reg_f_in[`FLAG_3_NUM];
+wire flag_v = rdata[b] == 0;
+wire flag_n = 0;
+wire flag_c = z80fi_reg_f_in[`FLAG_C_NUM];
+
+wire [15:0] offset = {{8{d[7]}}, d[7:0]};
+assign spec_mem_raddr = (iy ? z80fi_reg_iy_in : z80fi_reg_ix_in) + offset;
+assign spec_reg_f_out =
+    {flag_s, flag_z, flag_5, flag_h, flag_3, flag_v, flag_n, flag_c};
+
+assign spec_reg_ip_out = z80fi_reg_ip_in + 4;
+
+endmodule

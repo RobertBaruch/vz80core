@@ -207,6 +207,20 @@ always @(*) begin
                 group <= `INSN_GROUP_SHIFT_IND_HL;
                 len <= 2;
             end
+            16'b01???00011001011,
+            16'b01???00111001011,
+            16'b01???01011001011,
+            16'b01???01111001011,
+            16'b01???10011001011,
+            16'b01???10111001011,
+            16'b01???11111001011: begin
+                group <= `INSN_GROUP_BIT_REG;
+                len <= 2;
+            end
+            16'b01???11011001011: begin
+                group <= `INSN_GROUP_BIT_IND_HL;
+                len <= 2;
+            end
             16'h42ED, 16'h52ED, 16'h62ED, 16'h72ED,
             16'h4AED, 16'h5AED, 16'h6AED, 16'h7AED: begin
                 group <= `INSN_GROUP_ADC_SBC_HL_DD;
@@ -372,6 +386,8 @@ always @(*) begin
             group <= `INSN_GROUP_RR_RLC_IDX_IXIY;
         8'h26, 8'h2E, 8'h3E:
             group <= `INSN_GROUP_SHIFT_IDX_IXIY;
+        8'b01???110:
+            group <= `INSN_GROUP_BIT_IDX_IXIY;
         default:
             group <= `INSN_GROUP_ILLEGAL_INSTR;
     endcase

@@ -236,10 +236,13 @@ endfunction
 `define INSN_GROUP_SHIFT_REG 65        /* SRA/SRL/SLA r    */
 `define INSN_GROUP_SHIFT_IND_HL 66     /* SRA/SRL/SLA (HL) */
 `define INSN_GROUP_ROT_DEC 67          /* RRD/RLD          */
+`define INSN_GROUP_BIT_REG 68          /* BIT b, r         */
+`define INSN_GROUP_BIT_IND_HL 69       /* BIT b, (HL)      */
 
 // These are the INSN_GROUP_IDX_IXIY_BITS groups
 `define INSN_GROUP_RR_RLC_IDX_IXIY 0   /* RLCA/RLA/RRCA/RRA (IX/IY + d) */
 `define INSN_GROUP_SHIFT_IDX_IXIY 1    /* SRA/SRL/SLA (IX/IY + d)       */
+`define INSN_GROUP_BIT_IDX_IXIY 2      /* BIT b, (IX/IY + d)            */
 
 `define Z80_REGS_OUTPUTS \
 output [7:0] z80_reg_a, \
