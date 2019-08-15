@@ -23,10 +23,10 @@ assign spec_signals = `SPEC_REG_IP | `SPEC_REG_SP |
 
 wire [15:0] wdata = iy ? z80fi_reg_iy_in : z80fi_reg_ix_in;
 
-assign spec_mem_waddr = z80fi_reg_sp_in - 16'h2;
-assign spec_mem_waddr2 = z80fi_reg_sp_in - 16'h1;
-assign spec_mem_wdata = wdata[7:0];
-assign spec_mem_wdata2 = wdata[15:8];
+assign spec_mem_waddr = z80fi_reg_sp_in - 16'h1;
+assign spec_mem_waddr2 = z80fi_reg_sp_in - 16'h2;
+assign spec_mem_wdata = wdata[15:8];
+assign spec_mem_wdata2 = wdata[7:0];
 assign spec_reg_sp_out = z80fi_reg_sp_in - 16'h2;
 
 assign spec_reg_ip_out = z80fi_reg_ip_in + 2;

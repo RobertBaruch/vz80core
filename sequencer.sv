@@ -1287,13 +1287,13 @@ always @(*) begin
                     0: begin
                         task_read_reg(1, `DD_REG_SP);
                         task_read_reg(2, {`REG_SET_QQ, instr_for_decoder[5:4]});
-                        task_write_mem(1, reg1_rdata - 16'h2, reg2_rdata[7:0]);
+                        task_write_mem(1, reg1_rdata - 16'h1, reg2_rdata[15:8]);
                     end
                     1: begin
                         task_write_mem_done(1);
                         task_read_reg(1, `DD_REG_SP);
                         task_read_reg(2, {`REG_SET_QQ, instr_for_decoder[5:4]});
-                        task_write_mem(2, reg1_rdata - 16'h1, reg2_rdata[15:8]);
+                        task_write_mem(2, reg1_rdata - 16'h2, reg2_rdata[7:0]);
                     end
                     2: begin
                         task_write_mem_done(2);
@@ -1308,13 +1308,13 @@ always @(*) begin
                     0: begin
                         task_read_reg(1, `DD_REG_SP);
                         task_read_reg(2, {`REG_SET_IDX, instr_for_decoder[5]});
-                        task_write_mem(1, reg1_rdata - 16'h2, reg2_rdata[7:0]);
+                        task_write_mem(1, reg1_rdata - 16'h1, reg2_rdata[15:8]);
                     end
                     1: begin
                         task_write_mem_done(1);
                         task_read_reg(1, `DD_REG_SP);
                         task_read_reg(2, {`REG_SET_IDX, instr_for_decoder[5]});
-                        task_write_mem(2, reg1_rdata - 16'h1, reg2_rdata[15:8]);
+                        task_write_mem(2, reg1_rdata - 16'h2, reg2_rdata[7:0]);
                     end
                     2: begin
                         task_write_mem_done(2);
