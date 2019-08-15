@@ -682,6 +682,26 @@ always @(*) begin
                     end
                 endcase
 
+            `INSN_GROUP_RST:  /* RST p */
+                case (state)
+                    0: begin
+                        task_read_reg(1, `DD_REG_SP);
+                        task_write_mem(1, reg1_rdata - 16'h1, next_z80_reg_ip[15:8]);
+                    end
+                    1: begin
+                        task_write_mem_done(1);
+                        task_read_reg(1, `DD_REG_SP);
+                        task_write_mem(2, reg1_rdata - 16'h2, next_z80_reg_ip[7:0]);
+                        task_write_reg(`DD_REG_SP, reg1_rdata - 16'h2);
+                    end
+                    2: begin
+                        task_write_mem_done(2);
+                        task_jump({8'b0, 2'b00, instr_for_decoder[5:3], 3'b000});
+                        task_done();
+                    end
+                endcase
+
+
             `INSN_GROUP_RET:  /* RET */
                 case (state)
                     0: begin
