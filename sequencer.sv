@@ -1415,6 +1415,26 @@ always @(*) begin
                     end
                 endcase
 
+            `INSN_GROUP_ROT_DEC:  /* RRD/RLD */
+                case (state)
+                    0: begin
+                        task_read_reg(1, `DD_REG_HL);
+                        task_read_mem(1, reg1_rdata);
+                    end
+                    1: begin
+                        task_collect_data(1);
+                        task_read_reg(1, `DD_REG_HL);
+                        task_read_reg(2, `REG_A);
+                        task_rotate_decimal(instr_for_decoder[11],
+                            reg2_rdata[7:0], next_collected_data[7:0],
+                            reg1_rdata);
+                    end
+                    2: begin
+                        task_write_mem_done(1);
+                        task_done();
+                    end
+                endcase
+
             `INSN_GROUP_IDX_IXIY_BITS:
                 // Handles all the DDCB / FDCB instructions
                 handle_ixiy_bits_group(ixiy_bits_group);

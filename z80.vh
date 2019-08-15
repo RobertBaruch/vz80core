@@ -235,6 +235,7 @@ endfunction
 `define INSN_GROUP_RR_RLC_IND_HL 64    /* RLCA/RLA/RRCA/RRA (HL)  */
 `define INSN_GROUP_SHIFT_REG 65        /* SRA/SRL/SLA r    */
 `define INSN_GROUP_SHIFT_IND_HL 66     /* SRA/SRL/SLA (HL) */
+`define INSN_GROUP_ROT_DEC 67          /* RRD/RLD          */
 
 // These are the INSN_GROUP_IDX_IXIY_BITS groups
 `define INSN_GROUP_RR_RLC_IDX_IXIY 0   /* RLCA/RLA/RRCA/RRA (IX/IY + d) */

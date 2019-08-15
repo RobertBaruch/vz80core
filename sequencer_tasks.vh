@@ -244,6 +244,27 @@ begin
 end
 endtask
 
+task task_rotate_decimal;
+    input left;
+    input [7:0] a;
+    input [7:0] m;
+    input [15:0] addr;
+begin
+    task_write_reg(`REG_A, left ? {a[7:4], m[7:4]} : {a[7:4], m[3:0]});
+    task_write_mem(1, addr, left ? {m[3:0], a[3:0]} : {a[3:0], m[7:4]});
+    task_write_f({
+        a[7], // S
+        a[7:4] == 0 && (left ? m[7:4] : m[3:0]) == 0, // Z
+        f_rdata[`FLAG_5_NUM],
+        1'b0, // H
+        f_rdata[`FLAG_3_NUM],
+        _alu_parity8(left ? {a[7:4], m[7:4]} : {a[7:4], m[3:0]}), // V
+        1'b0, // N
+        f_rdata[`FLAG_C_NUM]
+    });
+end
+endtask
+
 task task_disable_interrupts;
 begin
     disable_interrupts = 1;
