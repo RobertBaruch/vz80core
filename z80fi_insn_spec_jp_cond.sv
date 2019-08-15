@@ -21,14 +21,14 @@ assign spec_valid = z80fi_valid &&
 `Z80FI_SPEC_SIGNALS
 assign spec_signals = `SPEC_REG_IP;
 
-wire [3:0] flagnum =
+wire [2:0] flagnum =
     (cond == 0 || cond == 1) ? `FLAG_Z_NUM :
-    (cond == 0 || cond == 1) ? `FLAG_C_NUM :
-    (cond == 0 || cond == 1) ? `FLAG_PV_NUM :
-    (cond == 0 || cond == 1) ? `FLAG_S_NUM : 0;
+    (cond == 2 || cond == 3) ? `FLAG_C_NUM :
+    (cond == 4 || cond == 5) ? `FLAG_PV_NUM :
+    (cond == 6 || cond == 7) ? `FLAG_S_NUM : 0;
 wire want = cond[0];
 
 assign spec_reg_ip_out =
-    z80fi_reg_f_in[flagnum] == want ? nn : z80fi_reg_ip_in + 3;
+    (z80fi_reg_f_in[flagnum] == want) ? nn : (z80fi_reg_ip_in + 16'h3);
 
 endmodule

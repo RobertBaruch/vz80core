@@ -125,6 +125,14 @@ always @(*) begin
                 group <= `INSN_GROUP_JP_COND;
                 len <= 3;
             end
+            8'h18: begin
+                group <= `INSN_GROUP_JR;
+                len <= 2;
+            end
+            8'b001??000: begin
+                group <= `INSN_GROUP_JR_COND;
+                len <= 2;
+            end
             8'hC1, 8'hD1, 8'hE1, 8'hF1: begin
                 group <= `INSN_GROUP_POP_QQ;
                 len <= 1;

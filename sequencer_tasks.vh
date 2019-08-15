@@ -26,6 +26,7 @@
 // task_alu16_op(func, x, y)
 // task_rotate_decimal(left, acc, mem, addr) // For RRD/RLD insns.
 // task_jump(addr)
+// task_jump_relative(offset)
 
 // task_read_mem(n, addr)
 // Set up to read memory at the given address. n is the
@@ -283,6 +284,13 @@ task task_jump;
     input [15:0] local_addr;
 begin
     next_z80_reg_ip = local_addr;
+end
+endtask
+
+task task_jump_relative;
+    input [15:0] offset;
+begin
+    next_z80_reg_ip = next_z80_reg_ip + offset;
 end
 endtask
 

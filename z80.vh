@@ -244,6 +244,8 @@ endfunction
 `define INSN_GROUP_RES_IND_HL 73       /* RES b, (HL)      */
 `define INSN_GROUP_JP 74               /* JP nn            */
 `define INSN_GROUP_JP_COND 75          /* JP CC, nn        */
+`define INSN_GROUP_JR 76               /* JR e             */
+`define INSN_GROUP_JR_COND 77          /* JR CC, e         */
 
 // These are the INSN_GROUP_IDX_IXIY_BITS groups
 `define INSN_GROUP_RR_RLC_IDX_IXIY 0   /* RLCA/RLA/RRCA/RRA (IX/IY + d) */

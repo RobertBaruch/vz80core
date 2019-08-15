@@ -552,16 +552,16 @@ always @(*) begin
 
             // TODO: Break out of halt on interrupt
             `INSN_GROUP_HALT: begin  /* HALT */
-                task_jump(z80_reg_ip - 16'h1);
+                task_jump_relative(-16'h1);
                 task_done();
             end
 
-            `INSN_GROUP_JP: begin /* JP */
+            `INSN_GROUP_JP: begin /* JP nn */
                 task_jump(insn_operand[15:0]);
                 task_done();
             end
 
-            `INSN_GROUP_JP_COND: begin /* JP */
+            `INSN_GROUP_JP_COND: begin /* JP CC, nn */
                 case (instr_for_decoder[5:3])
                     0, 1: if (f_rdata[`FLAG_Z_NUM] == instr_for_decoder[3])
                         task_jump(insn_operand[15:0]);
@@ -572,6 +572,18 @@ always @(*) begin
                     6, 7: if (f_rdata[`FLAG_S_NUM] == instr_for_decoder[3])
                         task_jump(insn_operand[15:0]);
                 endcase
+                task_done();
+            end
+
+            `INSN_GROUP_JR: begin /* JR e */
+                task_jump_relative({ {8{insn_operand[7]}}, insn_operand[7:0]});
+                task_done();
+            end
+
+            `INSN_GROUP_JR_COND: begin /* JR CC, e */
+                if (f_rdata[instr_for_decoder[4] ? `FLAG_C_NUM : `FLAG_Z_NUM] ==
+                        instr_for_decoder[3])
+                    task_jump_relative({ {8{insn_operand[7]}}, insn_operand[7:0]});
                 task_done();
             end
 
@@ -914,7 +926,7 @@ always @(*) begin
                     end
                     2: begin
                         task_write_mem_done(1);
-                        task_jump(z80_reg_ip - (flag_pv ? 16'h2 : 0));
+                        task_jump_relative(flag_pv ? -16'h2 : 0);
                         task_done();
                     end
                 endcase
@@ -933,7 +945,7 @@ always @(*) begin
                     end
                     2: begin
                         task_write_mem_done(1);
-                        task_jump(z80_reg_ip - (flag_pv ? 16'h2 : 0));
+                        task_jump_relative(flag_pv ? -16'h2 : 0);
                         task_done();
                     end
                 endcase
@@ -977,7 +989,7 @@ always @(*) begin
                         task_compare_block_dec();
                     end
                     3: begin
-                        task_jump(z80_reg_ip - (flag_pv ? 16'h2 : 0));
+                        task_jump_relative(flag_pv ? -16'h2 : 0);
                         task_done();
                     end
                 endcase
@@ -1021,7 +1033,7 @@ always @(*) begin
                         task_compare_block_inc();
                     end
                     3: begin
-                        task_jump(z80_reg_ip - (flag_pv ? 16'h2 : 0));
+                        task_jump_relative(flag_pv ? -16'h2 : 0);
                         task_done();
                     end
                 endcase
