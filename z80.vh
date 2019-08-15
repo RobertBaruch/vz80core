@@ -249,6 +249,10 @@ endfunction
 `define INSN_GROUP_JP_IND_HL 78        /* JP (HL)          */
 `define INSN_GROUP_JP_IND_IXIY 79      /* JP (IX/IY)       */
 `define INSN_GROUP_DJNZ 80             /* DJNZ e           */
+`define INSN_GROUP_CALL 81             /* CALL nn          */
+`define INSN_GROUP_CALL_COND 82        /* CALL CC, nn      */
+`define INSN_GROUP_RET 83              /* RET              */
+`define INSN_GROUP_RET_COND 84         /* RET CC           */
 
 // These are the INSN_GROUP_IDX_IXIY_BITS groups
 `define INSN_GROUP_RR_RLC_IDX_IXIY 0   /* RLCA/RLA/RRCA/RRA (IX/IY + d) */

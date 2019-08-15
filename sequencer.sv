@@ -632,6 +632,106 @@ always @(*) begin
                 task_done();
             end
 
+            `INSN_GROUP_CALL:  /* CALL nn */
+                case (state)
+                    0: begin
+                        task_read_reg(1, `DD_REG_SP);
+                        task_write_mem(1, reg1_rdata - 16'h1, next_z80_reg_ip[15:8]);
+                    end
+                    1: begin
+                        task_write_mem_done(1);
+                        task_read_reg(1, `DD_REG_SP);
+                        task_write_mem(2, reg1_rdata - 16'h2, next_z80_reg_ip[7:0]);
+                        task_write_reg(`DD_REG_SP, reg1_rdata - 16'h2);
+                    end
+                    2: begin
+                        task_write_mem_done(2);
+                        task_jump(insn_operand[15:0]);
+                        task_done();
+                    end
+                endcase
+
+            `INSN_GROUP_CALL_COND:  /* CALL CC, nn */
+                case (state)
+                    0: begin
+                        case (instr_for_decoder[5:3])
+                            0, 1: if (f_rdata[`FLAG_Z_NUM] != instr_for_decoder[3])
+                                task_done();
+                            2, 3: if (f_rdata[`FLAG_C_NUM] != instr_for_decoder[3])
+                                task_done();
+                            4, 5: if (f_rdata[`FLAG_PV_NUM] != instr_for_decoder[3])
+                                task_done();
+                            6, 7: if (f_rdata[`FLAG_S_NUM] != instr_for_decoder[3])
+                                task_done();
+                        endcase
+                    end
+                    1: begin
+                        task_read_reg(1, `DD_REG_SP);
+                        task_write_mem(1, reg1_rdata - 16'h1, next_z80_reg_ip[15:8]);
+                    end
+                    2: begin
+                        task_write_mem_done(1);
+                        task_read_reg(1, `DD_REG_SP);
+                        task_write_mem(2, reg1_rdata - 16'h2, next_z80_reg_ip[7:0]);
+                        task_write_reg(`DD_REG_SP, reg1_rdata - 16'h2);
+                    end
+                    3: begin
+                        task_write_mem_done(2);
+                        task_jump(insn_operand[15:0]);
+                        task_done();
+                    end
+                endcase
+
+            `INSN_GROUP_RET:  /* RET */
+                case (state)
+                    0: begin
+                        task_read_reg(1, `DD_REG_SP);
+                        task_read_mem(1, reg1_rdata);
+                    end
+                    1: begin
+                        task_collect_data(1);
+                        task_read_reg(1, `DD_REG_SP);
+                        task_read_mem(2, reg1_rdata + 16'h1);
+                        task_write_reg(`DD_REG_SP, reg1_rdata + 16'h2);
+                    end
+                    2: begin
+                        task_collect_data(2);
+                        task_jump(next_collected_data[15:0]);
+                        task_done();
+                    end
+                endcase
+
+            `INSN_GROUP_RET_COND:  /* RET CC */
+                case (state)
+                    0: begin
+                        case (instr_for_decoder[5:3])
+                            0, 1: if (f_rdata[`FLAG_Z_NUM] != instr_for_decoder[3])
+                                task_done();
+                            2, 3: if (f_rdata[`FLAG_C_NUM] != instr_for_decoder[3])
+                                task_done();
+                            4, 5: if (f_rdata[`FLAG_PV_NUM] != instr_for_decoder[3])
+                                task_done();
+                            6, 7: if (f_rdata[`FLAG_S_NUM] != instr_for_decoder[3])
+                                task_done();
+                        endcase
+                    end
+                    1: begin
+                        task_read_reg(1, `DD_REG_SP);
+                        task_read_mem(1, reg1_rdata);
+                    end
+                    2: begin
+                        task_collect_data(1);
+                        task_read_reg(1, `DD_REG_SP);
+                        task_read_mem(2, reg1_rdata + 16'h1);
+                        task_write_reg(`DD_REG_SP, reg1_rdata + 16'h2);
+                    end
+                    3: begin
+                        task_collect_data(2);
+                        task_jump(next_collected_data[15:0]);
+                        task_done();
+                    end
+                endcase
+
             `INSN_GROUP_EI_DI: begin  /* EI/DI */
                 if (!instr_for_decoder[3]) task_disable_interrupts();
                 else task_enable_interrupts();

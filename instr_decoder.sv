@@ -141,6 +141,22 @@ always @(*) begin
                 group <= `INSN_GROUP_DJNZ;
                 len <= 2;
             end
+            8'hCD: begin
+                group <= `INSN_GROUP_CALL;
+                len <= 3;
+            end
+            8'b11???100: begin
+                group <= `INSN_GROUP_CALL_COND;
+                len <= 3;
+            end
+            8'hC9: begin
+                group <= `INSN_GROUP_RET;
+                len <= 1;
+            end
+            8'b11???000: begin
+                group <= `INSN_GROUP_RET_COND;
+                len <= 1;
+            end
             8'hC1, 8'hD1, 8'hE1, 8'hF1: begin
                 group <= `INSN_GROUP_POP_QQ;
                 len <= 1;
