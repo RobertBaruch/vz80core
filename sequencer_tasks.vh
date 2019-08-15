@@ -24,6 +24,8 @@
 // task_exx()
 // task_alu8_op(func, x, y)
 // task_alu16_op(func, x, y)
+// task_rotate_decimal(left, acc, mem, addr) // For RRD/RLD insns.
+// task_jump(addr)
 
 // task_read_mem(n, addr)
 // Set up to read memory at the given address. n is the
@@ -274,6 +276,13 @@ endtask
 task task_enable_interrupts;
 begin
     enable_interrupts = 1;
+end
+endtask
+
+task task_jump;
+    input [15:0] local_addr;
+begin
+    next_z80_reg_ip = local_addr;
 end
 endtask
 

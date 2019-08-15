@@ -552,7 +552,12 @@ always @(*) begin
 
             // TODO: Break out of halt on interrupt
             `INSN_GROUP_HALT: begin  /* HALT */
-                next_z80_reg_ip = z80_reg_ip - 16'h1;
+                task_jump(z80_reg_ip - 16'h1);
+                task_done();
+            end
+
+            `INSN_GROUP_JP: begin /* JP */
+                task_jump(insn_operand[15:0]);
                 task_done();
             end
 
@@ -895,7 +900,7 @@ always @(*) begin
                     end
                     2: begin
                         task_write_mem_done(1);
-                        next_z80_reg_ip = z80_reg_ip - (flag_pv ? 16'h2 : 0);
+                        task_jump(z80_reg_ip - (flag_pv ? 16'h2 : 0));
                         task_done();
                     end
                 endcase
@@ -914,7 +919,7 @@ always @(*) begin
                     end
                     2: begin
                         task_write_mem_done(1);
-                        next_z80_reg_ip = z80_reg_ip - (flag_pv ? 16'h2 : 0);
+                        task_jump(z80_reg_ip - (flag_pv ? 16'h2 : 0));
                         task_done();
                     end
                 endcase
@@ -958,7 +963,7 @@ always @(*) begin
                         task_compare_block_dec();
                     end
                     3: begin
-                        next_z80_reg_ip = z80_reg_ip - (flag_pv ? 16'h2 : 0);
+                        task_jump(z80_reg_ip - (flag_pv ? 16'h2 : 0));
                         task_done();
                     end
                 endcase
@@ -1002,7 +1007,7 @@ always @(*) begin
                         task_compare_block_inc();
                     end
                     3: begin
-                        next_z80_reg_ip = z80_reg_ip - (flag_pv ? 16'h2 : 0);
+                        task_jump(z80_reg_ip - (flag_pv ? 16'h2 : 0));
                         task_done();
                     end
                 endcase

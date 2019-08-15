@@ -242,6 +242,7 @@ endfunction
 `define INSN_GROUP_SET_IND_HL 71       /* SET b, (HL)      */
 `define INSN_GROUP_RES_REG 72          /* RES b, r         */
 `define INSN_GROUP_RES_IND_HL 73       /* RES b, (HL)      */
+`define INSN_GROUP_JP 74               /* JP nn            */
 
 // These are the INSN_GROUP_IDX_IXIY_BITS groups
 `define INSN_GROUP_RR_RLC_IDX_IXIY 0   /* RLCA/RLA/RRCA/RRA (IX/IY + d) */
