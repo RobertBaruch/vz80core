@@ -18,17 +18,12 @@ module z80fi_insn_spec_rr_rlc_ind_hl(
     `Z80FI_INSN_SPEC_IO
 );
 
-wire [2:0] insn_fixed1 = z80fi_insn[15:13];
 wire       through_c   = z80fi_insn[12];
 wire       right       = z80fi_insn[11];
-wire [2:0] insn_fixed2 = z80fi_insn[10:8];
-wire [7:0] insn_fixed3 = z80fi_insn[7:0];
 
 assign spec_valid = z80fi_valid &&
     z80fi_insn_len == 2 &&
-    insn_fixed1 == 3'b000 &&
-    insn_fixed2 == 3'b110 &&
-    insn_fixed3 == 8'hCB;
+    z80fi_insn[15:0] == 16'b000??110_11001011;
 
 `Z80FI_SPEC_SIGNALS
 assign spec_signals = `SPEC_REG_IP | `SPEC_REG_F | `SPEC_MEM_RD |

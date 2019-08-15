@@ -12,23 +12,14 @@ module z80fi_insn_spec_shift_idx_ixiy(
     `Z80FI_INSN_SPEC_IO
 );
 
-wire [2:0] insn_fixed1 = z80fi_insn[31:29];
 wire       logical     = z80fi_insn[28];
 wire       right       = z80fi_insn[27];
-wire [2:0] insn_fixed2 = z80fi_insn[26:24];
 wire [7:0] d           = z80fi_insn[23:16];
-wire [7:0] insn_fixed3 = z80fi_insn[15:8];
-wire [1:0] insn_fixed4 = z80fi_insn[7:6];
 wire [0:0] iy          = z80fi_insn[5];
-wire [4:0] insn_fixed5 = z80fi_insn[4:0];
 
 assign spec_valid = z80fi_valid &&
     z80fi_insn_len == 4 &&
-    insn_fixed1 == 3'b001 &&
-    insn_fixed2 == 3'b110 &&
-    insn_fixed3 == 8'hCB &&
-    insn_fixed4 == 2'b11 &&
-    insn_fixed5 == 5'b11101 &&
+    z80fi_insn[31:0] == 32'b001??110_????????_11001011_11?11101 &&
     !(logical && !right); // SLL is illegal in strict mode.
 
 `Z80FI_SPEC_SIGNALS

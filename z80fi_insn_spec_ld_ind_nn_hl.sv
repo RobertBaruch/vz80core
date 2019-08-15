@@ -13,11 +13,10 @@ module z80fi_insn_spec_ld_ind_nn_hl(
 );
 
 wire [15:0] nn         = z80fi_insn[23:8];
-wire [7:0] insn_fixed1 = z80fi_insn[7:0];
 
 assign spec_valid = z80fi_valid &&
     z80fi_insn_len == 3 &&
-    insn_fixed1 == 8'h22;
+    z80fi_insn[7:0] == 8'b00100010;
 
 `Z80FI_SPEC_SIGNALS
 assign spec_signals = `SPEC_REG_IP | `SPEC_MEM_WR | `SPEC_MEM_WR2;

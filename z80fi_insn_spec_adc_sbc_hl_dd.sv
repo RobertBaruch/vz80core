@@ -11,17 +11,12 @@ module z80fi_insn_spec_adc_sbc_hl_dd(
     `Z80FI_INSN_SPEC_IO
 );
 
-wire [1:0] insn_fixed1 = z80fi_insn[15:14];
 wire [1:0] dd          = z80fi_insn[13:12];
 wire       add         = z80fi_insn[11];
-wire [2:0] insn_fixed2 = z80fi_insn[10:8];
-wire [7:0] insn_fixed3 = z80fi_insn[7:0];
 
 assign spec_valid = z80fi_valid &&
     z80fi_insn_len == 2 &&
-    insn_fixed1 == 2'b01 &&
-    insn_fixed2 == 3'b010 &&
-    insn_fixed3 == 8'hED;
+    z80fi_insn[15:0] == 16'b01???010_11101101;
 
 `Z80FI_SPEC_SIGNALS
 assign spec_signals = `SPEC_REG_IP | `SPEC_REG_HL | `SPEC_REG_F;

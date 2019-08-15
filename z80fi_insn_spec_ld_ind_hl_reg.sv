@@ -12,12 +12,11 @@ module z80fi_insn_spec_ld_ind_hl_reg(
     `Z80FI_INSN_SPEC_IO
 );
 
-wire [4:0] insn_fixed1 = z80fi_insn[7:3];
 wire [2:0] r           = z80fi_insn[2:0];
 
 assign spec_valid = z80fi_valid &&
     z80fi_insn_len == 1 &&
-    insn_fixed1 == 5'b01110 &&
+    z80fi_insn[7:0] == 8'b01110??? &&
     r != 6;
 
 `Z80FI_SPEC_SIGNALS

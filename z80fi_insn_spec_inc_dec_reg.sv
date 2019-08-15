@@ -11,16 +11,13 @@ module z80fi_insn_spec_inc_dec_reg(
     `Z80FI_INSN_SPEC_IO
 );
 
-wire [1:0] insn_fixed1 = z80fi_insn[7:6];
 wire [2:0] r           = z80fi_insn[5:3];
-wire [1:0] insn_fixed2 = z80fi_insn[2:1];
 wire       inc         = z80fi_insn[0];
 
 assign spec_valid = z80fi_valid &&
     z80fi_insn_len == 1 &&
-    r != 6 &&
-    insn_fixed1 == 2'b00 &&
-    insn_fixed2 == 2'b10;
+    z80fi_insn[7:0] == 8'b00???10? &&
+    r != 6;
 
 `Z80FI_SPEC_SIGNALS
 assign spec_signals = `SPEC_REG_IP | `SPEC_REG_AF | `SPEC_REG_BC |

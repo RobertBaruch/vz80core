@@ -11,16 +11,11 @@ module z80fi_insn_spec_bit_ind_hl(
     `Z80FI_INSN_SPEC_IO
 );
 
-wire [7:0] insn_fixed1 = z80fi_insn[7:0];
-wire [1:0] insn_fixed2 = z80fi_insn[15:14];
 wire [2:0] b           = z80fi_insn[13:11];
-wire [2:0] insn_fixed3 = z80fi_insn[10:8];
 
 assign spec_valid = z80fi_valid &&
     z80fi_insn_len == 2 &&
-    insn_fixed1 == 8'hCB &&
-    insn_fixed2 == 2'b01 &&
-    insn_fixed3 == 3'b110;
+    z80fi_insn[15:0] == 16'b01???110_11001011;
 
 `Z80FI_SPEC_SIGNALS
 assign spec_signals = `SPEC_REG_IP | `SPEC_REG_F | `SPEC_MEM_RD;

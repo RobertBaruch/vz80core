@@ -11,14 +11,13 @@ module z80fi_insn_spec_alu_a_reg(
     `Z80FI_INSN_SPEC_IO
 );
 
-wire [1:0] insn_fixed1 = z80fi_insn[7:6];
 wire [2:0] op          = z80fi_insn[5:3];
 wire [2:0] r           = z80fi_insn[2:0];
 
 assign spec_valid = z80fi_valid &&
     z80fi_insn_len == 1 &&
-    r != 6 &&
-    insn_fixed1 == 2'b10;
+    z80fi_insn[7:0] == 8'b10?????? &&
+    r != 6;
 
 `Z80FI_SPEC_SIGNALS
 assign spec_signals = `SPEC_REG_IP | `SPEC_REG_AF;

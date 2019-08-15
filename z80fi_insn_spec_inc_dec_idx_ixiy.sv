@@ -12,17 +12,12 @@ module z80fi_insn_spec_inc_dec_idx_ixiy(
 );
 
 wire [15:0] d          = { {8{z80fi_insn[23]}}, z80fi_insn[23:16]};
-wire [6:0] insn_fixed1 = z80fi_insn[15:9];
 wire       inc         = z80fi_insn[8];
-wire [1:0] insn_fixed2 = z80fi_insn[7:6];
 wire       iy          = z80fi_insn[5];
-wire [4:0] insn_fixed3 = z80fi_insn[4:0];
 
 assign spec_valid = z80fi_valid &&
     z80fi_insn_len == 3 &&
-    insn_fixed1 == 7'b0011010 &&
-    insn_fixed2 == 2'b11 &&
-    insn_fixed3 == 5'b11101;
+    z80fi_insn[23:0] == 24'b????????_0011010?_11?11101;
 
 `Z80FI_SPEC_SIGNALS
 assign spec_signals = `SPEC_REG_IP | `SPEC_REG_F | `SPEC_MEM_RD | `SPEC_MEM_WR;

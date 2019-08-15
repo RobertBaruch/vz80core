@@ -11,14 +11,11 @@ module z80fi_insn_spec_ld_ind_bcde_a(
     `Z80FI_INSN_SPEC_IO
 );
 
-wire [2:0] insn_fixed1  = z80fi_insn[7:5];
-wire [0:0] de           = z80fi_insn[4:4];
-wire [3:0] insn_fixed2  = z80fi_insn[3:0];
+wire de           = z80fi_insn[4];
 
 assign spec_valid = z80fi_valid &&
     z80fi_insn_len == 1 &&
-    insn_fixed1 == 3'b000 &&
-    insn_fixed2 == 4'b0010;
+    z80fi_insn[7:0] == 8'b000?0010;
 
 `Z80FI_SPEC_SIGNALS
 assign spec_signals = `SPEC_REG_IP |`SPEC_MEM_WR;

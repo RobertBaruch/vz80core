@@ -13,20 +13,13 @@ module z80fi_insn_spec_ld_reg_idx_ixiy(
 );
 
 wire [15:0] d           = { {8{z80fi_insn[23]}}, z80fi_insn[23:16]};
-wire [1:0] insn_fixed1 = z80fi_insn[15:14];
 wire [2:0] r           = z80fi_insn[13:11];
-wire [2:0] insn_fixed2 = z80fi_insn[10:8];
-wire [1:0] insn_fixed3 = z80fi_insn[7:6];
 wire       iy          = z80fi_insn[5];
-wire [4:0] insn_fixed4 = z80fi_insn[4:0];
 
 // LD r, (IX/IY + d) instruction
 assign spec_valid = z80fi_valid &&
     z80fi_insn_len == 3 &&
-    insn_fixed1 == 2'b01 &&
-    insn_fixed2 == 3'b110 &&
-    insn_fixed3 == 2'b11 &&
-    insn_fixed4 == 5'b11101 &&
+    z80fi_insn[15:0] == 16'b01???110_11?11101 &&
     r != 6;
 
 `Z80FI_SPEC_SIGNALS

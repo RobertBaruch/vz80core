@@ -15,17 +15,11 @@ module z80fi_insn_spec_ld_dd_ind_nn(
 );
 
 wire [15:0] addr        = z80fi_insn[31:16];
-wire [1:0]  insn_fixed1 = z80fi_insn[15:14];
 wire [1:0]  dd          = z80fi_insn[13:12];
-wire [3:0]  insn_fixed2 = z80fi_insn[11:8];
-wire [7:0]  insn_fixed3 = z80fi_insn[7:0];
 
-// LD dd, (nn) instruction
 assign spec_valid = z80fi_valid &&
     z80fi_insn_len == 4 &&
-    insn_fixed1 == 2'b01 &&
-    insn_fixed2 == 4'b1011 &&
-    insn_fixed3 == 8'hED;
+    z80fi_insn[15:0] == 16'b01??1011_11101101;
 
 `Z80FI_SPEC_SIGNALS
 assign spec_signals = `SPEC_REG_IP |

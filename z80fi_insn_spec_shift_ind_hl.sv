@@ -12,17 +12,12 @@ module z80fi_insn_spec_shift_ind_hl(
     `Z80FI_INSN_SPEC_IO
 );
 
-wire [7:0] insn_fixed1 = z80fi_insn[7:0];
-wire [2:0] insn_fixed2 = z80fi_insn[15:13];
 wire       logical     = z80fi_insn[12];
 wire       right       = z80fi_insn[11];
-wire [2:0] insn_fixed3 = z80fi_insn[10:8];
 
 assign spec_valid = z80fi_valid &&
     z80fi_insn_len == 2 &&
-    insn_fixed1 == 8'hCB &&
-    insn_fixed2 == 3'b001 &&
-    insn_fixed3 == 3'b110 &&
+    z80fi_insn[15:0] == 16'b001??110_11001011 &&
     !(logical && !right); // SLL is illegal in strict mode.
 
 `Z80FI_SPEC_SIGNALS

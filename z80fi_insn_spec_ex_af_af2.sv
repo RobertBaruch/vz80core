@@ -13,7 +13,7 @@ module z80fi_insn_spec_ex_af_af2(
 
 assign spec_valid = z80fi_valid &&
     z80fi_insn_len == 1 &&
-    z80fi_insn[7:0] == 8'h08;
+    z80fi_insn[7:0] == 8'b00001000;
 
 `Z80FI_SPEC_SIGNALS
 assign spec_signals = `SPEC_REG_IP | `SPEC_REG_AF | `SPEC_REG_AF2;

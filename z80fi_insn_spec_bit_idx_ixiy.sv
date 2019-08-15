@@ -12,22 +12,13 @@ module z80fi_insn_spec_bit_idx_ixiy(
     `Z80FI_INSN_SPEC_IO
 );
 
-wire [1:0] insn_fixed1 = z80fi_insn[31:30];
 wire [2:0] b           = z80fi_insn[29:27];
-wire [2:0] insn_fixed2 = z80fi_insn[26:24];
 wire [7:0] d           = z80fi_insn[23:16];
-wire [7:0] insn_fixed3 = z80fi_insn[15:8];
-wire [1:0] insn_fixed4 = z80fi_insn[7:6];
 wire [0:0] iy          = z80fi_insn[5];
-wire [4:0] insn_fixed5 = z80fi_insn[4:0];
 
 assign spec_valid = z80fi_valid &&
     z80fi_insn_len == 4 &&
-    insn_fixed1 == 2'b01 &&
-    insn_fixed2 == 3'b110 &&
-    insn_fixed3 == 8'hCB &&
-    insn_fixed4 == 2'b11 &&
-    insn_fixed5 == 5'b11101;
+    z80fi_insn[31:0] == 32'b01???110_????????_11001011_11?11101;
 
 `Z80FI_SPEC_SIGNALS
 assign spec_signals = `SPEC_REG_IP | `SPEC_REG_F | `SPEC_MEM_RD;

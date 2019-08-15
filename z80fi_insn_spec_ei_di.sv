@@ -12,14 +12,11 @@ module z80fi_insn_spec_ei_di(
     `Z80FI_INSN_SPEC_IO
 );
 
-wire [3:0] insn_fixed1 = z80fi_insn[7:4];
 wire       enable      = z80fi_insn[3];
-wire [2:0] insn_fixed2 = z80fi_insn[2:0];
 
 assign spec_valid = z80fi_valid &&
     z80fi_insn_len == 1 &&
-    insn_fixed1 == 4'b1111 &&
-    insn_fixed2 == 3'b011;
+    z80fi_insn[7:0] == 8'b1111?011;
 
 `Z80FI_SPEC_SIGNALS
 assign spec_signals = `SPEC_REG_IP | `SPEC_REG_IFF1 | `SPEC_REG_IFF2;

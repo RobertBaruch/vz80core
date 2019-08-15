@@ -12,7 +12,7 @@ module z80fi_insn_spec_ld_i_a(
 
 assign spec_valid = z80fi_valid &&
     z80fi_insn_len == 2 &&
-    z80fi_insn[15:0] == 16'h47ED;
+    z80fi_insn[15:0] == 16'b01000111_11101101;
 
 `Z80FI_SPEC_SIGNALS
 assign spec_signals = `SPEC_REG_IP | `SPEC_REG_I;
