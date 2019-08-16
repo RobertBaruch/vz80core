@@ -15,8 +15,10 @@ module sequencer(
     output logic done,
 
     output logic [15:0] addr,
-    output logic write_mem,
-    output logic read_mem,
+    output logic mem_wr,
+    output logic mem_rd,
+    output logic io_wr,
+    output logic io_rd,
     output logic [7:0] bus_wdata
 
 `ifdef Z80_FORMAL
@@ -32,12 +34,6 @@ logic gated_iff2;
 logic delayed_enable_interrupts;
 assign gated_iff1 = z80_reg_iff1 & !reset & !disable_interrupts & !enable_interrupts & !delayed_enable_interrupts;
 assign gated_iff2 = z80_reg_iff2 & !reset & !disable_interrupts & !enable_interrupts & !delayed_enable_interrupts;
-
-logic mem_wr;
-logic mem_rd;
-
-assign write_mem = mem_wr;
-assign read_mem = mem_rd;
 
 logic `reg_select reg_wnum;
 logic `reg_select reg1_rnum;
@@ -120,6 +116,8 @@ logic next_done;
 logic [15:0] next_addr;
 logic next_mem_rd;
 logic next_mem_wr;
+logic next_io_rd;
+logic next_io_wr;
 logic [7:0] next_bus_wdata;
 
 logic [31:0] next_collected_insn;
@@ -146,6 +144,8 @@ always @(posedge clk or posedge reset) begin
         addr <= 0;
         mem_rd <= 1;
         mem_wr <= 0;
+        io_rd <= 0;
+        io_wr <= 0;
         bus_wdata <= 0;
 
         collected_insn <= 0;
@@ -170,6 +170,8 @@ always @(posedge clk or posedge reset) begin
         addr <= next_addr;
         mem_rd <= next_mem_rd;
         mem_wr <= next_mem_wr;
+        io_rd <= next_io_rd;
+        io_wr <= next_io_wr;
         bus_wdata <= next_bus_wdata;
 
         collected_insn <= next_collected_insn;
@@ -441,6 +443,8 @@ always @(*) begin
     next_z80fi_valid = 0;
 
     next_mem_wr = 0;
+    next_io_rd = 0;
+    next_io_wr = 0;
     next_bus_wdata = 0;
 
     reg1_rnum = 0;
@@ -868,6 +872,42 @@ always @(*) begin
                     end
                 endcase
 
+            `INSN_GROUP_IN_A:  /* IN  A, (n) */
+                case (state)
+                    0: begin
+                        task_read_reg(1, `REG_A);
+                        task_read_io({reg1_rdata[7:0], insn_operand[7:0]});
+                    end
+                    1: begin
+                        task_collect_data(1);
+                        task_write_reg(`REG_A, next_collected_data[7:0]);
+                        task_done();
+                    end
+                endcase
+
+            `INSN_GROUP_IN_REG:  /* IN  r, (C) */
+                case (state)
+                    0: begin
+                        task_read_reg(1, `DD_REG_BC);
+                        task_read_io(reg1_rdata);
+                    end
+                    1: begin
+                        task_collect_data(1);
+                        task_write_reg(instr_for_decoder[13:11], next_collected_data[7:0]);
+                        task_write_f({
+                            next_collected_data[7], // S
+                            (next_collected_data[7:0] == 0), // Z
+                            f_rdata[`FLAG_5_NUM],
+                            1'b0, // H
+                            f_rdata[`FLAG_3_NUM],
+                            _alu_parity8(next_collected_data[7:0]), // V
+                            1'b0, // N
+                            f_rdata[`FLAG_C_NUM]
+                        });
+                        task_done();
+                    end
+                endcase
+
             `INSN_GROUP_LD_IND_NN_A:  /* LD  (nn), A */
                 case (state)
                     0: begin
@@ -1236,6 +1276,49 @@ always @(*) begin
                     end
                     3: begin
                         task_jump_relative(flag_pv ? -16'h2 : 0);
+                        task_done();
+                    end
+                endcase
+
+            `INSN_GROUP_IN_BLOCK:  /* INI/INIR/IND/INDR */
+                case (state)
+                    0: begin
+                        task_read_reg(1, `DD_REG_BC);
+                        task_read_io(reg1_rdata);
+                    end
+                    1: begin
+                        task_collect_data(1);
+                        task_read_reg(1, `DD_REG_HL);
+                        task_write_mem(1, reg1_rdata, next_collected_data[7:0]);
+                        task_alu16_op(
+                            instr_for_decoder[11] ? `ALU_FUNC_SUB : `ALU_FUNC_ADD,
+                            reg1_rdata, 1);
+                        task_write_reg(`DD_REG_HL, alu16_out);
+                    end
+                    2: begin
+                        task_write_mem_done(1);
+                        task_read_reg(1, `REG_B);
+                        task_alu8_op(`ALU_FUNC_SUB, reg1_rdata[7:0], 1);
+                        task_write_reg(`REG_B, alu8_out);
+                        // Flags: the undocumented document claims a
+                        // weird formula for H, P, N, and C. It also
+                        // contradicts the documented values for N (1)
+                        // and C (unaffected). So for now we'll just
+                        // set H and P to zero until we can verify what's
+                        // going on.
+                        task_write_f({
+                            alu8_out[7], // S ("unknown")
+                            alu8_out == 0, // Z
+                            f_rdata[`FLAG_5_NUM],
+                            1'b0, // H ("unknown")
+                            f_rdata[`FLAG_3_NUM],
+                            // Same
+                            1'b0, // P ("unknown")
+                            1'b1, // N
+                            f_rdata[`FLAG_C_NUM]
+                        });
+                        if (instr_for_decoder[12])
+                            task_jump_relative(alu8_out == 0 ? -16'h2 : 0);
                         task_done();
                     end
                 endcase

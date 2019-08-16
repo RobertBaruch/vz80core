@@ -10,22 +10,25 @@ module z80fi_wrapper(
 
 `z80formal_rand_reg [7:0] bus_rdata;
 
-wire [15:0] mem_addr;
+// These output signals aren't monitored. Instead, we verify
+// using the z80fi interface.
+wire [15:0] bus_addr;
 wire [7:0] bus_wdata;
-wire mem_write;
-wire mem_read;
-
-wire mem_nwrite = !mem_write;
-wire mem_nread = !mem_read;
+wire bus_nwrite;
+wire bus_nread;
+wire nmreq;
+wire niorq;
 
 z80 uut(
     .CLK(clk),
     .nRESET(!reset),
     .READ_D(bus_rdata),
 
-    .A(mem_addr),
-    .nWR(mem_nwrite),
-    .nRD(mem_nread),
+    .A(bus_addr),
+    .nMREQ(nmreq),
+    .nIORQ(niorq),
+    .nWR(bus_nwrite),
+    .nRD(bus_nread),
     .WRITE_D(bus_wdata),
 
     `Z80FI_CONN

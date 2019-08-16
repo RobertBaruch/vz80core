@@ -14,6 +14,8 @@ module z80(
     input nRESET,
     input [7:0] READ_D,
 
+    output nMREQ,
+    output nIORQ,
     output nRD,
     output nWR,
     output [15:0] A,
@@ -26,12 +28,16 @@ module z80(
 );
 
 wire reset = !nRESET;
-wire write_mem;
-wire read_mem;
+wire mem_wr;
+wire mem_rd;
+wire io_wr;
+wire io_rd;
 logic done;
 
-assign nRD = !read_mem;
-assign nWR = !write_mem;
+assign nRD = !(mem_rd || io_rd);
+assign nWR = !(mem_wr || io_wr);
+assign nMREQ = !(mem_rd || mem_wr);
+assign nIORQ = !(io_rd || io_wr);
 
 sequencer sequencer(
     .reset(reset),
@@ -39,8 +45,10 @@ sequencer sequencer(
     .bus_rdata(READ_D),
     .done(done),
     .addr(A),
-    .write_mem(write_mem),
-    .read_mem(read_mem),
+    .mem_wr(mem_wr),
+    .mem_rd(mem_rd),
+    .io_wr(io_wr),
+    .io_rd(io_rd),
     .bus_wdata(WRITE_D)
 
 `ifdef Z80_FORMAL
@@ -50,7 +58,11 @@ sequencer sequencer(
 );
 
 `ifdef FORMAL
-    always @(*) assert(!(write_mem && read_mem));
+    always @(*) begin
+        assert(!(mem_wr && mem_rd));
+        assert(!(io_wr && io_rd));
+        assert(!((mem_wr || mem_rd) && (io_wr || io_rd)));
+    end
 `endif
 
 endmodule

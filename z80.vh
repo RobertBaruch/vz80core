@@ -256,6 +256,9 @@ endfunction
 `define INSN_GROUP_RETI 85             /* RETI             */
 `define INSN_GROUP_RETN 86             /* RETN             */
 `define INSN_GROUP_RST 87              /* RST p            */
+`define INSN_GROUP_IN_A 88             /* IN A, (n)        */
+`define INSN_GROUP_IN_REG 89           /* IN r, (C)        */
+`define INSN_GROUP_IN_BLOCK 90         /* INI/INIR/IND/INDR */
 
 // These are the INSN_GROUP_IDX_IXIY_BITS groups
 `define INSN_GROUP_RR_RLC_IDX_IXIY 0   /* RLCA/RLA/RRCA/RRA (IX/IY + d) */

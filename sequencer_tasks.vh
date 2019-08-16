@@ -6,10 +6,13 @@
 // Index of tasks:
 //
 // task_done()
-// task_read_mem(n, addr)      // requires delay with task_collect_data(n)
+// task_read_mem(n, addr)         // requires one cycle delay with task_collect_data(n)
 // task_collect_data(n)
-// task_write_mem(n, addr, data)  // requires delay with task_write_mem_done(n)
+// task_write_mem(n, addr, data)  // requires one cycle delay with task_write_mem_done(n)
 // task_write_mem_done(n)
+// task_read_io(addr)             // requires one cycle delay with task_collect_data(1)
+// task_write_io(addr, data)      // requires one cycle delay with task_write_io_done()
+// task_write_io_done()
 // task_read_reg(n, rnum)
 // task_write_reg(rnum, data)
 // task_write_i(data)  // write the I register
@@ -33,6 +36,11 @@
 // task_ret_from_nmi()
 
 // task_read_mem(n, addr)
+//
+// n is 1 or 2, depending on whether you're reading for the first time
+// in the instruction, or the second time (not including instruction
+// bytes).
+//
 // Set up to read memory at the given address. n is the
 // number of the read in this instruction, starting from 1.
 // n makes no difference in the logic, but does matter to
@@ -56,6 +64,23 @@ begin
 end
 endtask
 
+// task_read_io(addr)
+//
+// Reads a byte of I/O with the given address.
+task task_read_io;
+    input [15:0] local_addr;
+begin
+    next_addr = local_addr;
+    next_mem_rd = 0;
+    next_io_rd = 1;
+
+    `ifdef Z80_FORMAL
+        next_z80fi_io_rd = 1;
+        next_z80fi_bus_raddr = local_addr;
+    `endif
+end
+endtask
+
 // task_collect_data(n)
 // Collect the data read from memory. n is the
 // number of the read in this instruction, starting from 1.
@@ -73,7 +98,10 @@ begin
 end
 endtask
 
-// task_write_mem(addr, data)
+// task_write_mem(n, addr, data)
+//
+// n is 1 or 2, depending on whether you're writing for the first time
+// in the instruction, or the second time.
 //
 // You must delay one cycle before continuing (or ending) the instruction,
 // with task_write_mem_done(n).
@@ -104,6 +132,34 @@ begin
             next_z80fi_bus_waddr2 = addr;
             next_z80fi_bus_wdata2 = bus_wdata;
         end
+    `endif
+end
+endtask
+
+// task_write_io(addr, data)
+//
+// You must delay one cycle before continuing (or ending) the instruction,
+// with task_write_io_done().
+task task_write_io;
+    input [15:0] local_addr;
+    input [7:0] local_data;
+begin
+    next_addr = local_addr;
+    next_mem_rd = 0;
+    next_io_rd = 0;
+    next_io_wr = 1;
+    next_bus_wdata = local_data;
+end
+endtask
+
+task task_write_io_done;
+begin
+    next_io_wr = 0;
+
+    `ifdef Z80_FORMAL
+        next_z80fi_io_wr = 1;
+        next_z80fi_bus_waddr = addr;
+        next_z80fi_bus_wdata = bus_wdata;
     `endif
 end
 endtask

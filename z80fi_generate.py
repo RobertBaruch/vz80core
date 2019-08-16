@@ -29,11 +29,12 @@ def bit(i: int, l: int) -> str:
 # z80fi_signals.vh
 
 # Define all the formal interface signals. Format is {name, bits}.
-z80fi_signals = [("valid", 1), ("insn", 32), ("insn_len", 3), ("mem_rd", 1),
-                 ("bus_raddr", 16), ("bus_rdata", 8), ("mem_rd2", 1),
-                 ("bus_raddr2", 16), ("bus_rdata2", 8), ("mem_wr", 1),
-                 ("bus_waddr", 16), ("bus_wdata", 8), ("mem_wr2", 1),
-                 ("bus_waddr2", 16), ("bus_wdata2", 8)]
+z80fi_signals = [("valid", 1), ("insn", 32), ("insn_len", 3),
+                 ("bus_raddr", 16), ("bus_rdata", 8), ("bus_raddr2", 16),
+                 ("bus_rdata2", 8), ("bus_waddr", 16), ("bus_wdata", 8),
+                 ("bus_waddr2", 16), ("bus_wdata2", 8), ("mem_rd", 1),
+                 ("mem_rd2", 1), ("mem_wr", 1), ("mem_wr2", 1), ("io_rd", 1),
+                 ("io_wr", 1)]
 
 # These are the signals which are registers, so they don't have to be
 # registered again. z80fi signals will be generated for z80fi_{register}_in and
@@ -72,7 +73,7 @@ z80fi_spec_outputs = [
 #
 # assign spec_reg_a_out = ...;
 z80fi_action_signals = [("mem_rd", 1), ("mem_rd2", 1), ("mem_wr", 1),
-                        ("mem_wr2", 1)]
+                        ("mem_wr2", 1), ("io_rd", 1), ("io_wr", 1)]
 
 # Z80FI_SPEC_SIGNALS
 z80fi_spec_signals = "\n".join([

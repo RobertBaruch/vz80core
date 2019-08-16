@@ -38,20 +38,23 @@ always @(*) begin
         // magic.
         assume(spec_valid);
 
-        // Check that if we were supposed to read or write memory,
-        // we did.
+        // Check that if we were supposed to read or write memory
+        // or I/O, we did.
         assert(spec_mem_rd == mem_rd);
         assert(spec_mem_rd2 == mem_rd2);
         assert(spec_mem_wr == mem_wr);
         assert(spec_mem_wr2 == mem_wr2);
+        assert(spec_io_rd == io_rd);
+        assert(spec_io_wr == io_wr);
 
         // Check that we read from the right locations if we
-        // were supposed to read from memory.
+        // were supposed to read from memory or I/O.
         if (spec_mem_rd) assert(spec_bus_raddr == bus_raddr);
         if (spec_mem_rd2) assert(spec_bus_raddr2 == bus_raddr2);
+        if (spec_io_rd) assert(spec_bus_raddr == bus_raddr);
 
-        // Check that we wronte the correct values to the right
-        // locations if we were supposed to write memory.
+        // Check that we wrote the correct values to the right
+        // locations if we were supposed to write memory or I/O.
         if (spec_mem_wr) begin
             assert(spec_bus_waddr == bus_waddr);
             assert(spec_bus_wdata == bus_wdata);
@@ -59,6 +62,10 @@ always @(*) begin
         if (spec_mem_wr2) begin
             assert(spec_bus_waddr2 == bus_waddr2);
             assert(spec_bus_wdata2 == bus_wdata2);
+        end
+        if (spec_io_wr) begin
+            assert(spec_bus_waddr == bus_waddr);
+            assert(spec_bus_wdata == bus_wdata);
         end
 
         // Check that the instruction pointer (aka IP or PC) points

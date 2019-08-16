@@ -216,6 +216,10 @@ always @(*) begin
                 group <= `INSN_GROUP_EI_DI;
                 len <= 1;
             end
+            8'hDB: begin
+                group <= `INSN_GROUP_IN_A;
+                len <= 2;
+            end
             default: begin
                 group <= `INSN_GROUP_ILLEGAL_INSTR;
                 len <= 1;
@@ -293,6 +297,11 @@ always @(*) begin
                 group <= `INSN_GROUP_RES_IND_HL;
                 len <= 2;
             end
+            16'h40ED, 16'h48ED, 16'h50ED, 16'h58ED,
+            16'h60ED, 16'h68ED, 16'h78ED: begin
+                group <= `INSN_GROUP_IN_REG;
+                len <= 2;
+            end
             16'h42ED, 16'h52ED, 16'h62ED, 16'h72ED,
             16'h4AED, 16'h5AED, 16'h6AED, 16'h7AED: begin
                 group <= `INSN_GROUP_ADC_SBC_HL_DD;
@@ -316,6 +325,10 @@ always @(*) begin
             end
             16'h4DED: begin
                 group <= `INSN_GROUP_RETI;
+                len <= 2;
+            end
+            16'b101??010_11101101: begin
+                group <= `INSN_GROUP_IN_BLOCK;
                 len <= 2;
             end
             16'h09DD, 16'h19DD, 16'h29DD, 16'h39DD,
