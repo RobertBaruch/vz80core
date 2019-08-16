@@ -908,6 +908,31 @@ always @(*) begin
                     end
                 endcase
 
+            `INSN_GROUP_OUT_A:  /* OUT (n), A */
+                case (state)
+                    0: begin
+                        task_read_reg(1, `REG_A);
+                        task_write_io({reg1_rdata[7:0], insn_operand[7:0]}, reg1_rdata[7:0]);
+                    end
+                    1: begin
+                        task_write_io_done();
+                        task_done();
+                    end
+                endcase
+
+            `INSN_GROUP_OUT_REG:  /* OUT (C), r */
+                case (state)
+                    0: begin
+                        task_read_reg(1, `DD_REG_BC);
+                        task_read_reg(2, instr_for_decoder[13:11]);
+                        task_write_io(reg1_rdata, reg2_rdata[7:0]);
+                    end
+                    1: begin
+                        task_write_io_done();
+                        task_done();
+                    end
+                endcase
+
             `INSN_GROUP_LD_IND_NN_A:  /* LD  (nn), A */
                 case (state)
                     0: begin
@@ -1297,6 +1322,50 @@ always @(*) begin
                     end
                     2: begin
                         task_write_mem_done(1);
+                        task_read_reg(1, `REG_B);
+                        task_alu8_op(`ALU_FUNC_SUB, reg1_rdata[7:0], 1);
+                        task_write_reg(`REG_B, alu8_out);
+                        // Flags: the undocumented document claims a
+                        // weird formula for H, P, N, and C. It also
+                        // contradicts the documented values for N (1)
+                        // and C (unaffected). So for now we'll just
+                        // set H and P to zero until we can verify what's
+                        // going on.
+                        task_write_f({
+                            alu8_out[7], // S ("unknown")
+                            alu8_out == 0, // Z
+                            f_rdata[`FLAG_5_NUM],
+                            1'b0, // H ("unknown")
+                            f_rdata[`FLAG_3_NUM],
+                            // Same
+                            1'b0, // P ("unknown")
+                            1'b1, // N
+                            f_rdata[`FLAG_C_NUM]
+                        });
+                        if (instr_for_decoder[12])
+                            task_jump_relative(alu8_out == 0 ? -16'h2 : 0);
+                        task_done();
+                    end
+                endcase
+
+            `INSN_GROUP_OUT_BLOCK:  /* OUTI/OTIR/OUTD/OTDR */
+                case (state)
+                    0: begin
+                        task_read_reg(1, `DD_REG_HL);
+                        task_read_mem(1, reg1_rdata);
+                    end
+                    1: begin
+                        task_collect_data(1);
+                        task_read_reg(1, `DD_REG_HL);
+                        task_read_reg(2, `DD_REG_BC);
+                        task_write_io(reg2_rdata, next_collected_data[7:0]);
+                        task_alu16_op(
+                            instr_for_decoder[11] ? `ALU_FUNC_SUB : `ALU_FUNC_ADD,
+                            reg1_rdata, 1);
+                        task_write_reg(`DD_REG_HL, alu16_out);
+                    end
+                    2: begin
+                        task_write_io_done(1);
                         task_read_reg(1, `REG_B);
                         task_alu8_op(`ALU_FUNC_SUB, reg1_rdata[7:0], 1);
                         task_write_reg(`REG_B, alu8_out);

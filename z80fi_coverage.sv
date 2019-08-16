@@ -7,7 +7,7 @@ module coverage(
     input [2:0] insn_len
 );
 
-wire [92:0] insn_valid;
+wire [95:0] insn_valid;
 
 isa_coverage isa_coverage(
     .insn(insn),
