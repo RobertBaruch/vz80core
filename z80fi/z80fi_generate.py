@@ -45,7 +45,7 @@ z80fi_registers = [("reg_ip", 16), ("reg_a", 8), ("reg_f", 8), ("reg_b", 8),
                    ("reg_c2", 8), ("reg_d2", 8), ("reg_e2", 8), ("reg_h2", 8),
                    ("reg_l2", 8), ("reg_ix", 16), ("reg_iy", 16),
                    ("reg_sp", 16), ("reg_i", 8), ("reg_r", 8), ("reg_iff1", 1),
-                   ("reg_iff2", 1)]
+                   ("reg_iff2", 1), ("reg_im", 2)]
 z80fi_registers_in = [(f"{s[0]}_in", s[1]) for s in z80fi_registers]
 z80fi_registers_out = [(f"{s[0]}_out", s[1]) for s in z80fi_registers]
 

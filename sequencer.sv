@@ -2,7 +2,6 @@
 `define _sequencer_sv_
 
 `include "z80.vh"
-`include "z80fi.vh"
 `include "registers.sv"
 `include "ir_registers.sv"
 `include "alu.sv"
@@ -34,6 +33,9 @@ logic gated_iff2;
 logic delayed_enable_interrupts;
 assign gated_iff1 = z80_reg_iff1 & !reset & !disable_interrupts & !enable_interrupts & !delayed_enable_interrupts;
 assign gated_iff2 = z80_reg_iff2 & !reset & !disable_interrupts & !enable_interrupts & !delayed_enable_interrupts;
+
+// Interrupt mode
+logic [1:0] z80_reg_im;
 
 logic `reg_select reg_wnum;
 logic `reg_select reg1_rnum;
@@ -112,6 +114,7 @@ logic [3:0] state;
 // Next state variables
 //
 
+logic [1:0] next_z80_reg_im;
 logic next_done;
 logic [15:0] next_addr;
 logic next_mem_rd;
@@ -140,6 +143,7 @@ logic [3:0] next_state;
 
 always @(posedge clk or posedge reset) begin
     if (reset) begin
+        z80_reg_im <= 0;
         done <= 0;
         addr <= 0;
         mem_rd <= 1;
@@ -166,6 +170,7 @@ always @(posedge clk or posedge reset) begin
             `Z80FI_RESET_STATE
         `endif
     end else begin
+        z80_reg_im <= next_z80_reg_im;
         done <= next_done;
         addr <= next_addr;
         mem_rd <= next_mem_rd;
@@ -438,9 +443,13 @@ always @(*) begin
         `endif
     end
 
+    `ifdef Z80_FORMAL
+    next_z80fi_valid = 0;
+    `endif
+
+    next_z80_reg_im = z80_reg_im;
     next_done = 0;
     next_state = state;
-    next_z80fi_valid = 0;
 
     next_mem_wr = 0;
     next_io_rd = 0;
@@ -553,6 +562,15 @@ always @(*) begin
             // TODO: Break out of halt on interrupt
             `INSN_GROUP_HALT: begin  /* HALT */
                 task_jump_relative(-16'h1);
+                task_done();
+            end
+
+            `INSN_GROUP_IM: begin /* IM 0/1/2 */
+                case (instr_for_decoder[12:11])
+                    2'b00: task_set_im(2'b00);
+                    2'b10: task_set_im(2'b01);
+                    2'b11: task_set_im(2'b10);
+                endcase
                 task_done();
             end
 

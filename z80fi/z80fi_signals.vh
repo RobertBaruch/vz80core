@@ -42,6 +42,7 @@ input [7:0] z80fi_reg_i_in, \
 input [7:0] z80fi_reg_r_in, \
 input [0:0] z80fi_reg_iff1_in, \
 input [0:0] z80fi_reg_iff2_in, \
+input [1:0] z80fi_reg_im_in, \
 input [15:0] z80fi_reg_ip_out, \
 input [7:0] z80fi_reg_a_out, \
 input [7:0] z80fi_reg_f_out, \
@@ -65,7 +66,8 @@ input [15:0] z80fi_reg_sp_out, \
 input [7:0] z80fi_reg_i_out, \
 input [7:0] z80fi_reg_r_out, \
 input [0:0] z80fi_reg_iff1_out, \
-input [0:0] z80fi_reg_iff2_out
+input [0:0] z80fi_reg_iff2_out, \
+input [1:0] z80fi_reg_im_out
 
 `define Z80FI_OUTPUTS \
 output logic [0:0] z80fi_valid, \
@@ -109,6 +111,7 @@ output logic [7:0] z80fi_reg_i_in, \
 output logic [7:0] z80fi_reg_r_in, \
 output logic [0:0] z80fi_reg_iff1_in, \
 output logic [0:0] z80fi_reg_iff2_in, \
+output logic [1:0] z80fi_reg_im_in, \
 output logic [15:0] z80fi_reg_ip_out, \
 output logic [7:0] z80fi_reg_a_out, \
 output logic [7:0] z80fi_reg_f_out, \
@@ -132,7 +135,8 @@ output logic [15:0] z80fi_reg_sp_out, \
 output logic [7:0] z80fi_reg_i_out, \
 output logic [7:0] z80fi_reg_r_out, \
 output logic [0:0] z80fi_reg_iff1_out, \
-output logic [0:0] z80fi_reg_iff2_out
+output logic [0:0] z80fi_reg_iff2_out, \
+output logic [1:0] z80fi_reg_im_out
 
 `define Z80FI_WIRES \
 logic [0:0] z80fi_valid; \
@@ -176,6 +180,7 @@ logic [7:0] z80fi_reg_i_in; \
 logic [7:0] z80fi_reg_r_in; \
 logic [0:0] z80fi_reg_iff1_in; \
 logic [0:0] z80fi_reg_iff2_in; \
+logic [1:0] z80fi_reg_im_in; \
 logic [15:0] z80fi_reg_ip_out; \
 logic [7:0] z80fi_reg_a_out; \
 logic [7:0] z80fi_reg_f_out; \
@@ -199,7 +204,8 @@ logic [15:0] z80fi_reg_sp_out; \
 logic [7:0] z80fi_reg_i_out; \
 logic [7:0] z80fi_reg_r_out; \
 logic [0:0] z80fi_reg_iff1_out; \
-logic [0:0] z80fi_reg_iff2_out;
+logic [0:0] z80fi_reg_iff2_out; \
+logic [1:0] z80fi_reg_im_out;
 
 `define Z80FI_NEXT_STATE \
 logic [0:0] next_z80fi_valid; \
@@ -242,7 +248,8 @@ logic [15:0] next_z80fi_reg_sp_in; \
 logic [7:0] next_z80fi_reg_i_in; \
 logic [7:0] next_z80fi_reg_r_in; \
 logic [0:0] next_z80fi_reg_iff1_in; \
-logic [0:0] next_z80fi_reg_iff2_in;
+logic [0:0] next_z80fi_reg_iff2_in; \
+logic [1:0] next_z80fi_reg_im_in;
 
 `define Z80FI_RESET_STATE \
 z80fi_valid <= 0; \
@@ -285,7 +292,8 @@ z80fi_reg_sp_in <= 0; \
 z80fi_reg_i_in <= 0; \
 z80fi_reg_r_in <= 0; \
 z80fi_reg_iff1_in <= 0; \
-z80fi_reg_iff2_in <= 0;
+z80fi_reg_iff2_in <= 0; \
+z80fi_reg_im_in <= 0;
 
 `define Z80FI_LOAD_NEXT_STATE \
 z80fi_valid <= next_z80fi_valid; \
@@ -328,7 +336,8 @@ z80fi_reg_sp_in <= next_z80fi_reg_sp_in; \
 z80fi_reg_i_in <= next_z80fi_reg_i_in; \
 z80fi_reg_r_in <= next_z80fi_reg_r_in; \
 z80fi_reg_iff1_in <= next_z80fi_reg_iff1_in; \
-z80fi_reg_iff2_in <= next_z80fi_reg_iff2_in;
+z80fi_reg_iff2_in <= next_z80fi_reg_iff2_in; \
+z80fi_reg_im_in <= next_z80fi_reg_im_in;
 
 `define Z80FI_RETAIN_NEXT_STATE \
 next_z80fi_valid = 0; \
@@ -371,7 +380,8 @@ next_z80fi_reg_sp_in = z80fi_reg_sp_in; \
 next_z80fi_reg_i_in = z80fi_reg_i_in; \
 next_z80fi_reg_r_in = z80fi_reg_r_in; \
 next_z80fi_reg_iff1_in = z80fi_reg_iff1_in; \
-next_z80fi_reg_iff2_in = z80fi_reg_iff2_in;
+next_z80fi_reg_iff2_in = z80fi_reg_iff2_in; \
+next_z80fi_reg_im_in = z80fi_reg_im_in;
 
 `define Z80FI_INIT_NEXT_STATE \
 next_z80fi_valid = 0; \
@@ -414,7 +424,8 @@ next_z80fi_reg_sp_in = z80_reg_sp; \
 next_z80fi_reg_i_in = z80_reg_i; \
 next_z80fi_reg_r_in = z80_reg_r; \
 next_z80fi_reg_iff1_in = z80_reg_iff1; \
-next_z80fi_reg_iff2_in = z80_reg_iff2;
+next_z80fi_reg_iff2_in = z80_reg_iff2; \
+next_z80fi_reg_im_in = z80_reg_im;
 
 `define Z80FI_REG_ASSIGN \
 assign z80fi_reg_ip_out = z80_reg_ip; \
@@ -440,7 +451,8 @@ assign z80fi_reg_sp_out = z80_reg_sp; \
 assign z80fi_reg_i_out = z80_reg_i; \
 assign z80fi_reg_r_out = z80_reg_r; \
 assign z80fi_reg_iff1_out = z80_reg_iff1; \
-assign z80fi_reg_iff2_out = z80_reg_iff2;
+assign z80fi_reg_iff2_out = z80_reg_iff2; \
+assign z80fi_reg_im_out = z80_reg_im;
 
 `define Z80FI_CONN \
 .z80fi_valid (z80fi_valid), \
@@ -484,6 +496,7 @@ assign z80fi_reg_iff2_out = z80_reg_iff2;
 .z80fi_reg_r_in (z80fi_reg_r_in), \
 .z80fi_reg_iff1_in (z80fi_reg_iff1_in), \
 .z80fi_reg_iff2_in (z80fi_reg_iff2_in), \
+.z80fi_reg_im_in (z80fi_reg_im_in), \
 .z80fi_reg_ip_out (z80fi_reg_ip_out), \
 .z80fi_reg_a_out (z80fi_reg_a_out), \
 .z80fi_reg_f_out (z80fi_reg_f_out), \
@@ -507,7 +520,8 @@ assign z80fi_reg_iff2_out = z80_reg_iff2;
 .z80fi_reg_i_out (z80fi_reg_i_out), \
 .z80fi_reg_r_out (z80fi_reg_r_out), \
 .z80fi_reg_iff1_out (z80fi_reg_iff1_out), \
-.z80fi_reg_iff2_out (z80fi_reg_iff2_out)
+.z80fi_reg_iff2_out (z80fi_reg_iff2_out), \
+.z80fi_reg_im_out (z80fi_reg_im_out)
 
 `define Z80FI_INSN_SPEC_IO \
 output logic [0:0] spec_valid, \
@@ -552,6 +566,7 @@ input [7:0] z80fi_reg_i_in, \
 input [7:0] z80fi_reg_r_in, \
 input [0:0] z80fi_reg_iff1_in, \
 input [0:0] z80fi_reg_iff2_in, \
+input [1:0] z80fi_reg_im_in, \
 output logic [15:0] spec_reg_ip_out, \
 output logic [7:0] spec_reg_a_out, \
 output logic [7:0] spec_reg_f_out, \
@@ -576,6 +591,7 @@ output logic [7:0] spec_reg_i_out, \
 output logic [7:0] spec_reg_r_out, \
 output logic [0:0] spec_reg_iff1_out, \
 output logic [0:0] spec_reg_iff2_out, \
+output logic [1:0] spec_reg_im_out, \
 output logic [0:0] spec_reg_ip, \
 output logic [0:0] spec_reg_a, \
 output logic [0:0] spec_reg_f, \
@@ -599,41 +615,43 @@ output logic [0:0] spec_reg_sp, \
 output logic [0:0] spec_reg_i, \
 output logic [0:0] spec_reg_r, \
 output logic [0:0] spec_reg_iff1, \
-output logic [0:0] spec_reg_iff2
+output logic [0:0] spec_reg_iff2, \
+output logic [0:0] spec_reg_im
 
-`define SPEC_MEM_RD 30'b000000000000000000000000000001
-`define SPEC_MEM_RD2 30'b000000000000000000000000000010
-`define SPEC_MEM_WR 30'b000000000000000000000000000100
-`define SPEC_MEM_WR2 30'b000000000000000000000000001000
-`define SPEC_IO_RD 30'b000000000000000000000000010000
-`define SPEC_IO_WR 30'b000000000000000000000000100000
-`define SPEC_REG_IP 30'b000000000000000000000001000000
-`define SPEC_REG_A 30'b000000000000000000000010000000
-`define SPEC_REG_F 30'b000000000000000000000100000000
-`define SPEC_REG_B 30'b000000000000000000001000000000
-`define SPEC_REG_C 30'b000000000000000000010000000000
-`define SPEC_REG_D 30'b000000000000000000100000000000
-`define SPEC_REG_E 30'b000000000000000001000000000000
-`define SPEC_REG_H 30'b000000000000000010000000000000
-`define SPEC_REG_L 30'b000000000000000100000000000000
-`define SPEC_REG_A2 30'b000000000000001000000000000000
-`define SPEC_REG_F2 30'b000000000000010000000000000000
-`define SPEC_REG_B2 30'b000000000000100000000000000000
-`define SPEC_REG_C2 30'b000000000001000000000000000000
-`define SPEC_REG_D2 30'b000000000010000000000000000000
-`define SPEC_REG_E2 30'b000000000100000000000000000000
-`define SPEC_REG_H2 30'b000000001000000000000000000000
-`define SPEC_REG_L2 30'b000000010000000000000000000000
-`define SPEC_REG_IX 30'b000000100000000000000000000000
-`define SPEC_REG_IY 30'b000001000000000000000000000000
-`define SPEC_REG_SP 30'b000010000000000000000000000000
-`define SPEC_REG_I 30'b000100000000000000000000000000
-`define SPEC_REG_R 30'b001000000000000000000000000000
-`define SPEC_REG_IFF1 30'b010000000000000000000000000000
-`define SPEC_REG_IFF2 30'b100000000000000000000000000000
+`define SPEC_MEM_RD 31'b0000000000000000000000000000001
+`define SPEC_MEM_RD2 31'b0000000000000000000000000000010
+`define SPEC_MEM_WR 31'b0000000000000000000000000000100
+`define SPEC_MEM_WR2 31'b0000000000000000000000000001000
+`define SPEC_IO_RD 31'b0000000000000000000000000010000
+`define SPEC_IO_WR 31'b0000000000000000000000000100000
+`define SPEC_REG_IP 31'b0000000000000000000000001000000
+`define SPEC_REG_A 31'b0000000000000000000000010000000
+`define SPEC_REG_F 31'b0000000000000000000000100000000
+`define SPEC_REG_B 31'b0000000000000000000001000000000
+`define SPEC_REG_C 31'b0000000000000000000010000000000
+`define SPEC_REG_D 31'b0000000000000000000100000000000
+`define SPEC_REG_E 31'b0000000000000000001000000000000
+`define SPEC_REG_H 31'b0000000000000000010000000000000
+`define SPEC_REG_L 31'b0000000000000000100000000000000
+`define SPEC_REG_A2 31'b0000000000000001000000000000000
+`define SPEC_REG_F2 31'b0000000000000010000000000000000
+`define SPEC_REG_B2 31'b0000000000000100000000000000000
+`define SPEC_REG_C2 31'b0000000000001000000000000000000
+`define SPEC_REG_D2 31'b0000000000010000000000000000000
+`define SPEC_REG_E2 31'b0000000000100000000000000000000
+`define SPEC_REG_H2 31'b0000000001000000000000000000000
+`define SPEC_REG_L2 31'b0000000010000000000000000000000
+`define SPEC_REG_IX 31'b0000000100000000000000000000000
+`define SPEC_REG_IY 31'b0000001000000000000000000000000
+`define SPEC_REG_SP 31'b0000010000000000000000000000000
+`define SPEC_REG_I 31'b0000100000000000000000000000000
+`define SPEC_REG_R 31'b0001000000000000000000000000000
+`define SPEC_REG_IFF1 31'b0010000000000000000000000000000
+`define SPEC_REG_IFF2 31'b0100000000000000000000000000000
+`define SPEC_REG_IM 31'b1000000000000000000000000000000
 
 `define Z80FI_SPEC_SIGNALS \
-logic [29:0] spec_signals; \
+logic [30:0] spec_signals; \
 assign spec_mem_rd = spec_signals[0]; \
 assign spec_mem_rd2 = spec_signals[1]; \
 assign spec_mem_wr = spec_signals[2]; \
@@ -664,6 +682,7 @@ assign spec_reg_i = spec_signals[26]; \
 assign spec_reg_r = spec_signals[27]; \
 assign spec_reg_iff1 = spec_signals[28]; \
 assign spec_reg_iff2 = spec_signals[29]; \
+assign spec_reg_im = spec_signals[30]; \
 wire [15:0] z80fi_reg_bc_in = {z80fi_reg_b_in, z80fi_reg_c_in}; \
 wire [15:0] z80fi_reg_de_in = {z80fi_reg_d_in, z80fi_reg_e_in}; \
 wire [15:0] z80fi_reg_hl_in = {z80fi_reg_h_in, z80fi_reg_l_in}; \
@@ -715,6 +734,7 @@ wire [7:0] reg_i_in = z80fi_reg_i_in; \
 wire [7:0] reg_r_in = z80fi_reg_r_in; \
 wire [0:0] reg_iff1_in = z80fi_reg_iff1_in; \
 wire [0:0] reg_iff2_in = z80fi_reg_iff2_in; \
+wire [1:0] reg_im_in = z80fi_reg_im_in; \
 wire [15:0] reg_ip_out = z80fi_reg_ip_out; \
 wire [7:0] reg_a_out = z80fi_reg_a_out; \
 wire [7:0] reg_f_out = z80fi_reg_f_out; \
@@ -739,6 +759,7 @@ wire [7:0] reg_i_out = z80fi_reg_i_out; \
 wire [7:0] reg_r_out = z80fi_reg_r_out; \
 wire [0:0] reg_iff1_out = z80fi_reg_iff1_out; \
 wire [0:0] reg_iff2_out = z80fi_reg_iff2_out; \
+wire [1:0] reg_im_out = z80fi_reg_im_out; \
 \
 logic [0:0] spec_valid; \
 logic [31:0] spec_insn; \
@@ -781,6 +802,7 @@ logic [7:0] spec_reg_i_out; \
 logic [7:0] spec_reg_r_out; \
 logic [0:0] spec_reg_iff1_out; \
 logic [0:0] spec_reg_iff2_out; \
+logic [1:0] spec_reg_im_out; \
 logic [0:0] spec_reg_ip; \
 logic [0:0] spec_reg_a; \
 logic [0:0] spec_reg_f; \
@@ -804,7 +826,8 @@ logic [0:0] spec_reg_sp; \
 logic [0:0] spec_reg_i; \
 logic [0:0] spec_reg_r; \
 logic [0:0] spec_reg_iff1; \
-logic [0:0] spec_reg_iff2;
+logic [0:0] spec_reg_iff2; \
+logic [0:0] spec_reg_im;
 
 `define Z80FI_SPEC_CONNS \
 .z80fi_valid (valid), \
@@ -849,6 +872,7 @@ logic [0:0] spec_reg_iff2;
 .z80fi_reg_r_in (z80fi_reg_r_in), \
 .z80fi_reg_iff1_in (z80fi_reg_iff1_in), \
 .z80fi_reg_iff2_in (z80fi_reg_iff2_in), \
+.z80fi_reg_im_in (z80fi_reg_im_in), \
 .spec_reg_ip_out (spec_reg_ip_out), \
 .spec_reg_a_out (spec_reg_a_out), \
 .spec_reg_f_out (spec_reg_f_out), \
@@ -873,6 +897,7 @@ logic [0:0] spec_reg_iff2;
 .spec_reg_r_out (spec_reg_r_out), \
 .spec_reg_iff1_out (spec_reg_iff1_out), \
 .spec_reg_iff2_out (spec_reg_iff2_out), \
+.spec_reg_im_out (spec_reg_im_out), \
 .spec_reg_ip (spec_reg_ip), \
 .spec_reg_a (spec_reg_a), \
 .spec_reg_f (spec_reg_f), \
@@ -896,5 +921,6 @@ logic [0:0] spec_reg_iff2;
 .spec_reg_i (spec_reg_i), \
 .spec_reg_r (spec_reg_r), \
 .spec_reg_iff1 (spec_reg_iff1), \
-.spec_reg_iff2 (spec_reg_iff2)
+.spec_reg_iff2 (spec_reg_iff2), \
+.spec_reg_im (spec_reg_im)
 

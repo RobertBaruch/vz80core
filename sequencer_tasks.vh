@@ -34,6 +34,7 @@
 // task_disable_interrupts()
 // task_accept_nmi()
 // task_ret_from_nmi()
+// task_set_im(mode)
 
 // task_read_mem(n, addr)
 //
@@ -363,6 +364,13 @@ task task_jump_relative;
     input [15:0] offset;
 begin
     next_z80_reg_ip = next_z80_reg_ip + offset;
+end
+endtask
+
+task task_set_im;
+    input [1:0] mode;
+begin
+    next_z80_reg_im = mode;
 end
 endtask
 

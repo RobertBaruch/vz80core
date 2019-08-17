@@ -260,6 +260,7 @@ endfunction
 `define INSN_GROUP_OUT_A 91            /* OUT (n), A          */
 `define INSN_GROUP_OUT_REG 92          /* OUT (C), r          */
 `define INSN_GROUP_OUT_BLOCK 93        /* OUTI/OTIR/OUTD/OTDR */
+`define INSN_GROUP_IM 94               /* IM 0/1/2            */
 
 // These are the INSN_GROUP_IDX_IXIY_BITS groups
 `define INSN_GROUP_RR_RLC_IDX_IXIY 0   /* RLCA/RLA/RRCA/RRA (IX/IY + d) */
