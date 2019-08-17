@@ -1,0 +1,21 @@
+[tasks]
+bmc
+cover
+
+[options]
+bmc: mode bmc
+cover: mode cover
+bmc: depth 20
+cover: depth 100
+multiclock on
+
+[engines]
+smtbmc boolector
+
+[script]
+read -formal -sv m1.sv
+prep -top m1
+
+[files]
+z80.vh
+m1.sv

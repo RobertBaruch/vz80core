@@ -1,0 +1,22 @@
+[tasks]
+bmc
+cover
+
+[options]
+bmc: mode bmc
+bmc: depth 20
+cover: mode cover
+cover: depth 100
+cover: append 6
+multiclock on
+
+[engines]
+smtbmc boolector
+
+[script]
+read -formal -sv mrd_wr_io.sv
+prep -top mrd_wr_io
+
+[files]
+z80.vh
+mrd_wr_io.sv
