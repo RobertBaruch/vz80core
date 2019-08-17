@@ -4,8 +4,6 @@
 `default_nettype none
 `timescale 1us/1us
 
-`define Z80_FORMAL 1
-
 // reg_select is big enough for 4 bits of set number, and 3 bits of
 // register number. Not all combinations are valid.
 `define reg_select [4:0]

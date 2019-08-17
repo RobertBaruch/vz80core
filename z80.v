@@ -1,7 +1,6 @@
 `default_nettype none
 `timescale 1us/100 ns
 
-`define Z80_FORMAL
 `ifdef Z80_FORMAL
 `include "z80fi.vh"
 `endif

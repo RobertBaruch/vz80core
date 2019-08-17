@@ -1,0 +1,20 @@
+[tasks]
+bmc
+cover
+
+[options]
+bmc: mode bmc
+cover: mode cover
+depth 10
+
+[engines]
+smtbmc
+
+[script]
+read -formal -sv alu_formal.sv
+prep -top alu_tb
+
+[files]
+alu_formal.sv
+../alu.sv
+../z80.vh
