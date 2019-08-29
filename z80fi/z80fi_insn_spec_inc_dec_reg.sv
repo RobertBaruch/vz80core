@@ -12,7 +12,7 @@ module z80fi_insn_spec_inc_dec_reg(
 );
 
 wire [2:0] r           = z80fi_insn[5:3];
-wire       inc         = z80fi_insn[0];
+wire       dec         = z80fi_insn[0];
 
 assign spec_valid = z80fi_valid &&
     z80fi_insn_len == 1 &&
@@ -32,15 +32,15 @@ wire [7:0] operand =
     (r == `REG_H) ? z80fi_reg_h_in :
     (r == `REG_L) ? z80fi_reg_l_in : 0;
 
-wire [7:0] result = inc ? (operand + 8'b1) : (operand - 8'b1);
+wire [7:0] result = dec ? (operand - 8'b1) : (operand + 8'b1);
 
 wire flag_s = result[7];
 wire flag_z = (result == 8'b0);
 wire flag_5 = (z80fi_reg_f_in & `FLAG_5_BIT) != 0;
-wire flag_h = halfcarry8(operand, inc ? 8'b1 : ~8'b1, !inc);
+wire flag_h = halfcarry8(operand, dec ? ~8'b1 : 8'b1, dec);
 wire flag_3 = (z80fi_reg_f_in & `FLAG_3_BIT) != 0;
-wire flag_v = overflow8(operand, inc ? 8'b1 : ~8'b1, !inc);
-wire flag_n = !inc;
+wire flag_v = overflow8(operand, dec ? ~8'b1 : 8'b1, dec);
+wire flag_n = dec;
 wire flag_c = (z80fi_reg_f_in & `FLAG_C_BIT) != 0;
 
 assign spec_reg_a_out = (r == `REG_A) ? result : z80fi_reg_a_in;

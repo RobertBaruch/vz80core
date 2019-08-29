@@ -5,6 +5,7 @@
 
 // Index of tasks:
 //
+// task_idle()
 // task_done()
 // task_read_mem(n, addr)         // requires one cycle delay with task_collect_data(n)
 // task_collect_data(n)
@@ -36,6 +37,55 @@
 // task_ret_from_nmi()
 // task_set_im(mode)
 
+// task_idle has the sequencer_program do nothing except request that the
+// next cycle be an M1 cycle.
+task task_idle;
+begin
+    next_cycle = `CYCLE_M1;
+    next_addr = addr;
+    next_z80_reg_ip = z80_reg_ip;
+    add_to_insn = 0;
+    add_to_op = 0;
+    add_to_store_data = 0;
+    next_state = state;
+    bus_wdata = 0;
+    mem_wr = 0;
+    mem_rd = 0;
+    io_wr = 0;
+    io_rd = 0;
+    reg1_rnum = 0;
+    reg2_rnum = 0;
+    reg_wr = 0;
+    reg_wnum = 0;
+    reg_wdata = 0;
+    f_wr = 0;
+    f_wdata = 0;
+    block_inc = 0;
+    block_dec = 0;
+    block_compare = 0;
+    ex_de_hl = 0;
+    ex_af_af2 = 0;
+    exx = 0;
+    alu8_x = 0;
+    alu8_y = 0;
+    alu8_func = 0;
+    alu16_x = 0;
+    alu16_y = 0;
+    alu16_func = 0;
+    i_wr = 0;
+    i_wdata = 0;
+    r_wr = 0;
+    r_wdata = 0;
+    enable_interrupts = 0;
+    disable_interrupts = reset;
+    accept_nmi = 0;
+    ret_from_nmi = 0;
+    next_z80_reg_im = z80_reg_im;
+    done = 0;
+    jumped = 0;
+end
+endtask
+
 // task_read_mem(n, addr)
 //
 // n is 1 or 2, depending on whether you're reading for the first time
@@ -51,17 +101,7 @@ task task_read_mem;
     input [15:0] local_addr;
 begin
     next_addr = local_addr;
-    next_mem_rd = 1;
-
-    `ifdef Z80_FORMAL
-        if (local_n == 1) begin
-            next_z80fi_mem_rd = 1;
-            next_z80fi_bus_raddr = local_addr;
-        end else begin
-            next_z80fi_mem_rd2 = 1;
-            next_z80fi_bus_raddr2 = local_addr;
-        end
-    `endif
+    mem_rd = 1;
 end
 endtask
 
@@ -72,30 +112,24 @@ task task_read_io;
     input [15:0] local_addr;
 begin
     next_addr = local_addr;
-    next_mem_rd = 0;
-    next_io_rd = 1;
-
-    `ifdef Z80_FORMAL
-        next_z80fi_io_rd = 1;
-        next_z80fi_bus_raddr = local_addr;
-    `endif
+    mem_rd = 0;
+    io_rd = 1;
 end
 endtask
 
 // task_collect_data(n)
 // Collect the data read from memory. n is the
 // number of the read in this instruction, starting from 1.
-// The collected data is in next_collected_data.
+// The collected data is in next_stored_data.
 task task_collect_data;
     input [1:0] local_n;
 begin
-    if (local_n == 1) next_collected_data[7:0] = bus_rdata;
-    else next_collected_data[15:8] = bus_rdata;
-
-    `ifdef Z80_FORMAL
-        if (local_n == 1) next_z80fi_bus_rdata = bus_rdata;
-        else next_z80fi_bus_rdata2 = bus_rdata;
-    `endif
+    /*if (local_n == 1) begin
+        next_stored_data = {stored_data[15:8], bus_rdata};
+    end else begin
+        next_stored_data = {bus_rdata, stored_data[7:0]};
+    end */
+    add_to_store_data = 1;
 end
 endtask
 
@@ -112,28 +146,16 @@ task task_write_mem;
     input [7:0] local_data;
 begin
     next_addr = local_addr;
-    next_mem_rd = 0;
-    next_mem_wr = 1;
-    next_bus_wdata = local_data;
+    mem_rd = 0;
+    mem_wr = 1;
+    bus_wdata = local_data;
 end
 endtask
 
 task task_write_mem_done;
     input [1:0] local_n;
 begin
-    next_mem_wr = 0;
-
-    `ifdef Z80_FORMAL
-        if (local_n == 1) begin
-            next_z80fi_mem_wr = 1;
-            next_z80fi_bus_waddr = addr;
-            next_z80fi_bus_wdata = bus_wdata;
-        end else begin
-            next_z80fi_mem_wr2 = 1;
-            next_z80fi_bus_waddr2 = addr;
-            next_z80fi_bus_wdata2 = bus_wdata;
-        end
-    `endif
+    mem_wr = 0;
 end
 endtask
 
@@ -146,22 +168,16 @@ task task_write_io;
     input [7:0] local_data;
 begin
     next_addr = local_addr;
-    next_mem_rd = 0;
-    next_io_rd = 0;
-    next_io_wr = 1;
-    next_bus_wdata = local_data;
+    mem_rd = 0;
+    io_rd = 0;
+    io_wr = 1;
+    bus_wdata = local_data;
 end
 endtask
 
 task task_write_io_done;
 begin
-    next_io_wr = 0;
-
-    `ifdef Z80_FORMAL
-        next_z80fi_io_wr = 1;
-        next_z80fi_bus_waddr = addr;
-        next_z80fi_bus_wdata = bus_wdata;
-    `endif
+    io_wr = 0;
 end
 endtask
 
@@ -319,12 +335,12 @@ begin
     task_write_f({
         a[7], // S
         a[7:4] == 0 && (left ? m[7:4] : m[3:0]) == 0, // Z
-        f_rdata[`FLAG_5_NUM],
+        flag_5,
         1'b0, // H
-        f_rdata[`FLAG_3_NUM],
-        _alu_parity8(left ? {a[7:4], m[7:4]} : {a[7:4], m[3:0]}), // V
+        flag_3,
+        _parity8(left ? {a[7:4], m[7:4]} : {a[7:4], m[3:0]}), // V
         1'b0, // N
-        f_rdata[`FLAG_C_NUM]
+        flag_c
     });
 end
 endtask
@@ -357,6 +373,7 @@ task task_jump;
     input [15:0] local_addr;
 begin
     next_z80_reg_ip = local_addr;
+    jumped = 1;
 end
 endtask
 
@@ -364,6 +381,7 @@ task task_jump_relative;
     input [15:0] offset;
 begin
     next_z80_reg_ip = next_z80_reg_ip + offset;
+    jumped = 1;
 end
 endtask
 
@@ -377,7 +395,14 @@ endtask
 // task_done must be run at the end of an instruction, otherwise the
 // instruction will never end!
 task task_done;
-    next_done = 1;
+    done = 1;
+    next_cycle = `CYCLE_M1;
+    mem_rd = 0;
+    add_to_insn = 0;
+    add_to_op = 0;
+    next_state = 0;
+    // if (!jumped) next_z80_reg_ip = z80_reg_ip + 1;
+    next_addr = next_z80_reg_ip;
 endtask
 
 `endif // _sequencer_tasks_vh_

@@ -2,12 +2,14 @@
 `include "z80fi_wrapper.sv"
 
 `define Z80_FORMAL
+`ifndef Z80_FORMAL_RESET_CYCLES
 `define Z80_FORMAL_RESET_CYCLES 1
 `define Z80_FORMAL_CHECK_CYCLE 20
 `define Z80_FORMAL_CHECKER z80fi_insn_check
+`endif
 
 module z80fi_testbench (
-	input clk, reset
+	input clk, reset, wait
 );
 	`Z80FI_WIRES
 
@@ -17,6 +19,11 @@ module z80fi_testbench (
 
 	reg [7:0] cycle_reg = 0;
 	wire [7:0] cycle = reset ? 0 : cycle_reg;
+
+	(* gclk *) reg formal_timestep;
+
+	always @(posedge formal_timestep)
+		assume (clk == !$past(clk));
 
 	always @(posedge clk) begin
 		cycle_reg <= reset ? 1 : cycle_reg + (cycle_reg != 255);
@@ -33,7 +40,8 @@ module z80fi_testbench (
 
 	z80fi_wrapper wrapper (
 		.clk (clk),
-		.reset (reset),
+		.reset (cycle < `Z80_FORMAL_RESET_CYCLES),
+		.wait (wait),
 		`Z80FI_CONN
 	);
 endmodule

@@ -3,6 +3,9 @@
 
 `include "z80.vh"
 
+`default_nettype none
+`timescale 1us/1us
+
 module ir_registers(
     input logic reset,
     input logic clk,

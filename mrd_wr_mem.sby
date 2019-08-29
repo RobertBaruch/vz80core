@@ -14,9 +14,11 @@ multiclock on
 smtbmc boolector
 
 [script]
+verilog_defines -D MCYCLE_FORMAL=1
 read -formal -sv mrd_wr_mem.sv
 prep -top mrd_wr_mem
 
 [files]
 z80.vh
+edgelord.sv
 mrd_wr_mem.sv

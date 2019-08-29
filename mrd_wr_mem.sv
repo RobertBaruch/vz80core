@@ -4,6 +4,7 @@
 `default_nettype none
 
 `include "z80.vh"
+`include "edgelord.sv"
 
 // mrd_wr_mem handles signal control for non-M1 memory read and write cycles.
 module mrd_wr_mem(
@@ -24,149 +25,106 @@ module mrd_wr_mem(
     output logic [7:0] D_out,
     output logic data_out_en,
     output logic [7:0] rdata,
+    output logic [2:0] tcycle,
     output logic done
 );
 
-logic [1:0] phase;
-logic go;
+assign A = pc;
+assign D_out = wdata;
+
+// Clones the clk without exposing clk to combinatorial logic.
+logic clk_state;
+edgelord edgelord(
+    .clk(clk),
+    .reset(reset),
+    .clk_state(clk_state)
+);
+
 logic do_rd;
 logic do_wr;
 
-// nMREQ, nRD, nWR and data_out_en can change on both positive and negative
-// edge of the clock, so they need to be split out and multiplexed
-// together.
-//
-// The go signal also needs to be split out (but not necessarily
-// multiplexed).
-logic nMREQ_0;
-logic nMREQ_1;
-logic nRD_0;
-logic nRD_1;
-logic nWR_0;
-logic nWR_1;
-logic data_out_en_0;
-logic data_out_en_1;
-logic go_0;
-logic go_1;
-
-assign nMREQ = reset || (clk ? nMREQ_0 : nMREQ_1);
-assign nRD = reset || (clk ? nRD_0 : nRD_1);
-assign nWR = reset || (clk ? nWR_0 : nWR_1);
-assign data_out_en = !reset && (clk ? data_out_en_0 : data_out_en_1);
-assign go = clk ? go_0 : go_1;
+logic latched_nwait;
 
 always @(posedge clk) begin
     if (reset) begin
-        A <= 0;
-        nMREQ_0 <= 1;
-        nRD_0 <= 1;
-        nWR_0 <= 1;
-        data_out_en_0 <= 0;
-        done <= 0;
-        go_0 <= 0;
+        tcycle <= 0;  // inactive
         do_rd <= 0;
         do_wr <= 0;
-    end else if ((activate && phase == 0) || go_1) begin
-        case (phase)
-            0: begin // T1
-                do_rd <= rd;
-                do_wr <= wr;
-                go_0 <= 1;
-                A <= pc;
-                done <= 0;
-                nMREQ_0 <= 1;
-                nRD_0 <= 1;
-                nWR_0 <= 1;
-                data_out_en_0 <= 0;
-                D_out <= wdata;
-            end
-            1: begin // T2
-                nMREQ_0 <= 0;
-                nRD_0 <= !do_rd;
-                nWR_0 <= 1;
-                data_out_en_0 <= do_wr;
-            end
-            2: begin // Twait, skipped if not necessary
-                nMREQ_0 <= 0;
-                nRD_0 <= !do_rd;
-                nWR_0 <= !do_wr;
-                data_out_en_0 <= do_wr;
-            end
-            3: begin // T3
-                nMREQ_0 <= 0;
-                nRD_0 <= !do_rd;
-                nWR_0 <= !do_wr;
-                data_out_en_0 <= do_wr;
-                done <= 1;
-            end
-        endcase
     end else begin
-        A <= 0;
-        nMREQ_0 <= 1;
-        nRD_0 <= 1;
-        nWR_0 <= 1;
-        data_out_en_0 <= 0;
-        done <= 0;
-        go_0 <= 0;
-        do_rd <= 0;
-        do_wr <= 0;
+        case (tcycle)
+            0: tcycle <= activate ? 1 : 0;
+            1: tcycle <= 2;
+            2: tcycle <= !latched_nwait ? 7 : 3; // 7 is Twait.
+            3: tcycle <= activate ? 1 : 0;
+            7: tcycle <= !latched_nwait ? 7 : 3;
+            default: tcycle <= 0;
+        endcase
+
+        if (activate && (tcycle == 0 || tcycle == 3)) begin
+            do_rd <= rd;
+            do_wr <= wr;
+        end
     end
 end
 
 always @(negedge clk) begin
     if (reset) begin
-        phase <= 0;
-        nMREQ_1 <= 1;
-        nRD_1 <= 1;
-        nWR_1 <= 1;
-        data_out_en_1 <= 0;
-        go_1 <= 0;
-    end else if (go_0) begin
-        case (phase)
-            0: begin // T1
-                go_1 <= 1;
-                nMREQ_1 <= 0;
-                nRD_1 <= !do_rd;
-                nWR_1 <= 1;
-                data_out_en_1 <= do_wr;
-                phase <= 1;
-            end
-            1: begin // T2
-                nMREQ_1 <= 0;
-                nRD_1 <= !do_rd;
-                nWR_1 <= !do_wr;
-                data_out_en_1 <= do_wr;
-                if (nWAIT) phase <= 3;
-                else phase <= 2;
-            end
-            2: begin // Twait, skipped if not necessary
-                nMREQ_1 <= 0;
-                nRD_1 <= !do_rd;
-                nWR_1 <= !do_wr;
-                data_out_en_1 <= do_wr;
-                if (nWAIT) phase <= 3;
-            end
-            3: begin // T3
-                nMREQ_1 <= 1;
-                nRD_1 <= 1;
-                nWR_1 <= 1;
-                data_out_en_1 <= do_wr;
-                rdata <= D_in;
-                phase <= 0;
-                go_1 <= 0;
-            end
-        endcase
+        latched_nwait <= 1;
+        rdata <= D_in;
     end else begin
-        phase <= 0;
-        nMREQ_1 <= 1;
-        nRD_1 <= 1;
-        nWR_1 <= 1;
-        data_out_en_1 <= 0;
-        go_1 <= 0;
+        if (tcycle == 2 || tcycle == 7) latched_nwait <= nWAIT;
+        if (tcycle == 3) rdata <= D_in;
     end
 end
 
-`ifdef FORMAL
+always @(*) begin
+    case (tcycle)
+        1: begin  // T1
+            nMREQ = clk_state;
+            nRD = do_rd ? clk_state : 1;
+            nWR = 1;
+            data_out_en = do_wr ? !clk_state : 0;
+            done = 0;
+        end
+        2: begin  // T2
+            nMREQ = 0;
+            nRD = !do_rd;
+            nWR = do_wr ? clk_state : 1;
+            data_out_en = do_wr;
+            done = 0;
+        end
+        3: begin  // T3
+            nMREQ = !clk_state;
+            nRD = do_rd ? !clk_state : 1;
+            nWR = do_wr ? !clk_state : 1;
+            done = ~clk_state;
+        end
+        7: begin  // Twait
+            nMREQ = 0;
+            nRD = !do_rd;
+            nWR = !do_wr;
+            data_out_en = do_wr;
+            done = 0;
+        end
+        default: begin
+            nMREQ = 1;
+            nRD = 1;
+            nWR = 1;
+            data_out_en = 0;
+            done = 0;
+        end
+    endcase
+
+    if (reset) begin
+        nMREQ = 1;
+        nRD = 1;
+        nWR = 1;
+        data_out_en = 0;
+        done = 0;
+    end
+end
+
+`ifdef MCYCLE_FORMAL
 
 reg do_reset;
 
@@ -176,10 +134,10 @@ reg do_reset;
 
 reg [7:0] cycle_reg = 0;
 wire [7:0] cycle = do_reset ? 0 : cycle_reg;
-(* gclk *) reg formal_timestep;
+// (* gclk *) reg formal_timestep;
 
-always @(posedge formal_timestep)
-    assume (clk == !$past(clk));
+// always @(posedge formal_timestep)
+//     assume (clk == !$past(clk));
 
 always @(posedge clk) begin
     cycle_reg <= do_reset ? 1 : cycle_reg + (cycle_reg != 255);
@@ -196,12 +154,6 @@ end
 always @(*) begin
     assume(reset == cycle < 4);
     assume(activate == (cycle == 5 && !clk));
-    assume(pc == 16'h1234);
-    assume(D_in == 8'hFE);
-    assume(wdata == 8'h67);
-end
-
-always @(*) begin
     assume(!(rd && wr)); // rd and wr should be mutually exclusive
     if (activate) assume(rd || wr); // We want to test either read or write cycle.
 
@@ -211,15 +163,13 @@ always @(*) begin
     if (nMREQ) assert(nWR && nRD);
     if (!nWR) assert(data_out_en);
     if (data_out_en) assert(D_out == wdata);
-    if (!reset && go) assert(A == pc);
-    if (!go && did_read) assert(rdata == D_in);
 
     // Ensure nWAIT for read and write works
-    cover(cycle > 10 && done && did_read);
-    cover(cycle > 10 && done && did_write);
+    cover(cycle == 20 && done && did_read);
+    cover(cycle == 20 && done && did_write);
 end
 
-`endif
+`endif // MCYCLE_FORMAL
 
 endmodule
 

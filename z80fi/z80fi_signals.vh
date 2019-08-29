@@ -207,6 +207,175 @@ logic [0:0] z80fi_reg_iff1_out; \
 logic [0:0] z80fi_reg_iff2_out; \
 logic [1:0] z80fi_reg_im_out;
 
+`define Z80FI_REGS \
+logic [15:0] z80fi_reg_ip; \
+logic [7:0] z80fi_reg_a; \
+logic [7:0] z80fi_reg_f; \
+logic [7:0] z80fi_reg_b; \
+logic [7:0] z80fi_reg_c; \
+logic [7:0] z80fi_reg_d; \
+logic [7:0] z80fi_reg_e; \
+logic [7:0] z80fi_reg_h; \
+logic [7:0] z80fi_reg_l; \
+logic [7:0] z80fi_reg_a2; \
+logic [7:0] z80fi_reg_f2; \
+logic [7:0] z80fi_reg_b2; \
+logic [7:0] z80fi_reg_c2; \
+logic [7:0] z80fi_reg_d2; \
+logic [7:0] z80fi_reg_e2; \
+logic [7:0] z80fi_reg_h2; \
+logic [7:0] z80fi_reg_l2; \
+logic [15:0] z80fi_reg_ix; \
+logic [15:0] z80fi_reg_iy; \
+logic [15:0] z80fi_reg_sp; \
+logic [7:0] z80fi_reg_i; \
+logic [7:0] z80fi_reg_r; \
+logic [0:0] z80fi_reg_iff1; \
+logic [0:0] z80fi_reg_iff2; \
+logic [1:0] z80fi_reg_im;
+
+`define Z80FI_REG_INPUTS \
+input logic [15:0] z80fi_reg_ip, \
+input logic [7:0] z80fi_reg_a, \
+input logic [7:0] z80fi_reg_f, \
+input logic [7:0] z80fi_reg_b, \
+input logic [7:0] z80fi_reg_c, \
+input logic [7:0] z80fi_reg_d, \
+input logic [7:0] z80fi_reg_e, \
+input logic [7:0] z80fi_reg_h, \
+input logic [7:0] z80fi_reg_l, \
+input logic [7:0] z80fi_reg_a2, \
+input logic [7:0] z80fi_reg_f2, \
+input logic [7:0] z80fi_reg_b2, \
+input logic [7:0] z80fi_reg_c2, \
+input logic [7:0] z80fi_reg_d2, \
+input logic [7:0] z80fi_reg_e2, \
+input logic [7:0] z80fi_reg_h2, \
+input logic [7:0] z80fi_reg_l2, \
+input logic [15:0] z80fi_reg_ix, \
+input logic [15:0] z80fi_reg_iy, \
+input logic [15:0] z80fi_reg_sp, \
+input logic [7:0] z80fi_reg_i, \
+input logic [7:0] z80fi_reg_r, \
+input logic [0:0] z80fi_reg_iff1, \
+input logic [0:0] z80fi_reg_iff2, \
+input logic [1:0] z80fi_reg_im
+
+`define Z80FI_REG_CONN \
+.z80fi_reg_ip(z80fi_reg_ip), \
+.z80fi_reg_a(z80fi_reg_a), \
+.z80fi_reg_f(z80fi_reg_f), \
+.z80fi_reg_b(z80fi_reg_b), \
+.z80fi_reg_c(z80fi_reg_c), \
+.z80fi_reg_d(z80fi_reg_d), \
+.z80fi_reg_e(z80fi_reg_e), \
+.z80fi_reg_h(z80fi_reg_h), \
+.z80fi_reg_l(z80fi_reg_l), \
+.z80fi_reg_a2(z80fi_reg_a2), \
+.z80fi_reg_f2(z80fi_reg_f2), \
+.z80fi_reg_b2(z80fi_reg_b2), \
+.z80fi_reg_c2(z80fi_reg_c2), \
+.z80fi_reg_d2(z80fi_reg_d2), \
+.z80fi_reg_e2(z80fi_reg_e2), \
+.z80fi_reg_h2(z80fi_reg_h2), \
+.z80fi_reg_l2(z80fi_reg_l2), \
+.z80fi_reg_ix(z80fi_reg_ix), \
+.z80fi_reg_iy(z80fi_reg_iy), \
+.z80fi_reg_sp(z80fi_reg_sp), \
+.z80fi_reg_i(z80fi_reg_i), \
+.z80fi_reg_r(z80fi_reg_r), \
+.z80fi_reg_iff1(z80fi_reg_iff1), \
+.z80fi_reg_iff2(z80fi_reg_iff2), \
+.z80fi_reg_im(z80fi_reg_im)
+
+`define Z80FI_STATE_INPUTS \
+input logic [0:0] z80fi_valid, \
+input logic [31:0] z80fi_insn, \
+input logic [2:0] z80fi_insn_len, \
+input logic [15:0] z80fi_bus_raddr, \
+input logic [7:0] z80fi_bus_rdata, \
+input logic [15:0] z80fi_bus_raddr2, \
+input logic [7:0] z80fi_bus_rdata2, \
+input logic [15:0] z80fi_bus_waddr, \
+input logic [7:0] z80fi_bus_wdata, \
+input logic [15:0] z80fi_bus_waddr2, \
+input logic [7:0] z80fi_bus_wdata2, \
+input logic [0:0] z80fi_mem_rd, \
+input logic [0:0] z80fi_mem_rd2, \
+input logic [0:0] z80fi_mem_wr, \
+input logic [0:0] z80fi_mem_wr2, \
+input logic [0:0] z80fi_io_rd, \
+input logic [0:0] z80fi_io_wr, \
+input logic [15:0] z80fi_reg_ip_in, \
+input logic [7:0] z80fi_reg_a_in, \
+input logic [7:0] z80fi_reg_f_in, \
+input logic [7:0] z80fi_reg_b_in, \
+input logic [7:0] z80fi_reg_c_in, \
+input logic [7:0] z80fi_reg_d_in, \
+input logic [7:0] z80fi_reg_e_in, \
+input logic [7:0] z80fi_reg_h_in, \
+input logic [7:0] z80fi_reg_l_in, \
+input logic [7:0] z80fi_reg_a2_in, \
+input logic [7:0] z80fi_reg_f2_in, \
+input logic [7:0] z80fi_reg_b2_in, \
+input logic [7:0] z80fi_reg_c2_in, \
+input logic [7:0] z80fi_reg_d2_in, \
+input logic [7:0] z80fi_reg_e2_in, \
+input logic [7:0] z80fi_reg_h2_in, \
+input logic [7:0] z80fi_reg_l2_in, \
+input logic [15:0] z80fi_reg_ix_in, \
+input logic [15:0] z80fi_reg_iy_in, \
+input logic [15:0] z80fi_reg_sp_in, \
+input logic [7:0] z80fi_reg_i_in, \
+input logic [7:0] z80fi_reg_r_in, \
+input logic [0:0] z80fi_reg_iff1_in, \
+input logic [0:0] z80fi_reg_iff2_in, \
+input logic [1:0] z80fi_reg_im_in
+
+`define Z80FI_STATE_CONN \
+.z80fi_valid (z80fi_valid), \
+.z80fi_insn (z80fi_insn), \
+.z80fi_insn_len (z80fi_insn_len), \
+.z80fi_bus_raddr (z80fi_bus_raddr), \
+.z80fi_bus_rdata (z80fi_bus_rdata), \
+.z80fi_bus_raddr2 (z80fi_bus_raddr2), \
+.z80fi_bus_rdata2 (z80fi_bus_rdata2), \
+.z80fi_bus_waddr (z80fi_bus_waddr), \
+.z80fi_bus_wdata (z80fi_bus_wdata), \
+.z80fi_bus_waddr2 (z80fi_bus_waddr2), \
+.z80fi_bus_wdata2 (z80fi_bus_wdata2), \
+.z80fi_mem_rd (z80fi_mem_rd), \
+.z80fi_mem_rd2 (z80fi_mem_rd2), \
+.z80fi_mem_wr (z80fi_mem_wr), \
+.z80fi_mem_wr2 (z80fi_mem_wr2), \
+.z80fi_io_rd (z80fi_io_rd), \
+.z80fi_io_wr (z80fi_io_wr), \
+.z80fi_reg_ip_in (z80fi_reg_ip_in), \
+.z80fi_reg_a_in (z80fi_reg_a_in), \
+.z80fi_reg_f_in (z80fi_reg_f_in), \
+.z80fi_reg_b_in (z80fi_reg_b_in), \
+.z80fi_reg_c_in (z80fi_reg_c_in), \
+.z80fi_reg_d_in (z80fi_reg_d_in), \
+.z80fi_reg_e_in (z80fi_reg_e_in), \
+.z80fi_reg_h_in (z80fi_reg_h_in), \
+.z80fi_reg_l_in (z80fi_reg_l_in), \
+.z80fi_reg_a2_in (z80fi_reg_a2_in), \
+.z80fi_reg_f2_in (z80fi_reg_f2_in), \
+.z80fi_reg_b2_in (z80fi_reg_b2_in), \
+.z80fi_reg_c2_in (z80fi_reg_c2_in), \
+.z80fi_reg_d2_in (z80fi_reg_d2_in), \
+.z80fi_reg_e2_in (z80fi_reg_e2_in), \
+.z80fi_reg_h2_in (z80fi_reg_h2_in), \
+.z80fi_reg_l2_in (z80fi_reg_l2_in), \
+.z80fi_reg_ix_in (z80fi_reg_ix_in), \
+.z80fi_reg_iy_in (z80fi_reg_iy_in), \
+.z80fi_reg_sp_in (z80fi_reg_sp_in), \
+.z80fi_reg_i_in (z80fi_reg_i_in), \
+.z80fi_reg_r_in (z80fi_reg_r_in), \
+.z80fi_reg_iff1_in (z80fi_reg_iff1_in), \
+.z80fi_reg_iff2_in (z80fi_reg_iff2_in), \
+.z80fi_reg_im_in (z80fi_reg_im_in)
+
 `define Z80FI_NEXT_STATE \
 logic [0:0] next_z80fi_valid; \
 logic [31:0] next_z80fi_insn; \
@@ -250,6 +419,94 @@ logic [7:0] next_z80fi_reg_r_in; \
 logic [0:0] next_z80fi_reg_iff1_in; \
 logic [0:0] next_z80fi_reg_iff2_in; \
 logic [1:0] next_z80fi_reg_im_in;
+
+`define Z80FI_NEXT_STATE_CONN \
+.next_z80fi_valid (next_z80fi_valid), \
+.next_z80fi_insn (next_z80fi_insn), \
+.next_z80fi_insn_len (next_z80fi_insn_len), \
+.next_z80fi_bus_raddr (next_z80fi_bus_raddr), \
+.next_z80fi_bus_rdata (next_z80fi_bus_rdata), \
+.next_z80fi_bus_raddr2 (next_z80fi_bus_raddr2), \
+.next_z80fi_bus_rdata2 (next_z80fi_bus_rdata2), \
+.next_z80fi_bus_waddr (next_z80fi_bus_waddr), \
+.next_z80fi_bus_wdata (next_z80fi_bus_wdata), \
+.next_z80fi_bus_waddr2 (next_z80fi_bus_waddr2), \
+.next_z80fi_bus_wdata2 (next_z80fi_bus_wdata2), \
+.next_z80fi_mem_rd (next_z80fi_mem_rd), \
+.next_z80fi_mem_rd2 (next_z80fi_mem_rd2), \
+.next_z80fi_mem_wr (next_z80fi_mem_wr), \
+.next_z80fi_mem_wr2 (next_z80fi_mem_wr2), \
+.next_z80fi_io_rd (next_z80fi_io_rd), \
+.next_z80fi_io_wr (next_z80fi_io_wr), \
+.next_z80fi_reg_ip_in (next_z80fi_reg_ip_in), \
+.next_z80fi_reg_a_in (next_z80fi_reg_a_in), \
+.next_z80fi_reg_f_in (next_z80fi_reg_f_in), \
+.next_z80fi_reg_b_in (next_z80fi_reg_b_in), \
+.next_z80fi_reg_c_in (next_z80fi_reg_c_in), \
+.next_z80fi_reg_d_in (next_z80fi_reg_d_in), \
+.next_z80fi_reg_e_in (next_z80fi_reg_e_in), \
+.next_z80fi_reg_h_in (next_z80fi_reg_h_in), \
+.next_z80fi_reg_l_in (next_z80fi_reg_l_in), \
+.next_z80fi_reg_a2_in (next_z80fi_reg_a2_in), \
+.next_z80fi_reg_f2_in (next_z80fi_reg_f2_in), \
+.next_z80fi_reg_b2_in (next_z80fi_reg_b2_in), \
+.next_z80fi_reg_c2_in (next_z80fi_reg_c2_in), \
+.next_z80fi_reg_d2_in (next_z80fi_reg_d2_in), \
+.next_z80fi_reg_e2_in (next_z80fi_reg_e2_in), \
+.next_z80fi_reg_h2_in (next_z80fi_reg_h2_in), \
+.next_z80fi_reg_l2_in (next_z80fi_reg_l2_in), \
+.next_z80fi_reg_ix_in (next_z80fi_reg_ix_in), \
+.next_z80fi_reg_iy_in (next_z80fi_reg_iy_in), \
+.next_z80fi_reg_sp_in (next_z80fi_reg_sp_in), \
+.next_z80fi_reg_i_in (next_z80fi_reg_i_in), \
+.next_z80fi_reg_r_in (next_z80fi_reg_r_in), \
+.next_z80fi_reg_iff1_in (next_z80fi_reg_iff1_in), \
+.next_z80fi_reg_iff2_in (next_z80fi_reg_iff2_in), \
+.next_z80fi_reg_im_in (next_z80fi_reg_im_in)
+
+`define Z80FI_NEXT_STATE_OUTPUTS \
+output logic [0:0] next_z80fi_valid, \
+output logic [31:0] next_z80fi_insn, \
+output logic [2:0] next_z80fi_insn_len, \
+output logic [15:0] next_z80fi_bus_raddr, \
+output logic [7:0] next_z80fi_bus_rdata, \
+output logic [15:0] next_z80fi_bus_raddr2, \
+output logic [7:0] next_z80fi_bus_rdata2, \
+output logic [15:0] next_z80fi_bus_waddr, \
+output logic [7:0] next_z80fi_bus_wdata, \
+output logic [15:0] next_z80fi_bus_waddr2, \
+output logic [7:0] next_z80fi_bus_wdata2, \
+output logic [0:0] next_z80fi_mem_rd, \
+output logic [0:0] next_z80fi_mem_rd2, \
+output logic [0:0] next_z80fi_mem_wr, \
+output logic [0:0] next_z80fi_mem_wr2, \
+output logic [0:0] next_z80fi_io_rd, \
+output logic [0:0] next_z80fi_io_wr, \
+output logic [15:0] next_z80fi_reg_ip_in, \
+output logic [7:0] next_z80fi_reg_a_in, \
+output logic [7:0] next_z80fi_reg_f_in, \
+output logic [7:0] next_z80fi_reg_b_in, \
+output logic [7:0] next_z80fi_reg_c_in, \
+output logic [7:0] next_z80fi_reg_d_in, \
+output logic [7:0] next_z80fi_reg_e_in, \
+output logic [7:0] next_z80fi_reg_h_in, \
+output logic [7:0] next_z80fi_reg_l_in, \
+output logic [7:0] next_z80fi_reg_a2_in, \
+output logic [7:0] next_z80fi_reg_f2_in, \
+output logic [7:0] next_z80fi_reg_b2_in, \
+output logic [7:0] next_z80fi_reg_c2_in, \
+output logic [7:0] next_z80fi_reg_d2_in, \
+output logic [7:0] next_z80fi_reg_e2_in, \
+output logic [7:0] next_z80fi_reg_h2_in, \
+output logic [7:0] next_z80fi_reg_l2_in, \
+output logic [15:0] next_z80fi_reg_ix_in, \
+output logic [15:0] next_z80fi_reg_iy_in, \
+output logic [15:0] next_z80fi_reg_sp_in, \
+output logic [7:0] next_z80fi_reg_i_in, \
+output logic [7:0] next_z80fi_reg_r_in, \
+output logic [0:0] next_z80fi_reg_iff1_in, \
+output logic [0:0] next_z80fi_reg_iff2_in, \
+output logic [1:0] next_z80fi_reg_im_in
 
 `define Z80FI_RESET_STATE \
 z80fi_valid <= 0; \
@@ -401,58 +658,58 @@ next_z80fi_mem_wr = 0; \
 next_z80fi_mem_wr2 = 0; \
 next_z80fi_io_rd = 0; \
 next_z80fi_io_wr = 0; \
-next_z80fi_reg_ip_in = z80_reg_ip; \
-next_z80fi_reg_a_in = z80_reg_a; \
-next_z80fi_reg_f_in = z80_reg_f; \
-next_z80fi_reg_b_in = z80_reg_b; \
-next_z80fi_reg_c_in = z80_reg_c; \
-next_z80fi_reg_d_in = z80_reg_d; \
-next_z80fi_reg_e_in = z80_reg_e; \
-next_z80fi_reg_h_in = z80_reg_h; \
-next_z80fi_reg_l_in = z80_reg_l; \
-next_z80fi_reg_a2_in = z80_reg_a2; \
-next_z80fi_reg_f2_in = z80_reg_f2; \
-next_z80fi_reg_b2_in = z80_reg_b2; \
-next_z80fi_reg_c2_in = z80_reg_c2; \
-next_z80fi_reg_d2_in = z80_reg_d2; \
-next_z80fi_reg_e2_in = z80_reg_e2; \
-next_z80fi_reg_h2_in = z80_reg_h2; \
-next_z80fi_reg_l2_in = z80_reg_l2; \
-next_z80fi_reg_ix_in = z80_reg_ix; \
-next_z80fi_reg_iy_in = z80_reg_iy; \
-next_z80fi_reg_sp_in = z80_reg_sp; \
-next_z80fi_reg_i_in = z80_reg_i; \
-next_z80fi_reg_r_in = z80_reg_r; \
-next_z80fi_reg_iff1_in = z80_reg_iff1; \
-next_z80fi_reg_iff2_in = z80_reg_iff2; \
-next_z80fi_reg_im_in = z80_reg_im;
+next_z80fi_reg_ip_in = z80fi_reg_ip; \
+next_z80fi_reg_a_in = z80fi_reg_a; \
+next_z80fi_reg_f_in = z80fi_reg_f; \
+next_z80fi_reg_b_in = z80fi_reg_b; \
+next_z80fi_reg_c_in = z80fi_reg_c; \
+next_z80fi_reg_d_in = z80fi_reg_d; \
+next_z80fi_reg_e_in = z80fi_reg_e; \
+next_z80fi_reg_h_in = z80fi_reg_h; \
+next_z80fi_reg_l_in = z80fi_reg_l; \
+next_z80fi_reg_a2_in = z80fi_reg_a2; \
+next_z80fi_reg_f2_in = z80fi_reg_f2; \
+next_z80fi_reg_b2_in = z80fi_reg_b2; \
+next_z80fi_reg_c2_in = z80fi_reg_c2; \
+next_z80fi_reg_d2_in = z80fi_reg_d2; \
+next_z80fi_reg_e2_in = z80fi_reg_e2; \
+next_z80fi_reg_h2_in = z80fi_reg_h2; \
+next_z80fi_reg_l2_in = z80fi_reg_l2; \
+next_z80fi_reg_ix_in = z80fi_reg_ix; \
+next_z80fi_reg_iy_in = z80fi_reg_iy; \
+next_z80fi_reg_sp_in = z80fi_reg_sp; \
+next_z80fi_reg_i_in = z80fi_reg_i; \
+next_z80fi_reg_r_in = z80fi_reg_r; \
+next_z80fi_reg_iff1_in = z80fi_reg_iff1; \
+next_z80fi_reg_iff2_in = z80fi_reg_iff2; \
+next_z80fi_reg_im_in = z80fi_reg_im;
 
 `define Z80FI_REG_ASSIGN \
-assign z80fi_reg_ip_out = z80_reg_ip; \
-assign z80fi_reg_a_out = z80_reg_a; \
-assign z80fi_reg_f_out = z80_reg_f; \
-assign z80fi_reg_b_out = z80_reg_b; \
-assign z80fi_reg_c_out = z80_reg_c; \
-assign z80fi_reg_d_out = z80_reg_d; \
-assign z80fi_reg_e_out = z80_reg_e; \
-assign z80fi_reg_h_out = z80_reg_h; \
-assign z80fi_reg_l_out = z80_reg_l; \
-assign z80fi_reg_a2_out = z80_reg_a2; \
-assign z80fi_reg_f2_out = z80_reg_f2; \
-assign z80fi_reg_b2_out = z80_reg_b2; \
-assign z80fi_reg_c2_out = z80_reg_c2; \
-assign z80fi_reg_d2_out = z80_reg_d2; \
-assign z80fi_reg_e2_out = z80_reg_e2; \
-assign z80fi_reg_h2_out = z80_reg_h2; \
-assign z80fi_reg_l2_out = z80_reg_l2; \
-assign z80fi_reg_ix_out = z80_reg_ix; \
-assign z80fi_reg_iy_out = z80_reg_iy; \
-assign z80fi_reg_sp_out = z80_reg_sp; \
-assign z80fi_reg_i_out = z80_reg_i; \
-assign z80fi_reg_r_out = z80_reg_r; \
-assign z80fi_reg_iff1_out = z80_reg_iff1; \
-assign z80fi_reg_iff2_out = z80_reg_iff2; \
-assign z80fi_reg_im_out = z80_reg_im;
+assign z80fi_reg_ip_out = z80fi_reg_ip; \
+assign z80fi_reg_a_out = z80fi_reg_a; \
+assign z80fi_reg_f_out = z80fi_reg_f; \
+assign z80fi_reg_b_out = z80fi_reg_b; \
+assign z80fi_reg_c_out = z80fi_reg_c; \
+assign z80fi_reg_d_out = z80fi_reg_d; \
+assign z80fi_reg_e_out = z80fi_reg_e; \
+assign z80fi_reg_h_out = z80fi_reg_h; \
+assign z80fi_reg_l_out = z80fi_reg_l; \
+assign z80fi_reg_a2_out = z80fi_reg_a2; \
+assign z80fi_reg_f2_out = z80fi_reg_f2; \
+assign z80fi_reg_b2_out = z80fi_reg_b2; \
+assign z80fi_reg_c2_out = z80fi_reg_c2; \
+assign z80fi_reg_d2_out = z80fi_reg_d2; \
+assign z80fi_reg_e2_out = z80fi_reg_e2; \
+assign z80fi_reg_h2_out = z80fi_reg_h2; \
+assign z80fi_reg_l2_out = z80fi_reg_l2; \
+assign z80fi_reg_ix_out = z80fi_reg_ix; \
+assign z80fi_reg_iy_out = z80fi_reg_iy; \
+assign z80fi_reg_sp_out = z80fi_reg_sp; \
+assign z80fi_reg_i_out = z80fi_reg_i; \
+assign z80fi_reg_r_out = z80fi_reg_r; \
+assign z80fi_reg_iff1_out = z80fi_reg_iff1; \
+assign z80fi_reg_iff2_out = z80fi_reg_iff2; \
+assign z80fi_reg_im_out = z80fi_reg_im;
 
 `define Z80FI_CONN \
 .z80fi_valid (z80fi_valid), \

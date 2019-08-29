@@ -1,47 +1,73 @@
 // Run with:
-//           iverilog -g2009 -o sequencer_tb sequencer_tb.sv
+//           iverilog -g2012 -o sequencer_tb sequencer_tb.sv
 //           vvp sequencer_tb
 //           gtkwave sequencer_tb.vcd
+
+`include "sequencer.sv"
 
 `default_nettype none
 `timescale 1us/1us
 
-`include "sequencer.sv"
-
 module sequencer_tb;
 
-    reg reset = 1;
-    reg clk = 0;
-    logic [7:0] mem_data;
-    logic done;
+reg reset = 1;
+reg clk = 0;
+logic [7:0] bus_rdata;
+logic mcycle_done;
 
-    logic [15:0] addr;
-    logic write_mem;
-    logic read_mem;
-    logic [7:0] write_data;
-
+logic done;
+logic [15:0] addr;
+logic mem_wr;
+logic mem_rd;
+logic io_wr;
+logic io_rd;
+logic [7:0] bus_wdata;
+logic opcode_fetch;
 
 sequencer sequencer(
     .reset(reset),
     .clk(clk),
-    .mem_data(mem_data),
+    .bus_rdata(bus_rdata),
+    .mcycle_done(mcycle_done),
+
     .done(done),
     .addr(addr),
-    .write_mem(write_mem),
-    .read_mem(read_mem),
-    .write_data(write_data)
+    .mem_wr(mem_wr),
+    .mem_rd(mem_rd),
+    .io_wr(io_wr),
+    .io_rd(io_rd),
+    .bus_wdata(bus_wdata),
+    .opcode_fetch(opcode_fetch)
 );
 
 always #1 clk=~clk;
 
+always begin
+    mcycle_done = 0;
+    #6 mcycle_done = 1;
+    #2 ;
+end
+
 always @(*) begin
-    if (addr == 0) mem_data = 8'hFD;
-    else if (addr == 1) mem_data = 8'hCB;
-    else if (addr == 2) mem_data = 8'h34;
-    else if (addr == 3) mem_data = 8'h06;
-    else if (addr == 4) mem_data = 8'h00;
-    else if (addr == 5) mem_data = 8'h00;
-    else mem_data = addr[7:0]^addr[15:8];
+    case (addr)
+        0: bus_rdata = 8'h00;  // NOP
+        1: bus_rdata = 8'h0C;  // INC C
+        2: bus_rdata = 8'h0E;  // LD C, 0x10
+        3: bus_rdata = 8'h10;
+        4: bus_rdata = 8'h21;  // LD HL, 0x1234
+        5: bus_rdata = 8'h12;
+        6: bus_rdata = 8'h34;
+        7: bus_rdata = 8'h4E;  // LD C, (HL)
+        8: bus_rdata = 8'h71;  // LD (HL), C
+        9: bus_rdata = 8'h00;  // NOP
+        10: bus_rdata = 8'h00;  // NOP
+        11: bus_rdata = 8'h00;  // NOP
+        12: bus_rdata = 8'h00;  // NOP
+        13: bus_rdata = 8'h00;  // NOP
+        14: bus_rdata = 8'h00;  // NOP
+        15: bus_rdata = 8'h00;  // NOP
+        default: bus_rdata = 8'hFF;
+    endcase
 end
 
 initial begin
@@ -51,7 +77,7 @@ initial begin
     #2
     reset = 0;
 
-    #12
+    #120
     $finish;
 end
 

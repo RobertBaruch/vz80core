@@ -7,10 +7,10 @@ bmc
 [options]
 bmc: mode bmc
 cover: mode cover
-expect pass,fail
 append 0
 tbtop wrapper.uut
-depth 21
+depth 63
+multiclock on
 # skip 20
 
 [engines]
@@ -18,9 +18,9 @@ smtbmc boolector
 
 [script]
 verilog_defines -D Z80_FORMAL=1
-verilog_defines -D Z80_FORMAL_RESET_CYCLES=1
-verilog_defines -D Z80_FORMAL_CHECK_CYCLE=20
-verilog_defines -D Z80_FORMAL_CHECKER=z80_insn_check
+verilog_defines -D Z80_FORMAL_RESET_CYCLES=2
+verilog_defines -D Z80_FORMAL_CHECK_CYCLE=31
+verilog_defines -D Z80_FORMAL_CHECKER=z80fi_insn_check
 verilog_defines -D Z80_FORMAL_INSN_MODEL=z80fi_insn_spec_cpi
 read_verilog -sv -formal z80fi_insn_spec_cpi.sv
 read_verilog -sv -formal z80fi_testbench.sv
@@ -35,10 +35,16 @@ z80fi_insn_check.sv
 z80fi_insn_spec_cpi.sv
 z80fi_wrapper.sv
 ../z80.vh
-../z80.v
+../z80.sv
 ../alu.sv
 ../sequencer.sv
+../sequencer_program.sv
 ../sequencer_tasks.vh
+../mcycle.sv
+../edgelord.sv
+../m1.sv
+../mrd_wr_mem.sv
+../mrd_wr_io.sv
 ../registers.sv
 ../ir_registers.sv
 ../instr_decoder.sv

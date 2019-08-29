@@ -2,7 +2,12 @@
 `define _z80_vh_
 
 `default_nettype none
-`timescale 1us/1us
+
+// types of cycles
+`define CYCLE_M1 0
+`define CYCLE_RDWR_MEM 1
+`define CYCLE_RDWR_IO 2
+`define CYCLE_NONE 7
 
 // reg_select is big enough for 4 bits of set number, and 3 bits of
 // register number. Not all combinations are valid.
@@ -115,6 +120,11 @@ function [7:0] _daa_adjustment(input flag_c, input flag_h, input [7:0] a);
     _daa_adjustment =
         ((flag_h || (a[3:0] > 4'h9)) ? 8'h6 : 0) +
         ((flag_c || (a[7:4] > 4'h9)) ? 8'h60 : 0);
+endfunction
+
+// Parity flag is set on parity even (i.e. 0).
+function _parity8(input [7:0] x);
+  _parity8 = ~(x[0] ^ x[1] ^ x[2] ^ x[3] ^ x[4] ^ x[5] ^ x[6] ^ x[7]);
 endfunction
 
 // These are numbered and ordered in the same way as instructions
@@ -261,6 +271,7 @@ endfunction
 `define INSN_GROUP_OUT_REG 92          /* OUT (C), r          */
 `define INSN_GROUP_OUT_BLOCK 93        /* OUTI/OTIR/OUTD/OTDR */
 `define INSN_GROUP_IM 94               /* IM 0/1/2            */
+`define INSN_GROUP_LD_REG_IND_HL 95    /* LD r, (HL)          */
 
 // These are the INSN_GROUP_IDX_IXIY_BITS groups
 `define INSN_GROUP_RR_RLC_IDX_IXIY 0   /* RLCA/RLA/RRCA/RRA (IX/IY + d) */
@@ -289,6 +300,27 @@ output [7:0] z80_reg_l2, \
 output [15:0] z80_reg_ix, \
 output [15:0] z80_reg_iy, \
 output [15:0] z80_reg_sp
+
+`define Z80_REGS_INPUTS \
+input logic [7:0] z80_reg_a, \
+input logic [7:0] z80_reg_f, \
+input logic [7:0] z80_reg_b, \
+input logic [7:0] z80_reg_c, \
+input logic [7:0] z80_reg_d, \
+input logic [7:0] z80_reg_e, \
+input logic [7:0] z80_reg_h, \
+input logic [7:0] z80_reg_l, \
+input logic [7:0] z80_reg_a2, \
+input logic [7:0] z80_reg_f2, \
+input logic [7:0] z80_reg_b2, \
+input logic [7:0] z80_reg_c2, \
+input logic [7:0] z80_reg_d2, \
+input logic [7:0] z80_reg_e2, \
+input logic [7:0] z80_reg_h2, \
+input logic [7:0] z80_reg_l2, \
+input logic [15:0] z80_reg_ix, \
+input logic [15:0] z80_reg_iy, \
+input logic [15:0] z80_reg_sp
 
 `define Z80_REGS_WIRES \
 wire [7:0] z80_reg_a; \

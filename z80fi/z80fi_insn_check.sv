@@ -29,7 +29,7 @@ always @(*) begin
     if (!reset) begin
         // Make sure we can generate the instruction under test.
         cover(spec_valid);
-        // Make sure we can generate the instructino under test
+        // Make sure we can generate the instruction under test
         // during the check cycle (typically the last cycle).
         cover(check && spec_valid);
     end

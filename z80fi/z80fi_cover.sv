@@ -1,5 +1,5 @@
 `include "z80fi.vh"
-`include "z80.v"
+`include "z80.sv"
 
 // See if we can read and write some memory.
 module testbench(

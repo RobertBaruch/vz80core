@@ -1,9 +1,10 @@
 `ifndef _registers_sv_
 `define _registers_sv_
 
-`default_nettype none
-
 `include "z80.vh"
+
+`default_nettype none
+`timescale 1us/1us
 
 // registers stores the A, B, C, D, E, H, L, IX, IY, SP, and Flags
 // registers. You can read any two registers or register pairs
@@ -88,21 +89,6 @@ logic [15:0] _ix;
 logic [15:0] _iy;
 logic [15:0] _sp;
 
-logic [15:0] next_af;
-logic [15:0] next_bc;
-logic [15:0] next_de;
-logic [15:0] next_hl;
-
-logic [15:0] next_af2;
-logic [15:0] next_bc2;
-logic [15:0] next_de2;
-logic [15:0] next_hl2;
-
-logic [15:0] next_ix;
-logic [15:0] next_iy;
-logic [15:0] next_sp;
-
-
 `ifdef Z80_FORMAL
   assign z80_reg_a = _af[15:8];
   assign z80_reg_f = _af[7:0];
@@ -123,7 +109,7 @@ logic [15:0] next_sp;
   assign z80_reg_ix = _ix;
   assign z80_reg_iy = _iy;
   assign z80_reg_sp = _sp;
-`endif // Z80_FORMAL
+`endif // FORMAL
 
 assign reg_f = _af[7:0];
 
@@ -159,16 +145,14 @@ assign _exx = !write_en && !block_inc && !block_dec &&
     !ex_de_hl && !ex_af_af2 && exx;
 
 always @(*) begin
-    out1[15:0] = 0;
-    out2[15:0] = 0;
-    case (src1)
-      `REG_A: out1[7:0] = _af[15:8];
-      `REG_B: out1[7:0] = _bc[15:8];
-      `REG_C: out1[7:0] = _bc[7:0];
-      `REG_D: out1[7:0] = _de[15:8];
-      `REG_E: out1[7:0] = _de[7:0];
-      `REG_H: out1[7:0] = _hl[15:8];
-      `REG_L: out1[7:0] = _hl[7:0];
+     case (src1)
+      `REG_A: out1[15:0] = {8'b0, _af[15:8]};
+      `REG_B: out1[15:0] = {8'b0, _bc[15:8]};
+      `REG_C: out1[15:0] = {8'b0, _bc[7:0]};
+      `REG_D: out1[15:0] = {8'b0, _de[15:8]};
+      `REG_E: out1[15:0] = {8'b0, _de[7:0]};
+      `REG_H: out1[15:0] = {8'b0, _hl[15:8]};
+      `REG_L: out1[15:0] = {8'b0, _hl[7:0]};
       `DD_REG_BC: out1[15:0] = _bc;
       `DD_REG_DE: out1[15:0] = _de;
       `DD_REG_HL: out1[15:0] = _hl;
@@ -179,15 +163,16 @@ always @(*) begin
       `QQ_REG_AF: out1[15:0] = _af;
       `IDX_REG_IX: out1[15:0] = _ix;
       `IDX_REG_IY: out1[15:0] = _iy;
+      default: out1[15:0] = 0;
     endcase
     case (src2)
-      `REG_A: out2[7:0] = _af[15:8];
-      `REG_B: out2[7:0] = _bc[15:8];
-      `REG_C: out2[7:0] = _bc[7:0];
-      `REG_D: out2[7:0] = _de[15:8];
-      `REG_E: out2[7:0] = _de[7:0];
-      `REG_H: out2[7:0] = _hl[15:8];
-      `REG_L: out2[7:0] = _hl[7:0];
+      `REG_A: out2[15:0] = {8'b0, _af[15:8]};
+      `REG_B: out2[15:0] = {8'b0, _bc[15:8]};
+      `REG_C: out2[15:0] = {8'b0, _bc[7:0]};
+      `REG_D: out2[15:0] = {8'b0, _de[15:8]};
+      `REG_E: out2[15:0] = {8'b0, _de[7:0]};
+      `REG_H: out2[15:0] = {8'b0, _hl[15:8]};
+      `REG_L: out2[15:0] = {8'b0, _hl[7:0]};
       `DD_REG_BC: out2[15:0] = _bc;
       `DD_REG_DE: out2[15:0] = _de;
       `DD_REG_HL: out2[15:0] = _hl;
@@ -198,6 +183,7 @@ always @(*) begin
       `QQ_REG_AF: out2[15:0] = _af;
       `IDX_REG_IX: out2[15:0] = _ix;
       `IDX_REG_IY: out2[15:0] = _iy;
+      default: out2[15:0] = 0;
     endcase
 end
 
@@ -238,6 +224,7 @@ always @(posedge clk or posedge reset) begin
         `QQ_REG_AF: _af <= in;
         `IDX_REG_IX: _ix <= in;
         `IDX_REG_IY: _iy <= in;
+        default: begin end
       endcase
     end else if (_block_inc) begin
       if (!block_compare) _de <= _de + 16'b1;

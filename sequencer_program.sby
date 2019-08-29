@@ -1,25 +1,19 @@
 [tasks]
 bmc
-cover
 
 [options]
 bmc: mode bmc
-cover: mode cover
-depth 20
 
 [engines]
 smtbmc boolector
 
 [script]
 verilog_defines -D SEQUENCER_FORMAL=1
-read -formal -sv sequencer.sv
-prep -top sequencer
+read -formal -sv sequencer_program.sv
+prep -top sequencer_program
 
 [files]
 z80.vh
-sequencer.sv
+sequencer_program.sv
 sequencer_tasks.vh
-alu.sv
-registers.sv
-ir_registers.sv
 instr_decoder.sv

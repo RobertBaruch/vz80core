@@ -18,6 +18,6 @@ assign spec_valid = z80fi_valid &&
 `Z80FI_SPEC_SIGNALS
 assign spec_signals = `SPEC_REG_IP;
 
-assign spec_reg_ip_out = z80fi_reg_ip_in - 16'h1;
+assign spec_reg_ip_out = z80fi_reg_ip_in;
 
 endmodule

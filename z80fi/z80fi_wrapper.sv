@@ -1,10 +1,10 @@
 `include "z80fi.vh"
-`define Z80_FORMAL
-`include "z80.v"
+`include "z80.sv"
 
 module z80fi_wrapper(
-    input         clk,
-	input         reset,
+    input clk,
+	input reset,
+    input wait,
 	`Z80FI_OUTPUTS
 );
 
@@ -12,16 +12,20 @@ module z80fi_wrapper(
 
 // These output signals aren't monitored. Instead, we verify
 // using the z80fi interface.
-wire [15:0] bus_addr;
-wire [7:0] bus_wdata;
-wire bus_nwrite;
-wire bus_nread;
-wire nmreq;
-wire niorq;
+logic [15:0] bus_addr;
+logic [7:0] bus_wdata;
+logic bus_nwrite;
+logic bus_nread;
+logic nmreq;
+logic niorq;
+logic nm1;
+logic nrfsh;
+
 
 z80 uut(
     .CLK(clk),
     .nRESET(!reset),
+    .nWAIT(!wait),
     .READ_D(bus_rdata),
 
     .A(bus_addr),
@@ -29,6 +33,8 @@ z80 uut(
     .nIORQ(niorq),
     .nWR(bus_nwrite),
     .nRD(bus_nread),
+    .nM1(nm1),
+    .nRFSH(nrfsh),
     .WRITE_D(bus_wdata),
 
     `Z80FI_CONN

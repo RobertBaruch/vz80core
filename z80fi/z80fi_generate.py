@@ -153,10 +153,32 @@ z80fi_wires = "; \\\n".join([
 # Z80FI_NEXT_STATE, Z80FI_RESET_STATE, Z80FI_LOAD_NEXT_STATE
 # include registers_in but not registers_out.
 
+z80fi_register_decls = "; \\\n".join(
+    [f"| logic [{s[1]-1}:0] z80fi_{s[0]}" for s in z80fi_registers]) + ";"
+z80fi_register_inputs = ", \\\n".join(
+    [f"| input logic [{s[1]-1}:0] z80fi_{s[0]}" for s in z80fi_registers])
+z80fi_register_conns = ", \\\n".join(
+    [f"| .z80fi_{s[0]}(z80fi_{s[0]})" for s in z80fi_registers])
+z80fi_state_inputs = ", \\\n".join([
+    f"| input logic [{s[1]-1}:0] z80fi_{s[0]}"
+    for s in z80fi_signals + z80fi_registers_in
+])
+z80fi_state_conn = ", \\\n".join([
+    f"| .z80fi_{s[0]} (z80fi_{s[0]})"
+    for s in z80fi_signals + z80fi_registers_in
+])
 z80fi_next_state = "; \\\n".join([
     f"| logic [{s[1]-1}:0] next_z80fi_{s[0]}"
     for s in z80fi_signals + z80fi_registers_in
 ]) + ";"
+z80fi_next_state_conn = ", \\\n".join([
+    f"| .next_z80fi_{s[0]} (next_z80fi_{s[0]})"
+    for s in z80fi_signals + z80fi_registers_in
+])
+z80fi_next_state_outputs = ", \\\n".join([
+    f"| output logic [{s[1]-1}:0] next_z80fi_{s[0]}"
+    for s in z80fi_signals + z80fi_registers_in
+])
 z80fi_reset_state = "; \\\n".join(
     [f"| z80fi_{s[0]} <= 0" for s in z80fi_signals + z80fi_registers_in]) + ";"
 z80fi_load_next_state = "; \\\n".join([
@@ -177,7 +199,7 @@ z80fi_retain_next_state = "; \\\n".join([
 z80fi_init_next_state = "; \\\n".join(
     [f"| next_z80fi_{s[0]} = 0" for s in z80fi_signals]) + "; \\\n"
 z80fi_init_next_state += "; \\\n".join(
-    [f"| next_z80fi_{s[0]}_in = z80_{s[0]}" for s in z80fi_registers]) + ";"
+    [f"| next_z80fi_{s[0]}_in = z80fi_{s[0]}" for s in z80fi_registers]) + ";"
 
 # Z80FI_CONN, module connections for Z80FI_OUTPUTS.
 z80fi_conn = ", \\\n".join([
@@ -187,7 +209,8 @@ z80fi_conn = ", \\\n".join([
 
 # Z80FI_REG_ASSIGN assigns register values to z80fi_regs.
 z80fi_reg_assign = "; \\\n".join(
-    [f"| assign z80fi_{s[0]}_out = z80_{s[0]}" for s in z80fi_registers]) + ";"
+    [f"| assign z80fi_{s[0]}_out = z80fi_{s[0]}"
+     for s in z80fi_registers]) + ";"
 
 with open("z80fi_signals.vh", "w") as f:
     print_dedent(
@@ -202,8 +225,29 @@ with open("z80fi_signals.vh", "w") as f:
         | `define Z80FI_WIRES \\
         {z80fi_wires}
         |
+        | `define Z80FI_REGS \\
+        {z80fi_register_decls}
+        |
+        | `define Z80FI_REG_INPUTS \\
+        {z80fi_register_inputs}
+        |
+        | `define Z80FI_REG_CONN \\
+        {z80fi_register_conns}
+        |
+        | `define Z80FI_STATE_INPUTS \\
+        {z80fi_state_inputs}
+        |
+        | `define Z80FI_STATE_CONN \\
+        {z80fi_state_conn}
+        |
         | `define Z80FI_NEXT_STATE \\
         {z80fi_next_state}
+        |
+        | `define Z80FI_NEXT_STATE_CONN \\
+        {z80fi_next_state_conn}
+        |
+        | `define Z80FI_NEXT_STATE_OUTPUTS \\
+        {z80fi_next_state_outputs}
         |
         | `define Z80FI_RESET_STATE \\
         {z80fi_reset_state}
@@ -360,10 +404,10 @@ for spec in specs:
             | [options]
             | bmc: mode bmc
             | cover: mode cover
-            | expect pass,fail
             | append 0
             | tbtop wrapper.uut
-            | depth 21
+            | depth 63
+            | multiclock on
             | # skip 20
             |
             | [engines]
@@ -371,9 +415,9 @@ for spec in specs:
             |
             | [script]
             | verilog_defines -D Z80_FORMAL=1
-            | verilog_defines -D Z80_FORMAL_RESET_CYCLES=1
-            | verilog_defines -D Z80_FORMAL_CHECK_CYCLE=20
-            | verilog_defines -D Z80_FORMAL_CHECKER=z80_insn_check
+            | verilog_defines -D Z80_FORMAL_RESET_CYCLES=2
+            | verilog_defines -D Z80_FORMAL_CHECK_CYCLE=31
+            | verilog_defines -D Z80_FORMAL_CHECKER=z80fi_insn_check
             | verilog_defines -D Z80_FORMAL_INSN_MODEL={spec}
             | read_verilog -sv -formal {spec}.sv
             | read_verilog -sv -formal z80fi_testbench.sv
@@ -388,12 +432,36 @@ for spec in specs:
             | {spec}.sv
             | z80fi_wrapper.sv
             | ../z80.vh
-            | ../z80.v
+            | ../z80.sv
             | ../alu.sv
             | ../sequencer.sv
+            | ../sequencer_program.sv
             | ../sequencer_tasks.vh
+            | ../mcycle.sv
+            | ../edgelord.sv
+            | ../m1.sv
+            | ../mrd_wr_mem.sv
+            | ../mrd_wr_io.sv
             | ../registers.sv
             | ../ir_registers.sv
             | ../instr_decoder.sv
             """,
             file=f)
+
+# makefile (for insn_spec checking)
+
+sbycmd = "sby"
+with open("makefile", "w") as f:
+    print("all:", end="", file=f)
+
+    checks = list(sorted(specs))
+
+    for check in checks:
+        print(" %s" % check, end="", file=f)
+    print(file=f)
+
+    for check in checks:
+        print("%s: %s_bmc/status" % (check, check), file=f)
+        print("%s_bmc/status:" % check, file=f)
+        print("\t%s %s.sby 2>&1 >/dev/null" % (sbycmd, check), file=f)
+        print(".PHONY: %s" % check, file=f)

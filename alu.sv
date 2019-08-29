@@ -1,18 +1,13 @@
 `ifndef _alu_sv_
 `define _alu_sv_
 
-`default_nettype none
-`timescale 1us/100 ns
-
 `include "z80.vh"
+
+`default_nettype none
+`timescale 1us/1us
 
 function _alu_iszero8(input [7:0] x);
   _alu_iszero8 = (x == 0);
-endfunction
-
-// Parity flag is set on parity even (i.e. 0).
-function _alu_parity8(input [7:0] x);
-  _alu_parity8 = ~(x[0] ^ x[1] ^ x[2] ^ x[3] ^ x[4] ^ x[5] ^ x[6] ^ x[7]);
 endfunction
 
 // Rotates left or right, through carry or copy into carry.
@@ -222,7 +217,7 @@ always @(*) begin
         f_in[5],
         1'b1, // h
         f_in[3],
-        _alu_parity8(out), // parity
+        _parity8(out), // parity
         2'b00 // n, c
       };
     end
@@ -235,7 +230,7 @@ always @(*) begin
         f_in[5],
         1'b0, // h
         f_in[3],
-        _alu_parity8(out), // parity
+        _parity8(out), // parity
         2'b00 // n, c
       };
     end
@@ -248,7 +243,7 @@ always @(*) begin
         f_in[5],
         1'b0, // h
         f_in[3],
-        _alu_parity8(out), // parity
+        _parity8(out), // parity
         2'b00 // n, c
       };
     end
@@ -263,7 +258,7 @@ always @(*) begin
       f[`FLAG_5_NUM] = 0; // overwritten later
       f[`FLAG_H_NUM] = 0;
       f[`FLAG_3_NUM] = 0; // overwritten later
-      f[`FLAG_PV_NUM] = _alu_parity8(out);
+      f[`FLAG_PV_NUM] = _parity8(out);
       f[`FLAG_N_NUM] = 0;
     end
 
@@ -274,7 +269,7 @@ always @(*) begin
       f[`FLAG_5_NUM] = 0; // overwritten later
       f[`FLAG_H_NUM] = 0;
       f[`FLAG_3_NUM] = 0; // overwritten later
-      f[`FLAG_PV_NUM] = _alu_parity8(out);
+      f[`FLAG_PV_NUM] = _parity8(out);
       f[`FLAG_N_NUM] = 0;
       f[`FLAG_C_NUM] = x[0];
     end
@@ -286,21 +281,9 @@ always @(*) begin
       f[`FLAG_5_NUM] = 0; // overwritten later
       f[`FLAG_H_NUM] = 0;
       f[`FLAG_3_NUM] = 0; // overwritten later
-      f[`FLAG_PV_NUM] = _alu_parity8(out);
+      f[`FLAG_PV_NUM] = _parity8(out);
       f[`FLAG_N_NUM] = 0;
       f[`FLAG_C_NUM] = x[7];
-    end
-
-    `ALU_FUNC_SRA: begin
-      out = {x[7], x[7:1]};
-      f[`FLAG_S_NUM] = out[7];
-      f[`FLAG_Z_NUM] = (out == 0);
-      f[`FLAG_5_NUM] = 0; // overwritten later
-      f[`FLAG_H_NUM] = 0;
-      f[`FLAG_3_NUM] = 0; // overwritten later
-      f[`FLAG_PV_NUM] = _alu_parity8(out);
-      f[`FLAG_N_NUM] = 0;
-      f[`FLAG_C_NUM] = x[0];
     end
 
     // This is undocumented.
@@ -311,7 +294,7 @@ always @(*) begin
       f[`FLAG_5_NUM] = 0; // overwritten later
       f[`FLAG_H_NUM] = 0;
       f[`FLAG_3_NUM] = 0; // overwritten later
-      f[`FLAG_PV_NUM] = _alu_parity8(out);
+      f[`FLAG_PV_NUM] = _parity8(out);
       f[`FLAG_N_NUM] = 0;
       f[`FLAG_C_NUM] = x[7];
     end
@@ -323,7 +306,7 @@ always @(*) begin
       f[`FLAG_5_NUM] = 0; // overwritten later
       f[`FLAG_H_NUM] = 0;
       f[`FLAG_3_NUM] = 0; // overwritten later
-      f[`FLAG_PV_NUM] = _alu_parity8(out);
+      f[`FLAG_PV_NUM] = _parity8(out);
       f[`FLAG_N_NUM] = 0;
       f[`FLAG_C_NUM] = x[0];
     end
