@@ -3,11 +3,20 @@
 
 `default_nettype none
 
-// types of cycles
-`define CYCLE_M1 0
-`define CYCLE_RDWR_MEM 1
-`define CYCLE_RDWR_IO 2
-`define CYCLE_NONE 7
+// Types of cycles. CYCLE_NONE must be zero to allow simple
+// zero-initialization of things.
+`define CYCLE_NONE 0
+`define CYCLE_M1 1
+`define CYCLE_RDWR_MEM 2
+`define CYCLE_RDWR_IO 3
+// 5 cycles of no bus access, for internal operations.
+`define CYCLE_INTERNAL 4
+// 4 cycles of no bus access, for internal operations.
+`define CYCLE_INTERNAL4 5
+// 3 cycles of no bus access, for internal operations.
+`define CYCLE_INTERNAL3 6
+// 1 cycle of no bus access, for internal operations.
+`define CYCLE_EXTENDED 7
 
 // reg_select is big enough for 4 bits of set number, and 3 bits of
 // register number. Not all combinations are valid.

@@ -9,7 +9,7 @@
 `endif
 
 module z80fi_testbench (
-	input clk, reset, wait
+	input clk, reset
 );
 	`Z80FI_WIRES
 
@@ -41,7 +41,6 @@ module z80fi_testbench (
 	z80fi_wrapper wrapper (
 		.clk (clk),
 		.reset (cycle < `Z80_FORMAL_RESET_CYCLES),
-		.wait (wait),
 		`Z80FI_CONN
 	);
 endmodule

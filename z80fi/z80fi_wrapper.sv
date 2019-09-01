@@ -1,10 +1,11 @@
-`include "z80fi.vh"
+`define Z80_FORMAL
+
 `include "z80.sv"
+`include "z80fi.vh"
 
 module z80fi_wrapper(
     input clk,
 	input reset,
-    input wait,
 	`Z80FI_OUTPUTS
 );
 
@@ -25,7 +26,10 @@ logic nrfsh;
 z80 uut(
     .CLK(clk),
     .nRESET(!reset),
-    .nWAIT(!wait),
+    // We don't test wait, so that we can test timing. Also, including
+    // this (without testing timing) causes verification time to increase
+    // by a factor of 10!
+    .nWAIT(1'b1),
     .READ_D(bus_rdata),
 
     .A(bus_addr),

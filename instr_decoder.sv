@@ -145,7 +145,7 @@ always @(*) begin
             end
             8'h10: begin
                 group = `INSN_GROUP_DJNZ;
-                len = 2;
+                len = 1;
             end
             8'hCD: begin
                 group = `INSN_GROUP_CALL;

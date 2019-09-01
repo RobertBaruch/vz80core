@@ -1,0 +1,51 @@
+# DO NOT EDIT -- auto-generated from z80fi_generate.py
+
+[tasks]
+cover
+bmc
+
+[options]
+bmc: mode bmc
+cover: mode cover
+append 0
+tbtop wrapper.uut
+depth 63
+multiclock on
+# skip 20
+
+[engines]
+smtbmc boolector
+
+[script]
+verilog_defines -D Z80_FORMAL=1
+verilog_defines -D Z80_FORMAL_RESET_CYCLES=2
+verilog_defines -D Z80_FORMAL_CHECK_CYCLE=31
+verilog_defines -D Z80_FORMAL_CHECKER=z80fi_insn_check
+verilog_defines -D Z80_FORMAL_INSN_MODEL=z80fi_insn_spec_ld_reg_ind_hl
+read_verilog -sv -formal z80fi_insn_spec_ld_reg_ind_hl.sv
+read_verilog -sv -formal z80fi_testbench.sv
+prep -flatten -nordff -top z80fi_testbench
+chformal -early
+
+[files]
+z80fi.vh
+z80fi_signals.vh
+z80fi_testbench.sv
+z80fi_insn_check.sv
+z80fi_insn_spec_ld_reg_ind_hl.sv
+z80fi_wrapper.sv
+../z80.vh
+../z80.sv
+../alu.sv
+../sequencer.sv
+../sequencer_program.sv
+../sequencer_tasks.vh
+../mcycle.sv
+../edgelord.sv
+../m1.sv
+../mrd_wr_mem.sv
+../mrd_wr_io.sv
+../registers.sv
+../ir_registers.sv
+../instr_decoder.sv
+

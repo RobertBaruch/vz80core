@@ -39,4 +39,13 @@ assign spec_reg_f_out = (qq == `REG_AF) ? data[7:0] : z80fi_reg_f_in;
 
 assign spec_reg_ip_out = z80fi_reg_ip_in + 1;
 
+assign spec_mcycle_type1 = `CYCLE_M1;
+assign spec_mcycle_type2 = `CYCLE_RDWR_MEM;
+assign spec_mcycle_type3 = `CYCLE_RDWR_MEM;
+assign spec_mcycle_type4 = `CYCLE_NONE;
+
+assign spec_tcycles1 = 4;
+assign spec_tcycles2 = 3;
+assign spec_tcycles3 = 3;
+
 endmodule

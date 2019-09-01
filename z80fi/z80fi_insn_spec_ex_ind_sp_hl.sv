@@ -21,14 +21,33 @@ assign spec_signals = `SPEC_REG_IP | `SPEC_REG_HL |
 
 assign spec_bus_raddr = z80fi_reg_sp_in;
 assign spec_bus_raddr2 = z80fi_reg_sp_in + 1;
-assign spec_bus_waddr = z80fi_reg_sp_in;
-assign spec_bus_waddr2 = z80fi_reg_sp_in + 1;
-assign spec_bus_wdata = z80fi_reg_l_in;
-assign spec_bus_wdata2 = z80fi_reg_h_in;
+assign spec_bus_waddr = z80fi_reg_sp_in + 1;
+assign spec_bus_waddr2 = z80fi_reg_sp_in;
+assign spec_bus_wdata = z80fi_reg_h_in;
+assign spec_bus_wdata2 = z80fi_reg_l_in;
 
 assign spec_reg_h_out = z80fi_bus_rdata2;
 assign spec_reg_l_out = z80fi_bus_rdata;
 
 assign spec_reg_ip_out = z80fi_reg_ip_in + 1;
+
+assign spec_mcycle_type1 = `CYCLE_M1;
+assign spec_mcycle_type2 = `CYCLE_RDWR_MEM;
+assign spec_mcycle_type3 = `CYCLE_EXTENDED;
+assign spec_mcycle_type4 = `CYCLE_RDWR_MEM;
+assign spec_mcycle_type5 = `CYCLE_RDWR_MEM;
+assign spec_mcycle_type6 = `CYCLE_EXTENDED;
+assign spec_mcycle_type7 = `CYCLE_RDWR_MEM;
+assign spec_mcycle_type8 = `CYCLE_EXTENDED;
+assign spec_mcycle_type9 = `CYCLE_NONE;
+
+assign spec_tcycles1 = 4;
+assign spec_tcycles2 = 3;
+assign spec_tcycles3 = 1;
+assign spec_tcycles4 = 3;
+assign spec_tcycles5 = 3;
+assign spec_tcycles6 = 1;
+assign spec_tcycles7 = 3;
+assign spec_tcycles8 = 1;
 
 endmodule

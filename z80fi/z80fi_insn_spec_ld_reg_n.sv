@@ -34,4 +34,10 @@ assign spec_reg_l_out = (r == `REG_L) ? n : z80fi_reg_l_in;
 
 assign spec_reg_ip_out = z80fi_reg_ip_in + 2;
 
+assign spec_mcycle_type1 = `CYCLE_M1;
+assign spec_tcycles1 = 4;
+assign spec_mcycle_type2 = `CYCLE_RDWR_MEM;
+assign spec_tcycles2 = 3;
+assign spec_mcycle_type3 = `CYCLE_NONE;
+
 endmodule

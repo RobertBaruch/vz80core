@@ -18,4 +18,9 @@ assign spec_signals = `SPEC_REG_IP;
 
 assign spec_reg_ip_out = z80fi_reg_ip_in + 1;
 
+assign spec_mcycle_type1 = `CYCLE_M1;
+assign spec_mcycle_type2 = `CYCLE_NONE;
+
+assign spec_tcycles1 = 4;
+
 endmodule

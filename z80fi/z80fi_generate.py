@@ -28,13 +28,21 @@ def bit(i: int, l: int) -> str:
 
 # z80fi_signals.vh
 
-# Define all the formal interface signals. Format is {name, bits}.
+# Define all the formal interface signals. Format is (name, bits).
 z80fi_signals = [("valid", 1), ("insn", 32), ("insn_len", 3),
                  ("bus_raddr", 16), ("bus_rdata", 8), ("bus_raddr2", 16),
                  ("bus_rdata2", 8), ("bus_waddr", 16), ("bus_wdata", 8),
                  ("bus_waddr2", 16), ("bus_wdata2", 8), ("mem_rd", 1),
                  ("mem_rd2", 1), ("mem_wr", 1), ("mem_wr2", 1), ("io_rd", 1),
                  ("io_wr", 1)]
+
+# These store timing information for each instruction. Format is (name, bits).
+z80fi_signals += [("mcycle_type1", 3), ("tcycles1", 3), ("mcycle_type2", 3),
+                  ("tcycles2", 3), ("mcycle_type3", 3), ("tcycles3", 3),
+                  ("mcycle_type4", 3), ("tcycles4", 3), ("mcycle_type5", 3),
+                  ("tcycles5", 3), ("mcycle_type6", 3), ("tcycles6", 3),
+                  ("mcycle_type7", 3), ("tcycles7", 3), ("mcycle_type8", 3),
+                  ("tcycles8", 3), ("mcycle_type9", 3), ("tcycles9", 3)]
 
 # These are the signals which are registers, so they don't have to be
 # registered again. z80fi signals will be generated for z80fi_{register}_in and
@@ -180,7 +188,9 @@ z80fi_next_state_outputs = ", \\\n".join([
     for s in z80fi_signals + z80fi_registers_in
 ])
 z80fi_reset_state = "; \\\n".join(
-    [f"| z80fi_{s[0]} <= 0" for s in z80fi_signals + z80fi_registers_in]) + ";"
+    [f"| z80fi_{s[0]} <= 0" for s in z80fi_signals]) + "; \\\n"
+z80fi_reset_state += "; \\\n".join(
+    [f"| z80fi_{s[0]}_in <= z80_{s[0]}" for s in z80fi_registers]) + ";"
 z80fi_load_next_state = "; \\\n".join([
     f"| z80fi_{s[0]} <= next_z80fi_{s[0]}"
     for s in z80fi_signals + z80fi_registers_in

@@ -18,6 +18,24 @@ input [0:0] z80fi_mem_wr, \
 input [0:0] z80fi_mem_wr2, \
 input [0:0] z80fi_io_rd, \
 input [0:0] z80fi_io_wr, \
+input [2:0] z80fi_mcycle_type1, \
+input [2:0] z80fi_tcycles1, \
+input [2:0] z80fi_mcycle_type2, \
+input [2:0] z80fi_tcycles2, \
+input [2:0] z80fi_mcycle_type3, \
+input [2:0] z80fi_tcycles3, \
+input [2:0] z80fi_mcycle_type4, \
+input [2:0] z80fi_tcycles4, \
+input [2:0] z80fi_mcycle_type5, \
+input [2:0] z80fi_tcycles5, \
+input [2:0] z80fi_mcycle_type6, \
+input [2:0] z80fi_tcycles6, \
+input [2:0] z80fi_mcycle_type7, \
+input [2:0] z80fi_tcycles7, \
+input [2:0] z80fi_mcycle_type8, \
+input [2:0] z80fi_tcycles8, \
+input [2:0] z80fi_mcycle_type9, \
+input [2:0] z80fi_tcycles9, \
 input [15:0] z80fi_reg_ip_in, \
 input [7:0] z80fi_reg_a_in, \
 input [7:0] z80fi_reg_f_in, \
@@ -87,6 +105,24 @@ output logic [0:0] z80fi_mem_wr, \
 output logic [0:0] z80fi_mem_wr2, \
 output logic [0:0] z80fi_io_rd, \
 output logic [0:0] z80fi_io_wr, \
+output logic [2:0] z80fi_mcycle_type1, \
+output logic [2:0] z80fi_tcycles1, \
+output logic [2:0] z80fi_mcycle_type2, \
+output logic [2:0] z80fi_tcycles2, \
+output logic [2:0] z80fi_mcycle_type3, \
+output logic [2:0] z80fi_tcycles3, \
+output logic [2:0] z80fi_mcycle_type4, \
+output logic [2:0] z80fi_tcycles4, \
+output logic [2:0] z80fi_mcycle_type5, \
+output logic [2:0] z80fi_tcycles5, \
+output logic [2:0] z80fi_mcycle_type6, \
+output logic [2:0] z80fi_tcycles6, \
+output logic [2:0] z80fi_mcycle_type7, \
+output logic [2:0] z80fi_tcycles7, \
+output logic [2:0] z80fi_mcycle_type8, \
+output logic [2:0] z80fi_tcycles8, \
+output logic [2:0] z80fi_mcycle_type9, \
+output logic [2:0] z80fi_tcycles9, \
 output logic [15:0] z80fi_reg_ip_in, \
 output logic [7:0] z80fi_reg_a_in, \
 output logic [7:0] z80fi_reg_f_in, \
@@ -156,6 +192,24 @@ logic [0:0] z80fi_mem_wr; \
 logic [0:0] z80fi_mem_wr2; \
 logic [0:0] z80fi_io_rd; \
 logic [0:0] z80fi_io_wr; \
+logic [2:0] z80fi_mcycle_type1; \
+logic [2:0] z80fi_tcycles1; \
+logic [2:0] z80fi_mcycle_type2; \
+logic [2:0] z80fi_tcycles2; \
+logic [2:0] z80fi_mcycle_type3; \
+logic [2:0] z80fi_tcycles3; \
+logic [2:0] z80fi_mcycle_type4; \
+logic [2:0] z80fi_tcycles4; \
+logic [2:0] z80fi_mcycle_type5; \
+logic [2:0] z80fi_tcycles5; \
+logic [2:0] z80fi_mcycle_type6; \
+logic [2:0] z80fi_tcycles6; \
+logic [2:0] z80fi_mcycle_type7; \
+logic [2:0] z80fi_tcycles7; \
+logic [2:0] z80fi_mcycle_type8; \
+logic [2:0] z80fi_tcycles8; \
+logic [2:0] z80fi_mcycle_type9; \
+logic [2:0] z80fi_tcycles9; \
 logic [15:0] z80fi_reg_ip_in; \
 logic [7:0] z80fi_reg_a_in; \
 logic [7:0] z80fi_reg_f_in; \
@@ -306,6 +360,24 @@ input logic [0:0] z80fi_mem_wr, \
 input logic [0:0] z80fi_mem_wr2, \
 input logic [0:0] z80fi_io_rd, \
 input logic [0:0] z80fi_io_wr, \
+input logic [2:0] z80fi_mcycle_type1, \
+input logic [2:0] z80fi_tcycles1, \
+input logic [2:0] z80fi_mcycle_type2, \
+input logic [2:0] z80fi_tcycles2, \
+input logic [2:0] z80fi_mcycle_type3, \
+input logic [2:0] z80fi_tcycles3, \
+input logic [2:0] z80fi_mcycle_type4, \
+input logic [2:0] z80fi_tcycles4, \
+input logic [2:0] z80fi_mcycle_type5, \
+input logic [2:0] z80fi_tcycles5, \
+input logic [2:0] z80fi_mcycle_type6, \
+input logic [2:0] z80fi_tcycles6, \
+input logic [2:0] z80fi_mcycle_type7, \
+input logic [2:0] z80fi_tcycles7, \
+input logic [2:0] z80fi_mcycle_type8, \
+input logic [2:0] z80fi_tcycles8, \
+input logic [2:0] z80fi_mcycle_type9, \
+input logic [2:0] z80fi_tcycles9, \
 input logic [15:0] z80fi_reg_ip_in, \
 input logic [7:0] z80fi_reg_a_in, \
 input logic [7:0] z80fi_reg_f_in, \
@@ -350,6 +422,24 @@ input logic [1:0] z80fi_reg_im_in
 .z80fi_mem_wr2 (z80fi_mem_wr2), \
 .z80fi_io_rd (z80fi_io_rd), \
 .z80fi_io_wr (z80fi_io_wr), \
+.z80fi_mcycle_type1 (z80fi_mcycle_type1), \
+.z80fi_tcycles1 (z80fi_tcycles1), \
+.z80fi_mcycle_type2 (z80fi_mcycle_type2), \
+.z80fi_tcycles2 (z80fi_tcycles2), \
+.z80fi_mcycle_type3 (z80fi_mcycle_type3), \
+.z80fi_tcycles3 (z80fi_tcycles3), \
+.z80fi_mcycle_type4 (z80fi_mcycle_type4), \
+.z80fi_tcycles4 (z80fi_tcycles4), \
+.z80fi_mcycle_type5 (z80fi_mcycle_type5), \
+.z80fi_tcycles5 (z80fi_tcycles5), \
+.z80fi_mcycle_type6 (z80fi_mcycle_type6), \
+.z80fi_tcycles6 (z80fi_tcycles6), \
+.z80fi_mcycle_type7 (z80fi_mcycle_type7), \
+.z80fi_tcycles7 (z80fi_tcycles7), \
+.z80fi_mcycle_type8 (z80fi_mcycle_type8), \
+.z80fi_tcycles8 (z80fi_tcycles8), \
+.z80fi_mcycle_type9 (z80fi_mcycle_type9), \
+.z80fi_tcycles9 (z80fi_tcycles9), \
 .z80fi_reg_ip_in (z80fi_reg_ip_in), \
 .z80fi_reg_a_in (z80fi_reg_a_in), \
 .z80fi_reg_f_in (z80fi_reg_f_in), \
@@ -394,6 +484,24 @@ logic [0:0] next_z80fi_mem_wr; \
 logic [0:0] next_z80fi_mem_wr2; \
 logic [0:0] next_z80fi_io_rd; \
 logic [0:0] next_z80fi_io_wr; \
+logic [2:0] next_z80fi_mcycle_type1; \
+logic [2:0] next_z80fi_tcycles1; \
+logic [2:0] next_z80fi_mcycle_type2; \
+logic [2:0] next_z80fi_tcycles2; \
+logic [2:0] next_z80fi_mcycle_type3; \
+logic [2:0] next_z80fi_tcycles3; \
+logic [2:0] next_z80fi_mcycle_type4; \
+logic [2:0] next_z80fi_tcycles4; \
+logic [2:0] next_z80fi_mcycle_type5; \
+logic [2:0] next_z80fi_tcycles5; \
+logic [2:0] next_z80fi_mcycle_type6; \
+logic [2:0] next_z80fi_tcycles6; \
+logic [2:0] next_z80fi_mcycle_type7; \
+logic [2:0] next_z80fi_tcycles7; \
+logic [2:0] next_z80fi_mcycle_type8; \
+logic [2:0] next_z80fi_tcycles8; \
+logic [2:0] next_z80fi_mcycle_type9; \
+logic [2:0] next_z80fi_tcycles9; \
 logic [15:0] next_z80fi_reg_ip_in; \
 logic [7:0] next_z80fi_reg_a_in; \
 logic [7:0] next_z80fi_reg_f_in; \
@@ -438,6 +546,24 @@ logic [1:0] next_z80fi_reg_im_in;
 .next_z80fi_mem_wr2 (next_z80fi_mem_wr2), \
 .next_z80fi_io_rd (next_z80fi_io_rd), \
 .next_z80fi_io_wr (next_z80fi_io_wr), \
+.next_z80fi_mcycle_type1 (next_z80fi_mcycle_type1), \
+.next_z80fi_tcycles1 (next_z80fi_tcycles1), \
+.next_z80fi_mcycle_type2 (next_z80fi_mcycle_type2), \
+.next_z80fi_tcycles2 (next_z80fi_tcycles2), \
+.next_z80fi_mcycle_type3 (next_z80fi_mcycle_type3), \
+.next_z80fi_tcycles3 (next_z80fi_tcycles3), \
+.next_z80fi_mcycle_type4 (next_z80fi_mcycle_type4), \
+.next_z80fi_tcycles4 (next_z80fi_tcycles4), \
+.next_z80fi_mcycle_type5 (next_z80fi_mcycle_type5), \
+.next_z80fi_tcycles5 (next_z80fi_tcycles5), \
+.next_z80fi_mcycle_type6 (next_z80fi_mcycle_type6), \
+.next_z80fi_tcycles6 (next_z80fi_tcycles6), \
+.next_z80fi_mcycle_type7 (next_z80fi_mcycle_type7), \
+.next_z80fi_tcycles7 (next_z80fi_tcycles7), \
+.next_z80fi_mcycle_type8 (next_z80fi_mcycle_type8), \
+.next_z80fi_tcycles8 (next_z80fi_tcycles8), \
+.next_z80fi_mcycle_type9 (next_z80fi_mcycle_type9), \
+.next_z80fi_tcycles9 (next_z80fi_tcycles9), \
 .next_z80fi_reg_ip_in (next_z80fi_reg_ip_in), \
 .next_z80fi_reg_a_in (next_z80fi_reg_a_in), \
 .next_z80fi_reg_f_in (next_z80fi_reg_f_in), \
@@ -482,6 +608,24 @@ output logic [0:0] next_z80fi_mem_wr, \
 output logic [0:0] next_z80fi_mem_wr2, \
 output logic [0:0] next_z80fi_io_rd, \
 output logic [0:0] next_z80fi_io_wr, \
+output logic [2:0] next_z80fi_mcycle_type1, \
+output logic [2:0] next_z80fi_tcycles1, \
+output logic [2:0] next_z80fi_mcycle_type2, \
+output logic [2:0] next_z80fi_tcycles2, \
+output logic [2:0] next_z80fi_mcycle_type3, \
+output logic [2:0] next_z80fi_tcycles3, \
+output logic [2:0] next_z80fi_mcycle_type4, \
+output logic [2:0] next_z80fi_tcycles4, \
+output logic [2:0] next_z80fi_mcycle_type5, \
+output logic [2:0] next_z80fi_tcycles5, \
+output logic [2:0] next_z80fi_mcycle_type6, \
+output logic [2:0] next_z80fi_tcycles6, \
+output logic [2:0] next_z80fi_mcycle_type7, \
+output logic [2:0] next_z80fi_tcycles7, \
+output logic [2:0] next_z80fi_mcycle_type8, \
+output logic [2:0] next_z80fi_tcycles8, \
+output logic [2:0] next_z80fi_mcycle_type9, \
+output logic [2:0] next_z80fi_tcycles9, \
 output logic [15:0] next_z80fi_reg_ip_in, \
 output logic [7:0] next_z80fi_reg_a_in, \
 output logic [7:0] next_z80fi_reg_f_in, \
@@ -526,31 +670,49 @@ z80fi_mem_wr <= 0; \
 z80fi_mem_wr2 <= 0; \
 z80fi_io_rd <= 0; \
 z80fi_io_wr <= 0; \
-z80fi_reg_ip_in <= 0; \
-z80fi_reg_a_in <= 0; \
-z80fi_reg_f_in <= 0; \
-z80fi_reg_b_in <= 0; \
-z80fi_reg_c_in <= 0; \
-z80fi_reg_d_in <= 0; \
-z80fi_reg_e_in <= 0; \
-z80fi_reg_h_in <= 0; \
-z80fi_reg_l_in <= 0; \
-z80fi_reg_a2_in <= 0; \
-z80fi_reg_f2_in <= 0; \
-z80fi_reg_b2_in <= 0; \
-z80fi_reg_c2_in <= 0; \
-z80fi_reg_d2_in <= 0; \
-z80fi_reg_e2_in <= 0; \
-z80fi_reg_h2_in <= 0; \
-z80fi_reg_l2_in <= 0; \
-z80fi_reg_ix_in <= 0; \
-z80fi_reg_iy_in <= 0; \
-z80fi_reg_sp_in <= 0; \
-z80fi_reg_i_in <= 0; \
-z80fi_reg_r_in <= 0; \
-z80fi_reg_iff1_in <= 0; \
-z80fi_reg_iff2_in <= 0; \
-z80fi_reg_im_in <= 0;
+z80fi_mcycle_type1 <= 0; \
+z80fi_tcycles1 <= 0; \
+z80fi_mcycle_type2 <= 0; \
+z80fi_tcycles2 <= 0; \
+z80fi_mcycle_type3 <= 0; \
+z80fi_tcycles3 <= 0; \
+z80fi_mcycle_type4 <= 0; \
+z80fi_tcycles4 <= 0; \
+z80fi_mcycle_type5 <= 0; \
+z80fi_tcycles5 <= 0; \
+z80fi_mcycle_type6 <= 0; \
+z80fi_tcycles6 <= 0; \
+z80fi_mcycle_type7 <= 0; \
+z80fi_tcycles7 <= 0; \
+z80fi_mcycle_type8 <= 0; \
+z80fi_tcycles8 <= 0; \
+z80fi_mcycle_type9 <= 0; \
+z80fi_tcycles9 <= 0; \
+z80fi_reg_ip_in <= z80_reg_ip; \
+z80fi_reg_a_in <= z80_reg_a; \
+z80fi_reg_f_in <= z80_reg_f; \
+z80fi_reg_b_in <= z80_reg_b; \
+z80fi_reg_c_in <= z80_reg_c; \
+z80fi_reg_d_in <= z80_reg_d; \
+z80fi_reg_e_in <= z80_reg_e; \
+z80fi_reg_h_in <= z80_reg_h; \
+z80fi_reg_l_in <= z80_reg_l; \
+z80fi_reg_a2_in <= z80_reg_a2; \
+z80fi_reg_f2_in <= z80_reg_f2; \
+z80fi_reg_b2_in <= z80_reg_b2; \
+z80fi_reg_c2_in <= z80_reg_c2; \
+z80fi_reg_d2_in <= z80_reg_d2; \
+z80fi_reg_e2_in <= z80_reg_e2; \
+z80fi_reg_h2_in <= z80_reg_h2; \
+z80fi_reg_l2_in <= z80_reg_l2; \
+z80fi_reg_ix_in <= z80_reg_ix; \
+z80fi_reg_iy_in <= z80_reg_iy; \
+z80fi_reg_sp_in <= z80_reg_sp; \
+z80fi_reg_i_in <= z80_reg_i; \
+z80fi_reg_r_in <= z80_reg_r; \
+z80fi_reg_iff1_in <= z80_reg_iff1; \
+z80fi_reg_iff2_in <= z80_reg_iff2; \
+z80fi_reg_im_in <= z80_reg_im;
 
 `define Z80FI_LOAD_NEXT_STATE \
 z80fi_valid <= next_z80fi_valid; \
@@ -570,6 +732,24 @@ z80fi_mem_wr <= next_z80fi_mem_wr; \
 z80fi_mem_wr2 <= next_z80fi_mem_wr2; \
 z80fi_io_rd <= next_z80fi_io_rd; \
 z80fi_io_wr <= next_z80fi_io_wr; \
+z80fi_mcycle_type1 <= next_z80fi_mcycle_type1; \
+z80fi_tcycles1 <= next_z80fi_tcycles1; \
+z80fi_mcycle_type2 <= next_z80fi_mcycle_type2; \
+z80fi_tcycles2 <= next_z80fi_tcycles2; \
+z80fi_mcycle_type3 <= next_z80fi_mcycle_type3; \
+z80fi_tcycles3 <= next_z80fi_tcycles3; \
+z80fi_mcycle_type4 <= next_z80fi_mcycle_type4; \
+z80fi_tcycles4 <= next_z80fi_tcycles4; \
+z80fi_mcycle_type5 <= next_z80fi_mcycle_type5; \
+z80fi_tcycles5 <= next_z80fi_tcycles5; \
+z80fi_mcycle_type6 <= next_z80fi_mcycle_type6; \
+z80fi_tcycles6 <= next_z80fi_tcycles6; \
+z80fi_mcycle_type7 <= next_z80fi_mcycle_type7; \
+z80fi_tcycles7 <= next_z80fi_tcycles7; \
+z80fi_mcycle_type8 <= next_z80fi_mcycle_type8; \
+z80fi_tcycles8 <= next_z80fi_tcycles8; \
+z80fi_mcycle_type9 <= next_z80fi_mcycle_type9; \
+z80fi_tcycles9 <= next_z80fi_tcycles9; \
 z80fi_reg_ip_in <= next_z80fi_reg_ip_in; \
 z80fi_reg_a_in <= next_z80fi_reg_a_in; \
 z80fi_reg_f_in <= next_z80fi_reg_f_in; \
@@ -614,6 +794,24 @@ next_z80fi_mem_wr = z80fi_mem_wr; \
 next_z80fi_mem_wr2 = z80fi_mem_wr2; \
 next_z80fi_io_rd = z80fi_io_rd; \
 next_z80fi_io_wr = z80fi_io_wr; \
+next_z80fi_mcycle_type1 = z80fi_mcycle_type1; \
+next_z80fi_tcycles1 = z80fi_tcycles1; \
+next_z80fi_mcycle_type2 = z80fi_mcycle_type2; \
+next_z80fi_tcycles2 = z80fi_tcycles2; \
+next_z80fi_mcycle_type3 = z80fi_mcycle_type3; \
+next_z80fi_tcycles3 = z80fi_tcycles3; \
+next_z80fi_mcycle_type4 = z80fi_mcycle_type4; \
+next_z80fi_tcycles4 = z80fi_tcycles4; \
+next_z80fi_mcycle_type5 = z80fi_mcycle_type5; \
+next_z80fi_tcycles5 = z80fi_tcycles5; \
+next_z80fi_mcycle_type6 = z80fi_mcycle_type6; \
+next_z80fi_tcycles6 = z80fi_tcycles6; \
+next_z80fi_mcycle_type7 = z80fi_mcycle_type7; \
+next_z80fi_tcycles7 = z80fi_tcycles7; \
+next_z80fi_mcycle_type8 = z80fi_mcycle_type8; \
+next_z80fi_tcycles8 = z80fi_tcycles8; \
+next_z80fi_mcycle_type9 = z80fi_mcycle_type9; \
+next_z80fi_tcycles9 = z80fi_tcycles9; \
 next_z80fi_reg_ip_in = z80fi_reg_ip_in; \
 next_z80fi_reg_a_in = z80fi_reg_a_in; \
 next_z80fi_reg_f_in = z80fi_reg_f_in; \
@@ -658,6 +856,24 @@ next_z80fi_mem_wr = 0; \
 next_z80fi_mem_wr2 = 0; \
 next_z80fi_io_rd = 0; \
 next_z80fi_io_wr = 0; \
+next_z80fi_mcycle_type1 = 0; \
+next_z80fi_tcycles1 = 0; \
+next_z80fi_mcycle_type2 = 0; \
+next_z80fi_tcycles2 = 0; \
+next_z80fi_mcycle_type3 = 0; \
+next_z80fi_tcycles3 = 0; \
+next_z80fi_mcycle_type4 = 0; \
+next_z80fi_tcycles4 = 0; \
+next_z80fi_mcycle_type5 = 0; \
+next_z80fi_tcycles5 = 0; \
+next_z80fi_mcycle_type6 = 0; \
+next_z80fi_tcycles6 = 0; \
+next_z80fi_mcycle_type7 = 0; \
+next_z80fi_tcycles7 = 0; \
+next_z80fi_mcycle_type8 = 0; \
+next_z80fi_tcycles8 = 0; \
+next_z80fi_mcycle_type9 = 0; \
+next_z80fi_tcycles9 = 0; \
 next_z80fi_reg_ip_in = z80fi_reg_ip; \
 next_z80fi_reg_a_in = z80fi_reg_a; \
 next_z80fi_reg_f_in = z80fi_reg_f; \
@@ -729,6 +945,24 @@ assign z80fi_reg_im_out = z80fi_reg_im;
 .z80fi_mem_wr2 (z80fi_mem_wr2), \
 .z80fi_io_rd (z80fi_io_rd), \
 .z80fi_io_wr (z80fi_io_wr), \
+.z80fi_mcycle_type1 (z80fi_mcycle_type1), \
+.z80fi_tcycles1 (z80fi_tcycles1), \
+.z80fi_mcycle_type2 (z80fi_mcycle_type2), \
+.z80fi_tcycles2 (z80fi_tcycles2), \
+.z80fi_mcycle_type3 (z80fi_mcycle_type3), \
+.z80fi_tcycles3 (z80fi_tcycles3), \
+.z80fi_mcycle_type4 (z80fi_mcycle_type4), \
+.z80fi_tcycles4 (z80fi_tcycles4), \
+.z80fi_mcycle_type5 (z80fi_mcycle_type5), \
+.z80fi_tcycles5 (z80fi_tcycles5), \
+.z80fi_mcycle_type6 (z80fi_mcycle_type6), \
+.z80fi_tcycles6 (z80fi_tcycles6), \
+.z80fi_mcycle_type7 (z80fi_mcycle_type7), \
+.z80fi_tcycles7 (z80fi_tcycles7), \
+.z80fi_mcycle_type8 (z80fi_mcycle_type8), \
+.z80fi_tcycles8 (z80fi_tcycles8), \
+.z80fi_mcycle_type9 (z80fi_mcycle_type9), \
+.z80fi_tcycles9 (z80fi_tcycles9), \
 .z80fi_reg_ip_in (z80fi_reg_ip_in), \
 .z80fi_reg_a_in (z80fi_reg_a_in), \
 .z80fi_reg_f_in (z80fi_reg_f_in), \
@@ -799,6 +1033,24 @@ output logic [0:0] spec_mem_wr, \
 output logic [0:0] spec_mem_wr2, \
 output logic [0:0] spec_io_rd, \
 output logic [0:0] spec_io_wr, \
+output logic [2:0] spec_mcycle_type1, \
+output logic [2:0] spec_tcycles1, \
+output logic [2:0] spec_mcycle_type2, \
+output logic [2:0] spec_tcycles2, \
+output logic [2:0] spec_mcycle_type3, \
+output logic [2:0] spec_tcycles3, \
+output logic [2:0] spec_mcycle_type4, \
+output logic [2:0] spec_tcycles4, \
+output logic [2:0] spec_mcycle_type5, \
+output logic [2:0] spec_tcycles5, \
+output logic [2:0] spec_mcycle_type6, \
+output logic [2:0] spec_tcycles6, \
+output logic [2:0] spec_mcycle_type7, \
+output logic [2:0] spec_tcycles7, \
+output logic [2:0] spec_mcycle_type8, \
+output logic [2:0] spec_tcycles8, \
+output logic [2:0] spec_mcycle_type9, \
+output logic [2:0] spec_tcycles9, \
 input [15:0] z80fi_reg_ip_in, \
 input [7:0] z80fi_reg_a_in, \
 input [7:0] z80fi_reg_f_in, \
@@ -967,6 +1219,24 @@ wire [0:0] mem_wr = z80fi_mem_wr; \
 wire [0:0] mem_wr2 = z80fi_mem_wr2; \
 wire [0:0] io_rd = z80fi_io_rd; \
 wire [0:0] io_wr = z80fi_io_wr; \
+wire [2:0] mcycle_type1 = z80fi_mcycle_type1; \
+wire [2:0] tcycles1 = z80fi_tcycles1; \
+wire [2:0] mcycle_type2 = z80fi_mcycle_type2; \
+wire [2:0] tcycles2 = z80fi_tcycles2; \
+wire [2:0] mcycle_type3 = z80fi_mcycle_type3; \
+wire [2:0] tcycles3 = z80fi_tcycles3; \
+wire [2:0] mcycle_type4 = z80fi_mcycle_type4; \
+wire [2:0] tcycles4 = z80fi_tcycles4; \
+wire [2:0] mcycle_type5 = z80fi_mcycle_type5; \
+wire [2:0] tcycles5 = z80fi_tcycles5; \
+wire [2:0] mcycle_type6 = z80fi_mcycle_type6; \
+wire [2:0] tcycles6 = z80fi_tcycles6; \
+wire [2:0] mcycle_type7 = z80fi_mcycle_type7; \
+wire [2:0] tcycles7 = z80fi_tcycles7; \
+wire [2:0] mcycle_type8 = z80fi_mcycle_type8; \
+wire [2:0] tcycles8 = z80fi_tcycles8; \
+wire [2:0] mcycle_type9 = z80fi_mcycle_type9; \
+wire [2:0] tcycles9 = z80fi_tcycles9; \
 wire [15:0] reg_ip_in = z80fi_reg_ip_in; \
 wire [7:0] reg_a_in = z80fi_reg_a_in; \
 wire [7:0] reg_f_in = z80fi_reg_f_in; \
@@ -1035,6 +1305,24 @@ logic [0:0] spec_mem_wr; \
 logic [0:0] spec_mem_wr2; \
 logic [0:0] spec_io_rd; \
 logic [0:0] spec_io_wr; \
+logic [2:0] spec_mcycle_type1; \
+logic [2:0] spec_tcycles1; \
+logic [2:0] spec_mcycle_type2; \
+logic [2:0] spec_tcycles2; \
+logic [2:0] spec_mcycle_type3; \
+logic [2:0] spec_tcycles3; \
+logic [2:0] spec_mcycle_type4; \
+logic [2:0] spec_tcycles4; \
+logic [2:0] spec_mcycle_type5; \
+logic [2:0] spec_tcycles5; \
+logic [2:0] spec_mcycle_type6; \
+logic [2:0] spec_tcycles6; \
+logic [2:0] spec_mcycle_type7; \
+logic [2:0] spec_tcycles7; \
+logic [2:0] spec_mcycle_type8; \
+logic [2:0] spec_tcycles8; \
+logic [2:0] spec_mcycle_type9; \
+logic [2:0] spec_tcycles9; \
 logic [15:0] spec_reg_ip_out; \
 logic [7:0] spec_reg_a_out; \
 logic [7:0] spec_reg_f_out; \
@@ -1104,6 +1392,24 @@ logic [0:0] spec_reg_im;
 .spec_mem_wr2 (spec_mem_wr2), \
 .spec_io_rd (spec_io_rd), \
 .spec_io_wr (spec_io_wr), \
+.spec_mcycle_type1 (spec_mcycle_type1), \
+.spec_tcycles1 (spec_tcycles1), \
+.spec_mcycle_type2 (spec_mcycle_type2), \
+.spec_tcycles2 (spec_tcycles2), \
+.spec_mcycle_type3 (spec_mcycle_type3), \
+.spec_tcycles3 (spec_tcycles3), \
+.spec_mcycle_type4 (spec_mcycle_type4), \
+.spec_tcycles4 (spec_tcycles4), \
+.spec_mcycle_type5 (spec_mcycle_type5), \
+.spec_tcycles5 (spec_tcycles5), \
+.spec_mcycle_type6 (spec_mcycle_type6), \
+.spec_tcycles6 (spec_tcycles6), \
+.spec_mcycle_type7 (spec_mcycle_type7), \
+.spec_tcycles7 (spec_tcycles7), \
+.spec_mcycle_type8 (spec_mcycle_type8), \
+.spec_tcycles8 (spec_tcycles8), \
+.spec_mcycle_type9 (spec_mcycle_type9), \
+.spec_tcycles9 (spec_tcycles9), \
 .spec_valid (spec_valid), \
 .z80fi_reg_ip_in (z80fi_reg_ip_in), \
 .z80fi_reg_a_in (z80fi_reg_a_in), \

@@ -1,7 +1,6 @@
 // JP (HL)
 //
-// Jumps to the absolute address given at the little-endian
-// 16-bit memory location in HL.
+// Jumps to the absolute address given in HL.
 
 `default_nettype none
 
@@ -17,11 +16,13 @@ assign spec_valid = z80fi_valid &&
     z80fi_insn[7:0] == 8'b11101001;
 
 `Z80FI_SPEC_SIGNALS
-assign spec_signals = `SPEC_REG_IP | `SPEC_MEM_RD | `SPEC_MEM_RD2;
+assign spec_signals = `SPEC_REG_IP;
 
-assign spec_bus_raddr = z80fi_reg_hl_in;
-assign spec_bus_raddr2 = z80fi_reg_hl_in + 1;
+assign spec_reg_ip_out = z80fi_reg_hl_in;
 
-assign spec_reg_ip_out = {z80fi_bus_rdata2, z80fi_bus_rdata};
+assign spec_mcycle_type1 = `CYCLE_M1;
+assign spec_mcycle_type2 = `CYCLE_NONE;
+
+assign spec_tcycles1 = 4;
 
 endmodule

@@ -53,6 +53,7 @@ begin
     mem_rd = 0;
     io_wr = 0;
     io_rd = 0;
+    extend_cycle = 0;
     reg1_rnum = 0;
     reg2_rnum = 0;
     reg_wr = 0;
@@ -392,17 +393,47 @@ begin
 end
 endtask
 
+task task_next_cycle_internal;
+begin
+    next_cycle = `CYCLE_INTERNAL;
+    internal_cycle = 5;
+end
+endtask
+
+task task_next_cycle_internal4;
+begin
+    next_cycle = `CYCLE_INTERNAL4;
+    internal_cycle = 4;
+end
+endtask
+
+task task_next_cycle_internal3;
+begin
+    next_cycle = `CYCLE_INTERNAL3;
+    internal_cycle = 3;
+end
+endtask
+
+task task_extend_cycle;
+begin
+    next_cycle = `CYCLE_EXTENDED;
+    extend_cycle = 1;
+end
+endtask
+
 // task_done must be run at the end of an instruction, otherwise the
 // instruction will never end!
 task task_done;
+begin
     done = 1;
     next_cycle = `CYCLE_M1;
-    mem_rd = 0;
+    // mem_rd = 0;
     add_to_insn = 0;
     add_to_op = 0;
     next_state = 0;
     // if (!jumped) next_z80_reg_ip = z80_reg_ip + 1;
     next_addr = next_z80_reg_ip;
+end
 endtask
 
 `endif // _sequencer_tasks_vh_

@@ -24,6 +24,8 @@ module sequencer(
     output logic mem_rd,
     output logic io_wr,
     output logic io_rd,
+    output logic extend_cycle,
+    output logic [2:0] internal_cycle,
     output logic [7:0] bus_wdata,
     output logic opcode_fetch
 
@@ -273,6 +275,10 @@ sequencer_program sequencer_program(
     .io_wr(io_wr),
     // We want to read bus_rdata at I/O location next_addr.
     .io_rd(io_rd),
+    // We want to extend the mcycle by one tcycle.
+    .extend_cycle(extend_cycle),
+    // We want to run an internal cycle of 3, 4, or 5 tcycles.
+    .internal_cycle(internal_cycle),
     // The register to put on bus 1.
     .reg1_rnum(reg1_rnum),
     // The register to put on bus 2.
@@ -359,6 +365,11 @@ logic latched_mem_wr;
 logic latched_io_rd;
 logic latched_io_wr;
 
+`ifdef Z80_FORMAL
+// Keeps track of the number of tcycles in the current mcycle
+logic [2:0] tcycles;
+`endif
+
 always @(posedge clk) begin
     latched_reset <= reset;
 
@@ -388,6 +399,7 @@ always @(posedge clk) begin
 
         `ifdef Z80_FORMAL
             `Z80FI_RESET_STATE
+            tcycles <= 1;
         `endif
     end else begin
         if ((mcycle == `CYCLE_M1 && tcycle == 1) ||
@@ -493,7 +505,37 @@ always @(posedge clk) begin
                 z80fi_insn <= sequencer_insn;
                 z80fi_insn_len <= sequencer_insn_len;
             end
-        end
+
+            if (z80fi_mcycle_type1 == `CYCLE_NONE) begin
+                z80fi_mcycle_type1 <= mcycle;
+                z80fi_tcycles1 <= tcycles;
+            end else if (z80fi_mcycle_type2 == `CYCLE_NONE) begin
+                z80fi_mcycle_type2 <= mcycle;
+                z80fi_tcycles2 <= tcycles;
+            end else if (z80fi_mcycle_type3 == `CYCLE_NONE) begin
+                z80fi_mcycle_type3 <= mcycle;
+                z80fi_tcycles3 <= tcycles;
+            end else if (z80fi_mcycle_type4 == `CYCLE_NONE) begin
+                z80fi_mcycle_type4 <= mcycle;
+                z80fi_tcycles4 <= tcycles;
+            end else if (z80fi_mcycle_type5 == `CYCLE_NONE) begin
+                z80fi_mcycle_type5 <= mcycle;
+                z80fi_tcycles5 <= tcycles;
+            end else if (z80fi_mcycle_type6 == `CYCLE_NONE) begin
+                z80fi_mcycle_type6 <= mcycle;
+                z80fi_tcycles6 <= tcycles;
+            end else if (z80fi_mcycle_type7 == `CYCLE_NONE) begin
+                z80fi_mcycle_type7 <= mcycle;
+                z80fi_tcycles7 <= tcycles;
+            end else if (z80fi_mcycle_type8 == `CYCLE_NONE) begin
+                z80fi_mcycle_type8 <= mcycle;
+                z80fi_tcycles8 <= tcycles;
+            end else begin
+                z80fi_mcycle_type9 <= mcycle;
+                z80fi_tcycles9 <= tcycles;
+            end
+            tcycles <= 1;
+        end else tcycles <= tcycles + 1;
 
         // We just finished an instruction and haven't yet
         // started executing the instruction to be read during
@@ -532,48 +574,7 @@ always @(posedge clk) begin
         // Now we can tear them all down and load up the current
         // state of the registers.
         if (insn_len == 0 && mcycle == `CYCLE_M1 && tcycle == 2) begin
-            z80fi_valid <= 0;
-            z80fi_insn <= 0;
-            z80fi_insn_len <= 0;
-            z80fi_mem_rd <= 0;
-            z80fi_mem_rd2 <= 0;
-            z80fi_mem_wr <= 0;
-            z80fi_mem_wr2 <= 0;
-            z80fi_io_rd <= 0;
-            z80fi_io_wr <= 0;
-            z80fi_bus_rdata <= 0;
-            z80fi_bus_rdata2 <= 0;
-            z80fi_bus_wdata <= 0;
-            z80fi_bus_wdata2 <= 0;
-            z80fi_bus_raddr <= 0;
-            z80fi_bus_raddr2 <= 0;
-            z80fi_bus_waddr <= 0;
-            z80fi_bus_waddr2 <= 0;
-            z80fi_reg_ip_in <= z80_reg_ip;
-            z80fi_reg_a_in <= z80_reg_a;
-            z80fi_reg_b_in <= z80_reg_b;
-            z80fi_reg_c_in <= z80_reg_c;
-            z80fi_reg_d_in <= z80_reg_d;
-            z80fi_reg_e_in <= z80_reg_e;
-            z80fi_reg_h_in <= z80_reg_h;
-            z80fi_reg_l_in <= z80_reg_l;
-            z80fi_reg_f_in <= z80_reg_f;
-            z80fi_reg_a2_in <= z80_reg_a2;
-            z80fi_reg_b2_in <= z80_reg_b2;
-            z80fi_reg_c2_in <= z80_reg_c2;
-            z80fi_reg_d2_in <= z80_reg_d2;
-            z80fi_reg_e2_in <= z80_reg_e2;
-            z80fi_reg_h2_in <= z80_reg_h2;
-            z80fi_reg_l2_in <= z80_reg_l2;
-            z80fi_reg_f2_in <= z80_reg_f2;
-            z80fi_reg_ix_in <= z80_reg_ix;
-            z80fi_reg_iy_in <= z80_reg_iy;
-            z80fi_reg_sp_in <= z80_reg_sp;
-            z80fi_reg_i_in <= z80_reg_i;
-            z80fi_reg_r_in <= z80_reg_r;
-            z80fi_reg_iff1_in <= z80_reg_iff1;
-            z80fi_reg_iff2_in <= z80_reg_iff2;
-            z80fi_reg_im_in <= z80_reg_im;
+            `Z80FI_RESET_STATE
         end
         `endif
     end

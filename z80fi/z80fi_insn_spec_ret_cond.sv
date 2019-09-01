@@ -40,4 +40,15 @@ assign spec_reg_ip_out =
     cond_met ? {z80fi_bus_rdata2, z80fi_bus_rdata} :
     (z80fi_reg_ip_in + 16'h1);
 
+assign spec_mcycle_type1 = `CYCLE_M1;
+assign spec_mcycle_type2 = `CYCLE_EXTENDED;
+assign spec_mcycle_type3 = cond_met ? `CYCLE_RDWR_MEM : `CYCLE_NONE;
+assign spec_mcycle_type4 = `CYCLE_RDWR_MEM;
+assign spec_mcycle_type5 = `CYCLE_NONE;
+
+assign spec_tcycles1 = 4;
+assign spec_tcycles2 = 1;
+assign spec_tcycles3 = 3;
+assign spec_tcycles4 = 3;
+
 endmodule

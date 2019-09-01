@@ -109,6 +109,42 @@ always @(*) begin
 
         assert(reg_iff1_out == (spec_reg_iff1 ? spec_reg_iff1_out : z80fi_reg_iff1_in));
         assert(reg_iff2_out == (spec_reg_iff2 ? spec_reg_iff2_out : z80fi_reg_iff2_in));
+
+        // Check that timings are accurate. We are assuming no nWAITs.
+        assert(mcycle_type1 == spec_mcycle_type1);
+        assert(tcycles1 == spec_tcycles1);
+        assert(mcycle_type2 == spec_mcycle_type2);
+        if (spec_mcycle_type2 != `CYCLE_NONE) begin
+            assert(tcycles2 == spec_tcycles2);
+            assert(mcycle_type3 == spec_mcycle_type3);
+            if (spec_mcycle_type3 != `CYCLE_NONE) begin
+                assert(tcycles3 == spec_tcycles3);
+                assert(mcycle_type4 == spec_mcycle_type4);
+                if (spec_mcycle_type4 != `CYCLE_NONE) begin
+                    assert(tcycles4 == spec_tcycles4);
+                    assert(mcycle_type5 == spec_mcycle_type5);
+                    if (spec_mcycle_type5 != `CYCLE_NONE) begin
+                        assert(tcycles5 == spec_tcycles5);
+                        assert(mcycle_type6 == spec_mcycle_type6);
+                        if (spec_mcycle_type6 != `CYCLE_NONE) begin
+                            assert(tcycles6 == spec_tcycles6);
+                            assert(mcycle_type7 == spec_mcycle_type7);
+                            if (spec_mcycle_type7 != `CYCLE_NONE) begin
+                                assert(tcycles7 == spec_tcycles7);
+                                assert(mcycle_type8 == spec_mcycle_type8);
+                                if (spec_mcycle_type8 != `CYCLE_NONE) begin
+                                    assert(tcycles8 == spec_tcycles8);
+                                    assert(mcycle_type9 == spec_mcycle_type9);
+                                    if (spec_mcycle_type9 != `CYCLE_NONE) begin
+                                        assert(tcycles9 == spec_tcycles9);
+                                    end // 9 mcycles
+                                end // 8 mcycles
+                            end // 7 mcycles
+                        end // 6 mcycles
+                    end // 5 mcycles
+                end // 4 mcycles
+            end // 3 mcycles
+        end // 2 mcycles
     end
 end
 `endif

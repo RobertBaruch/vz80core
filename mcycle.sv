@@ -46,9 +46,22 @@ assign mrd_wr_mem_active = tcycle_mrd_wr_mem != 0;
 logic mrd_wr_io_active;
 assign mrd_wr_io_active = tcycle_mrd_wr_io != 0;
 
+logic [2:0] tcycle_internal;
+logic done_internal;
+logic minternal_active;
+assign minternal_active = tcycle_internal != 0;
+logic [2:0] minternal_tcycles;
+
+logic [2:0] tcycle_extended;
+logic done_extended;
+logic mextended_active;
+assign mextended_active = tcycle_extended != 0;
+
 assign _mcycle = m1_active ? `CYCLE_M1 :
             mrd_wr_mem_active ? `CYCLE_RDWR_MEM :
             mrd_wr_io_active ? `CYCLE_RDWR_IO :
+            minternal_active ? `CYCLE_INTERNAL :
+            mextended_active ? `CYCLE_EXTENDED :
                 `CYCLE_NONE;
 
 assign A = m1_active ? A_m1 :
@@ -104,12 +117,73 @@ assign rdata = m1_active ? rdata_m1 :
 assign tcycle = m1_active ? tcycle_m1 :
                 mrd_wr_mem_active ? tcycle_mrd_wr_mem :
                 mrd_wr_io_active ? tcycle_mrd_wr_io :
+                minternal_active ? tcycle_internal :
+                mextended_active ? tcycle_extended :
                 0;
 
 assign done = m1_active ? done_m1 :
                 mrd_wr_mem_active ? done_mrd_wr_mem :
                 mrd_wr_io_active ? done_mrd_wr_io :
+                minternal_active ? done_internal :
+                mextended_active ? done_extended :
                 1;
+
+logic activate_internal;
+assign activate_internal = done &&
+    ((cycle == `CYCLE_INTERNAL) || (cycle == `CYCLE_INTERNAL4) ||
+     (cycle == `CYCLE_INTERNAL3));
+
+always @(posedge clk) begin
+    if (reset) begin
+        tcycle_internal <= 0;  // inactive
+
+    end else begin
+        if ((tcycle_internal == 0 && activate_internal) ||
+                (tcycle_internal == minternal_tcycles)) begin
+            tcycle_internal <= activate_internal ? 1 : 0;
+            case (cycle)
+                `CYCLE_INTERNAL: minternal_tcycles <= 5;
+                `CYCLE_INTERNAL4: minternal_tcycles <= 4;
+                `CYCLE_INTERNAL3: minternal_tcycles <= 3;
+                default: minternal_tcycles <= 1;
+            endcase
+
+        end else begin
+            case (tcycle_internal)
+                1: tcycle_internal <= 2;
+                2: tcycle_internal <= 3;
+                3: tcycle_internal <= 4;
+                4: tcycle_internal <= 5;
+                default: tcycle_internal <= 0;
+            endcase
+        end
+    end
+end
+
+always @(*) begin
+    if (reset) done_internal = 0;
+    else done_internal = (tcycle_internal == minternal_tcycles);
+end
+
+logic activate_extended;
+assign activate_extended = done && cycle == `CYCLE_EXTENDED;
+
+always @(posedge clk) begin
+    if (reset) begin
+        tcycle_extended <= 0;  // inactive
+    end else begin
+        case (tcycle_extended)
+            0: tcycle_extended <= activate_extended ? 1 : 0;
+            1: tcycle_extended <= activate_extended ? 1 : 0;
+            default: tcycle_extended <= 0;
+        endcase
+    end
+end
+
+always @(*) begin
+    if (reset) done_extended = 0;
+    else done_extended = (tcycle == 1);
+end
 
 logic [15:0] A_m1;
 logic nMREQ_m1;

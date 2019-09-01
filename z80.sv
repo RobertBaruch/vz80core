@@ -40,6 +40,8 @@ logic mem_wr;
 logic mem_rd;
 logic io_wr;
 logic io_rd;
+logic extend_cycle;
+logic [2:0] internal_cycle;
 logic opcode_fetch;
 logic data_out_en;
 logic done;
@@ -66,6 +68,8 @@ sequencer sequencer(
     .mem_rd(mem_rd),
     .io_wr(io_wr),
     .io_rd(io_rd),
+    .extend_cycle(extend_cycle),
+    .internal_cycle(internal_cycle),
     .bus_wdata(seq_wdata),
     .opcode_fetch(opcode_fetch)
 
@@ -79,7 +83,11 @@ logic [2:0] cycle;
 assign cycle = opcode_fetch ? `CYCLE_M1 :
                (mem_wr || mem_rd) ? `CYCLE_RDWR_MEM :
                (io_wr || io_rd) ? `CYCLE_RDWR_IO :
-               `CYCLE_M1;
+               extend_cycle ? `CYCLE_EXTENDED :
+               internal_cycle == 5 ? `CYCLE_INTERNAL :
+               internal_cycle == 4 ? `CYCLE_INTERNAL4 :
+               internal_cycle == 3 ? `CYCLE_INTERNAL3 :
+               `CYCLE_NONE;
 
 mcycle mcycle(
     .clk(CLK),
