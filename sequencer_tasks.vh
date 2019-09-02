@@ -400,20 +400,6 @@ begin
 end
 endtask
 
-task task_next_cycle_internal4;
-begin
-    next_cycle = `CYCLE_INTERNAL4;
-    internal_cycle = 4;
-end
-endtask
-
-task task_next_cycle_internal3;
-begin
-    next_cycle = `CYCLE_INTERNAL3;
-    internal_cycle = 3;
-end
-endtask
-
 task task_extend_cycle;
 begin
     next_cycle = `CYCLE_EXTENDED;

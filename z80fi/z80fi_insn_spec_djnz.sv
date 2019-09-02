@@ -35,14 +35,12 @@ assign spec_reg_ip_out =
     z80fi_reg_ip_in + 16'h2 + ((z80fi_reg_b_in != 1) ? offset : 0);
 
 assign spec_mcycle_type1 = `CYCLE_M1;
-assign spec_mcycle_type2 = `CYCLE_EXTENDED;
-assign spec_mcycle_type3 = `CYCLE_RDWR_MEM;
-assign spec_mcycle_type4 = (z80fi_reg_b_in != 1) ? `CYCLE_INTERNAL : `CYCLE_NONE;
-assign spec_mcycle_type5 = `CYCLE_NONE;
+assign spec_mcycle_type2 = `CYCLE_RDWR_MEM;
+assign spec_mcycle_type3 = (z80fi_reg_b_in != 1) ? `CYCLE_INTERNAL : `CYCLE_NONE;
+assign spec_mcycle_type4 = `CYCLE_NONE;
 
-assign spec_tcycles1 = 4;
-assign spec_tcycles2 = 1;
-assign spec_tcycles3 = 3;
-assign spec_tcycles4 = 5;
+assign spec_tcycles1 = 5;
+assign spec_tcycles2 = 3;
+assign spec_tcycles3 = 5;
 
 endmodule

@@ -46,14 +46,14 @@ always #1 CLK=~CLK;
 always @(*) begin
     case (A)
         0: READ_D = 8'h00;   // NOP
-        1: READ_D = 8'hCD;   // CALL 0102
-        2: READ_D = 8'h02;
-        3: READ_D = 8'h01;
-        4: READ_D = 8'h21;   // LD HL, 0x1234
-        5: READ_D = 8'h34;
-        6: READ_D = 8'h12;
-        7: READ_D = 8'h4E;   // LD C, (HL)
-        8: READ_D = 8'h71;   // LD (HL), C
+        1: READ_D = 8'hCB;   // BIT 0, (HL)
+        2: READ_D = 8'h46;
+        3: READ_D = 8'h00;   // NOP
+        4: READ_D = 8'hED;   // LD A, R
+        5: READ_D = 8'h5F;
+        6: READ_D = 8'hF9;   // LD SP, HL
+        7: READ_D = 8'hE3;   // EX (SP), HL
+        8: READ_D = 8'h00;   // NOP
         9: READ_D = 8'hED;   // NEG
         10: READ_D = 8'h44;
         11: READ_D = 8'hED;  // IN C, (C)

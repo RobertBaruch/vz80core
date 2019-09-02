@@ -36,6 +36,7 @@ assign reset = !nRESET;
 logic mcycle_done;
 logic [2:0] _mcycle;
 logic [2:0] tcycle;
+logic extra_tcycle;
 logic mem_wr;
 logic mem_rd;
 logic io_wr;
@@ -62,6 +63,7 @@ sequencer sequencer(
     .mcycle_done(mcycle_done),
     .mcycle(_mcycle),
     .tcycle(tcycle),
+    .extra_tcycle(extra_tcycle),
 
     .addr(seq_addr),
     .mem_wr(mem_wr),
@@ -83,7 +85,6 @@ logic [2:0] cycle;
 assign cycle = opcode_fetch ? `CYCLE_M1 :
                (mem_wr || mem_rd) ? `CYCLE_RDWR_MEM :
                (io_wr || io_rd) ? `CYCLE_RDWR_IO :
-               extend_cycle ? `CYCLE_EXTENDED :
                internal_cycle == 5 ? `CYCLE_INTERNAL :
                internal_cycle == 4 ? `CYCLE_INTERNAL4 :
                internal_cycle == 3 ? `CYCLE_INTERNAL3 :
@@ -100,6 +101,7 @@ mcycle mcycle(
     .wr(mem_wr || io_wr),
     .nWAIT(nWAIT),
     .cycle(cycle),
+    .extend_cycle(extend_cycle),
 
     .A(A),
     .nMREQ(nMREQ),
@@ -113,6 +115,7 @@ mcycle mcycle(
     .rdata(seq_rdata),
     ._mcycle(_mcycle),
     .tcycle(tcycle),
+    .extra_tcycle(extra_tcycle),
     .done(mcycle_done)
 );
 

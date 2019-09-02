@@ -17,6 +17,7 @@ module mrd_wr_mem(
     input logic rd,
     input logic wr,
     input logic nWAIT,
+    input logic extend_cycle,
 
     output logic [15:0] A,
     output logic nMREQ,
@@ -26,6 +27,7 @@ module mrd_wr_mem(
     output logic data_out_en,
     output logic [7:0] rdata,
     output logic [2:0] tcycle,
+    output logic extra_tcycle,
     output logic done
 );
 
@@ -43,6 +45,8 @@ edgelord edgelord(
 logic do_rd;
 logic do_wr;
 
+assign extra_tcycle = extend_cycle && (tcycle == 3 || tcycle == 4);
+
 logic latched_nwait;
 
 always @(posedge clk) begin
@@ -55,12 +59,11 @@ always @(posedge clk) begin
             0: tcycle <= activate ? 1 : 0;
             1: tcycle <= 2;
             2: tcycle <= !latched_nwait ? 7 : 3; // 7 is Twait.
-            3: tcycle <= activate ? 1 : 0;
             7: tcycle <= !latched_nwait ? 7 : 3;
-            default: tcycle <= 0;
+            default: tcycle <= extend_cycle ? 4 : (activate ? 1 : 0);
         endcase
 
-        if (activate && (tcycle == 0 || tcycle == 3)) begin
+        if (activate && (tcycle == 0 || tcycle == 3 || tcycle == 4)) begin
             do_rd <= rd;
             do_wr <= wr;
         end
@@ -97,7 +100,15 @@ always @(*) begin
             nMREQ = !clk_state;
             nRD = do_rd ? !clk_state : 1;
             nWR = do_wr ? !clk_state : 1;
+            data_out_en = do_wr ? clk_state : 0;
             done = ~clk_state;
+        end
+        4: begin  // any extended cycles
+            nMREQ = 1;
+            nRD = 1;
+            nWR = 1;
+            data_out_en = 0;
+            done = 1;
         end
         7: begin  // Twait
             nMREQ = 0;

@@ -21,6 +21,9 @@ module mcycle(
     input logic wr,
     input logic nWAIT,
     input logic [2:0] cycle,
+    // Before the cycle is done, if extend_cycle is high, add a
+    // tcycle.
+    input logic extend_cycle,
 
     output logic [15:0] A,
     output logic nMREQ,
@@ -34,6 +37,10 @@ module mcycle(
     output logic [7:0] rdata,
     output logic [2:0] _mcycle,
     output logic [2:0] tcycle,
+    // if the mcycle would have been done, but the sequencer requested
+    // the cycle to be extended, this signal goes high at what would have
+    // been the end of the mcycle.
+    output logic extra_tcycle,
     output logic done
 );
 
@@ -121,48 +128,42 @@ assign tcycle = m1_active ? tcycle_m1 :
                 mextended_active ? tcycle_extended :
                 0;
 
-assign done = m1_active ? done_m1 :
+assign extra_tcycle = m1_active ? extra_tcycle_m1 :
+                mrd_wr_mem_active ? extra_tcycle_mrd_wr_mem :
+                minternal_active ? extra_tcycle_internal :
+                0;
+
+assign done = !extend_cycle && (m1_active ? done_m1 :
                 mrd_wr_mem_active ? done_mrd_wr_mem :
                 mrd_wr_io_active ? done_mrd_wr_io :
                 minternal_active ? done_internal :
                 mextended_active ? done_extended :
-                1;
+                1);
 
 logic activate_internal;
-assign activate_internal = done &&
-    ((cycle == `CYCLE_INTERNAL) || (cycle == `CYCLE_INTERNAL4) ||
-     (cycle == `CYCLE_INTERNAL3));
+assign activate_internal = done && (cycle == `CYCLE_INTERNAL);
+logic extra_tcycle_internal;
+assign extra_tcycle_internal = extend_cycle;
 
 always @(posedge clk) begin
     if (reset) begin
         tcycle_internal <= 0;  // inactive
 
     end else begin
-        if ((tcycle_internal == 0 && activate_internal) ||
-                (tcycle_internal == minternal_tcycles)) begin
-            tcycle_internal <= activate_internal ? 1 : 0;
-            case (cycle)
-                `CYCLE_INTERNAL: minternal_tcycles <= 5;
-                `CYCLE_INTERNAL4: minternal_tcycles <= 4;
-                `CYCLE_INTERNAL3: minternal_tcycles <= 3;
-                default: minternal_tcycles <= 1;
-            endcase
+      if (tcycle_internal == 0) begin
+        if (activate_internal) tcycle_internal <= 1;
 
-        end else begin
-            case (tcycle_internal)
-                1: tcycle_internal <= 2;
-                2: tcycle_internal <= 3;
-                3: tcycle_internal <= 4;
-                4: tcycle_internal <= 5;
-                default: tcycle_internal <= 0;
-            endcase
-        end
+      end else begin
+        if (extend_cycle) tcycle_internal <= tcycle_internal + 1;
+        else if (activate_internal) tcycle_internal <= 1;
+        else tcycle_internal <= 0;
+      end
     end
 end
 
 always @(*) begin
     if (reset) done_internal = 0;
-    else done_internal = (tcycle_internal == minternal_tcycles);
+    else done_internal = (tcycle_internal != 0 && !extend_cycle);
 end
 
 logic activate_extended;
@@ -192,6 +193,7 @@ logic nM1_m1;
 logic nRFSH_m1;
 logic [7:0] rdata_m1;
 logic [2:0] tcycle_m1;
+logic extra_tcycle_m1;
 logic done_m1;
 
 m1 m1(
@@ -202,6 +204,7 @@ m1 m1(
     .refresh_addr(refresh_addr),
     .D(D_in),
     .nWAIT(nWAIT),
+    .extend_cycle(extend_cycle),
 
     .A(A_m1),
     .nMREQ(nMREQ_m1),
@@ -210,6 +213,7 @@ m1 m1(
     .nRFSH(nRFSH_m1),
     .rdata(rdata_m1),
     .tcycle(tcycle_m1),
+    .extra_tcycle(extra_tcycle_m1),
     .done(done_m1)
 );
 
@@ -221,6 +225,7 @@ logic [7:0] D_out_mrd_wr_mem;
 logic data_out_en_mrd_wr_mem;
 logic [7:0] rdata_mrd_wr_mem;
 logic [2:0] tcycle_mrd_wr_mem;
+logic extra_tcycle_mrd_wr_mem;
 logic done_mrd_wr_mem;
 
 mrd_wr_mem mrd_wr_mem(
@@ -233,6 +238,7 @@ mrd_wr_mem mrd_wr_mem(
     .rd(rd),
     .wr(wr),
     .nWAIT(nWAIT),
+    .extend_cycle(extend_cycle),
 
     .A(A_mrd_wr_mem),
     .nMREQ(nMREQ_mrd_wr_mem),
@@ -242,7 +248,8 @@ mrd_wr_mem mrd_wr_mem(
     .data_out_en(data_out_en_mrd_wr_mem),
     .rdata(rdata_mrd_wr_mem),
     .tcycle(tcycle_mrd_wr_mem),
-    .done(done_mrd_wr_mem)
+    .done(done_mrd_wr_mem),
+    .extra_tcycle(extra_tcycle_mrd_wr_mem)
 );
 
 logic [15:0] A_mrd_wr_io;

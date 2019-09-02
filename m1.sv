@@ -15,6 +15,7 @@ module m1(
     input logic [15:0] refresh_addr,
     input logic [7:0] D,
     input logic nWAIT,
+    input logic extend_cycle,
 
     output logic [15:0] A,
     output logic nMREQ,
@@ -23,6 +24,7 @@ module m1(
     output logic nRFSH,
     output logic [7:0] rdata,
     output logic [2:0] tcycle,
+    output logic extra_tcycle,
     output logic done
 );
 
@@ -40,6 +42,8 @@ edgelord edgelord(
 logic [7:0] latched_data;
 assign rdata = (tcycle == 3 || tcycle == 4) ? latched_data : D;
 
+assign extra_tcycle = extend_cycle && (tcycle >= 4);
+
 logic latched_nwait;
 
 always @(posedge clk) begin
@@ -52,8 +56,7 @@ always @(posedge clk) begin
             1: tcycle <= 2;
             2: tcycle <= !latched_nwait ? 2 : 3;
             3: tcycle <= 4;
-            4: tcycle <= activate ? 1 : 0;
-            default: tcycle <= 0;
+            default: tcycle <= extend_cycle ? 5 : (activate ? 1 : 0);
         endcase
 
         if (tcycle == 2) latched_data <= D;
@@ -97,6 +100,14 @@ always @(*) begin
             nM1 = 1;
             nRFSH = 0;
             done = ~clk_state;
+        end
+        5: begin  // any extended cycles
+            A = refresh_addr;
+            nMREQ = 1;
+            nRD = 1;
+            nM1 = 1;
+            nRFSH = 1;
+            done = 1;
         end
         default: begin
             A = 0;

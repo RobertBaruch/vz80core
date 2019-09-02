@@ -22,7 +22,7 @@ module sequencer_program(
     input logic [31:0] insn,
     input logic [2:0] insn_len, // length of instruction
     input logic [1:0] op_len, // length of opcode not including operand
-    input logic [2:0] state,
+    input logic [4:0] state,
     input logic [15:0] stored_data,
     input logic [1:0] stored_data_len,
     input logic [15:0] reg1_rdata,
@@ -52,7 +52,7 @@ module sequencer_program(
     // We want to add bus_rdata, when it's ready, to stored_data.
     output logic add_to_store_data,
     // This is the next state we want in handling a multi-state instruction.
-    output logic [2:0] next_state,
+    output logic [4:0] next_state,
 
     output logic [7:0] bus_wdata,
     // We want to write bus_wdata at memory location next_addr.
@@ -383,7 +383,11 @@ always @(*) begin
                 `INSN_GROUP_JR:  /* JR e */
                     case (state)
                         0: task_next_cycle_internal();
-                        1: begin
+                        1: task_extend_cycle();
+                        2: task_extend_cycle();
+                        3: task_extend_cycle();
+                        4: task_extend_cycle();
+                        5: begin
                             task_jump_relative({ {8{insn_operand[7]}}, insn_operand[7:0]});
                             task_done();
                         end
@@ -395,7 +399,11 @@ always @(*) begin
                             if (z80_reg_f[insn[4] ? `FLAG_C_NUM : `FLAG_Z_NUM] == insn[3]) task_next_cycle_internal();
                             else task_done();
                         end
-                        1: begin
+                        1: task_extend_cycle();
+                        2: task_extend_cycle();
+                        3: task_extend_cycle();
+                        4: task_extend_cycle();
+                        5: begin
                             task_jump_relative({ {8{insn_operand[7]}}, insn_operand[7:0]});
                             task_done();
                         end
@@ -416,7 +424,11 @@ always @(*) begin
                             if (!alu8_f_out[`FLAG_Z_NUM]) task_next_cycle_internal();
                             else task_done();
                         end
-                        3: begin
+                        3: task_extend_cycle();
+                        4: task_extend_cycle();
+                        5: task_extend_cycle();
+                        6: task_extend_cycle();
+                        7: begin
                             task_jump_relative({ {8{stored_data[7]}}, stored_data[7:0]});
                             task_done();
                         end
@@ -445,16 +457,15 @@ always @(*) begin
                 `INSN_GROUP_CALL_COND:  /* CALL CC, nn */
                     case (state)
                         0: begin
-                            task_extend_cycle();
-                            case (insn[5:3])
-                                0, 1: if (flag_z != insn[3])
-                                    task_done();
-                                2, 3: if (flag_c != insn[3])
-                                    task_done();
-                                4, 5: if (flag_pv != insn[3])
-                                    task_done();
-                                6, 7: if (flag_s != insn[3])
-                                    task_done();
+                            case (insn[5:4])
+                                0: if (flag_z != insn[3]) task_done();
+                                   else task_extend_cycle();
+                                1: if (flag_c != insn[3]) task_done();
+                                   else task_extend_cycle();
+                                2: if (flag_pv != insn[3]) task_done();
+                                   else task_extend_cycle();
+                                3: if (flag_s != insn[3]) task_done();
+                                   else task_extend_cycle();
                             endcase
                         end
                         1: begin
@@ -833,11 +844,15 @@ always @(*) begin
                 `INSN_GROUP_LD_REG_IDX_IXIY:  /* LD  r, (IX/IY+d) */
                     case (state)
                         0: task_next_cycle_internal();
-                        1: begin
+                        1: task_extend_cycle();
+                        2: task_extend_cycle();
+                        3: task_extend_cycle();
+                        4: task_extend_cycle();
+                        5: begin
                             task_read_reg(1, {`REG_SET_IDX, insn[5]});
                             task_read_mem(1, reg1_rdata + { {8{insn_operand[7]}}, insn_operand[7:0]});
                         end
-                        2: begin
+                        6: begin
                             task_collect_data(1);
                             task_write_reg(insn[13:11], stored_data[7:0]);
                             task_done();
@@ -861,12 +876,16 @@ always @(*) begin
                 `INSN_GROUP_LD_IDX_IXIY_REG:  /* LD  (IX/IY+d), r */
                     case (state)
                         0: task_next_cycle_internal();
-                        1: begin
+                        1: task_extend_cycle();
+                        2: task_extend_cycle();
+                        3: task_extend_cycle();
+                        4: task_extend_cycle();
+                        5: begin
                             task_read_reg(1, {`REG_SET_IDX, insn[5]});
                             task_read_reg(2, insn[10:8]);
                             task_write_mem(1, reg1_rdata + { {8{insn_operand[7]}}, insn_operand[7:0]}, reg2_rdata[7:0]);
                         end
-                        2: begin
+                        6: begin
                             task_write_mem_done(1);
                             task_done();
                         end
@@ -1043,7 +1062,11 @@ always @(*) begin
                             if (!flag_pv) task_done();
                             else task_next_cycle_internal();
                         end
-                        5: begin
+                        5: task_extend_cycle();
+                        6: task_extend_cycle();
+                        7: task_extend_cycle();
+                        8: task_extend_cycle();
+                        9: begin
                             task_jump_relative(-16'h2);
                             task_done();
                         end
@@ -1072,7 +1095,11 @@ always @(*) begin
                             if (!flag_pv) task_done();
                             else task_next_cycle_internal();
                         end
-                        5: begin
+                        5: task_extend_cycle();
+                        6: task_extend_cycle();
+                        7: task_extend_cycle();
+                        8: task_extend_cycle();
+                        9: begin
                             task_jump_relative(-16'h2);
                             task_done();
                         end
@@ -1085,19 +1112,24 @@ always @(*) begin
                             task_read_mem(1, reg1_rdata);
                         end
                         1: begin
-                            task_extend_cycle();
+                            task_next_cycle_internal();
                             task_collect_data(1);
+                        end
+                        2: begin
+                            task_extend_cycle();
                             task_read_reg(1, `REG_A);
                             task_alu8_compare(reg1_rdata[7:0], stored_data[7:0]);
                             // Flag C should be unaffected by the ALU.
                             task_write_f(
                                 _combine_flags(z80_reg_f, alu8_f_out, `FLAG_C_BIT));
                         end
-                        2: begin
+                        3: begin
                             task_extend_cycle();
                             task_compare_block_dec();
                         end
-                        3: task_done();
+                        4: task_extend_cycle();
+                        5: task_extend_cycle();
+                        6: task_done();
                     endcase
 
                 `INSN_GROUP_CPDR:  /* CPDR */
@@ -1107,7 +1139,7 @@ always @(*) begin
                             task_read_mem(1, reg1_rdata);
                         end
                         1: begin
-                            task_extend_cycle();
+                            task_next_cycle_internal();
                             task_collect_data(1);
                             task_read_reg(1, `REG_A);
                             task_alu8_compare(reg1_rdata[7:0], stored_data[7:0]);
@@ -1119,11 +1151,18 @@ always @(*) begin
                             task_extend_cycle();
                             task_compare_block_dec();
                         end
-                        3: begin
+                        3: task_extend_cycle();
+                        4: task_extend_cycle();
+                        5: task_extend_cycle();
+                        6: begin
                             if (!flag_pv) task_done();
                             else task_next_cycle_internal();
                         end
-                        4: begin
+                        7: task_extend_cycle();
+                        8: task_extend_cycle();
+                        9: task_extend_cycle();
+                        10: task_extend_cycle();
+                        11: begin
                             task_jump_relative(-16'h2);
                             task_done();
                         end
@@ -1136,19 +1175,24 @@ always @(*) begin
                             task_read_mem(1, reg1_rdata);
                         end
                         1: begin
-                            task_extend_cycle();
+                            task_next_cycle_internal();
                             task_collect_data(1);
+                        end
+                        2: begin
+                            task_extend_cycle();
                             task_read_reg(1, `REG_A);
                             task_alu8_compare(reg1_rdata[7:0], stored_data[7:0]);
                             // Flag C should be unaffected by the ALU.
                             task_write_f(
                                 _combine_flags(z80_reg_f, alu8_f_out, `FLAG_C_BIT));
                         end
-                        2: begin
+                        3: begin
                             task_extend_cycle();
                             task_compare_block_inc();
                         end
-                        3: task_done();
+                        4: task_extend_cycle();
+                        5: task_extend_cycle();
+                        6: task_done();
                     endcase
 
                 `INSN_GROUP_CPIR:  /* CPIR */
@@ -1158,7 +1202,7 @@ always @(*) begin
                             task_read_mem(1, reg1_rdata);
                         end
                         1: begin
-                            task_extend_cycle();
+                            task_next_cycle_internal();
                             task_collect_data(1);
                             task_read_reg(1, `REG_A);
                             task_alu8_compare(reg1_rdata[7:0], stored_data[7:0]);
@@ -1170,11 +1214,18 @@ always @(*) begin
                             task_extend_cycle();
                             task_compare_block_inc();
                         end
-                        3: begin
+                        3: task_extend_cycle();
+                        4: task_extend_cycle();
+                        5: task_extend_cycle();
+                        6: begin
                             if (!flag_pv) task_done();
                             else task_next_cycle_internal();
                         end
-                        4: begin
+                        7: task_extend_cycle();
+                        8: task_extend_cycle();
+                        9: task_extend_cycle();
+                        10: task_extend_cycle();
+                        11: begin
                             task_jump_relative(-16'h2);
                             task_done();
                         end
@@ -1221,7 +1272,11 @@ always @(*) begin
                             if (insn[12] && alu8_out == 0) task_next_cycle_internal();
                             else task_done();
                         end
-                        4: begin
+                        4: task_extend_cycle();
+                        5: task_extend_cycle();
+                        6: task_extend_cycle();
+                        7: task_extend_cycle();
+                        8: begin
                             task_jump_relative(-16'h2);
                             task_done();
                         end
@@ -1269,7 +1324,11 @@ always @(*) begin
                             if (insn[12] && alu8_out == 0) task_next_cycle_internal();
                             else task_done();
                         end
-                        4: begin
+                        4: task_extend_cycle();
+                        5: task_extend_cycle();
+                        6: task_extend_cycle();
+                        7: task_extend_cycle();
+                        8: begin
                             task_jump_relative(-16'h2);
                             task_done();
                         end
@@ -1380,31 +1439,29 @@ always @(*) begin
                         end
                         1: begin
                             task_collect_data(1);
-                            task_extend_cycle();
-                        end
-                        2: begin
                             task_read_reg(1, `DD_REG_SP);
                             task_read_mem(2, reg1_rdata + 1);
                         end
-                        3: begin
+                        2: begin
+                            task_extend_cycle();
                             task_collect_data(2);
+                        end
+                        3: begin
                             task_read_reg(1, `DD_REG_SP);
                             task_read_reg(2, `DD_REG_HL);
                             task_write_mem(1, reg1_rdata + 1, reg2_rdata[15:8]);
                         end
                         4: begin
                             task_write_mem_done(1);
-                            task_extend_cycle();
-                        end
-                        5: begin
                             task_read_reg(1, `DD_REG_SP);
                             task_read_reg(2, `DD_REG_HL);
                             task_write_mem(1, reg1_rdata, reg2_rdata[7:0]);
                         end
-                        6: begin
+                        5: begin
                             task_write_mem_done(2);
                             task_extend_cycle();
                         end
+                        6: task_extend_cycle();
                         7: begin
                             task_write_reg(`DD_REG_HL, stored_data);
                             task_done();
@@ -1419,31 +1476,29 @@ always @(*) begin
                         end
                         1: begin
                             task_collect_data(1);
-                            task_extend_cycle();
-                        end
-                        2: begin
                             task_read_reg(1, `DD_REG_SP);
                             task_read_mem(2, reg1_rdata + 1);
                         end
-                        3: begin
+                        2: begin
+                            task_extend_cycle();
                             task_collect_data(2);
+                        end
+                        3: begin
                             task_read_reg(1, `DD_REG_SP);
                             task_read_reg(2, {`REG_SET_IDX, insn[5]});
                             task_write_mem(1, reg1_rdata + 1, reg2_rdata[15:8]);
                         end
                         4: begin
                             task_write_mem_done(1);
-                            task_extend_cycle();
-                        end
-                        5: begin
                             task_read_reg(1, `DD_REG_SP);
                             task_read_reg(2, {`REG_SET_IDX, insn[5]});
                             task_write_mem(1, reg1_rdata, reg2_rdata[7:0]);
                         end
-                        6: begin
+                        5: begin
                             task_write_mem_done(2);
                             task_extend_cycle();
                         end
+                        6: task_extend_cycle();
                         7: begin
                             task_write_reg({`REG_SET_IDX, insn[5]}, stored_data);
                             task_done();
@@ -1551,11 +1606,15 @@ always @(*) begin
                 `INSN_GROUP_ALU_A_IDX_IXIY:  /* ADD/ADC/SUB/SBC/AND/XOR/OR/CP A, (IX/IY + d) */
                     case (state)
                         0: task_next_cycle_internal();
-                        1: begin
+                        1: task_extend_cycle();
+                        2: task_extend_cycle();
+                        3: task_extend_cycle();
+                        4: task_extend_cycle();
+                        5: begin
                             task_read_reg(2, {`REG_SET_IDX, insn[5]});
                             task_read_mem(1, reg2_rdata + { {8{insn_operand[7]}}, insn_operand[7:0]});
                         end
-                        2: begin
+                        6: begin
                             task_collect_data(1);
                             task_read_reg(1, `REG_A);
                             task_alu8_op(insn[13:11], reg1_rdata[7:0], stored_data[7:0]);
@@ -1568,22 +1627,26 @@ always @(*) begin
                 `INSN_GROUP_INC_DEC_IDX_IXIY:  /* INC/DEC (IX/IY + d) */
                     case (state)
                         0: task_next_cycle_internal();
-                        1: begin
+                        1: task_extend_cycle();
+                        2: task_extend_cycle();
+                        3: task_extend_cycle();
+                        4: task_extend_cycle();
+                        5: begin
                             task_read_reg(1, {`REG_SET_IDX, insn[5]});
                             task_read_mem(1, reg1_rdata + { {8{insn_operand[7]}}, insn_operand[7:0]});
                         end
-                        2: begin
+                        6: begin
                             task_extend_cycle();
                             task_collect_data(1);
                         end
-                        3: begin
+                        7: begin
                             task_read_reg(1, {`REG_SET_IDX, insn[5]});
                             task_alu8_op(insn[8] ? `ALU_FUNC_ADD : `ALU_FUNC_SUB, stored_data[7:0], 8'b1);
                             task_write_mem(1, reg1_rdata + { {8{insn_operand[7]}}, insn_operand[7:0]}, alu8_out);
                             // Flag C is not affected.
                             task_write_f(_combine_flags(z80_reg_f, alu8_f_out, `FLAG_C_BIT));
                         end
-                        4: begin
+                        8: begin
                             task_write_mem_done(1);
                             task_done();
                         end
@@ -1591,9 +1654,14 @@ always @(*) begin
 
                 `INSN_GROUP_ADD_HL_DD:  /* ADD HL, dd */
                     case (state)
-                        0: task_next_cycle_internal4();
-                        1: task_next_cycle_internal3();
-                        2: begin
+                        0: task_next_cycle_internal();
+                        1: task_extend_cycle();
+                        2: task_extend_cycle();
+                        3: task_extend_cycle();
+                        4: task_next_cycle_internal();
+                        5: task_extend_cycle();
+                        6: task_extend_cycle();
+                        7: begin
                             task_read_reg(1, `DD_REG_HL);
                             task_read_reg(2, {`REG_SET_DD, insn[5:4]});
                             task_alu16_op(`ALU_FUNC_ADD, reg1_rdata, reg2_rdata);
@@ -1608,9 +1676,14 @@ always @(*) begin
 
                 `INSN_GROUP_ADD_IXIY_SS:  /* ADD IX/IY, ss */
                     case (state)
-                        0: task_next_cycle_internal4();
-                        1: task_next_cycle_internal3();
-                        2: begin
+                        0: task_next_cycle_internal();
+                        1: task_extend_cycle();
+                        2: task_extend_cycle();
+                        3: task_extend_cycle();
+                        4: task_next_cycle_internal();
+                        5: task_extend_cycle();
+                        6: task_extend_cycle();
+                        7: begin
                             task_read_reg(1, insn[5] ? `IDX_REG_IY : `IDX_REG_IX);
                             if (insn[13:12] == `REG_HL)
                                 task_read_reg(2, insn[5] ? `IDX_REG_IY : `IDX_REG_IX);
@@ -1628,9 +1701,14 @@ always @(*) begin
 
                 `INSN_GROUP_ADC_SBC_HL_DD:  /* ADC/SBC HL, dd */
                     case (state)
-                        0: task_next_cycle_internal4();
-                        1: task_next_cycle_internal3();
-                        2: begin
+                        0: task_next_cycle_internal();
+                        1: task_extend_cycle();
+                        2: task_extend_cycle();
+                        3: task_extend_cycle();
+                        4: task_next_cycle_internal();
+                        5: task_extend_cycle();
+                        6: task_extend_cycle();
+                        7: begin
                             task_read_reg(1, `DD_REG_HL);
                             task_read_reg(2, {`REG_SET_DD, insn[13:12]});
                             task_alu16_op(insn[11] ? `ALU_FUNC_ADC : `ALU_FUNC_SBC, reg1_rdata, reg2_rdata);
@@ -1789,17 +1867,20 @@ always @(*) begin
                             task_read_mem(1, reg1_rdata);
                         end
                         1: begin
-                            task_next_cycle_internal4();
+                            task_next_cycle_internal();
                             task_collect_data(1);
                         end
-                        2: begin
+                        2: task_extend_cycle();
+                        3: task_extend_cycle();
+                        4: task_extend_cycle();
+                        5: begin
                             task_read_reg(1, `DD_REG_HL);
                             task_read_reg(2, `REG_A);
                             task_rotate_decimal(insn[11],
                                 reg2_rdata[7:0], stored_data[7:0],
                                 reg1_rdata);
                         end
-                        3: begin
+                        6: begin
                             task_write_mem_done(1);
                             task_done();
                         end

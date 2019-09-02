@@ -17,6 +17,10 @@ module sequencer(
     input logic mcycle_done,
     input logic [2:0] mcycle,
     input logic [2:0] tcycle,
+    // if the mcycle would have been done, but the sequencer requested
+    // the cycle to be extended, this signal goes high at what would have
+    // been the end of the mcycle.
+    input logic extra_tcycle,
 
     output logic done,
     output logic [15:0] addr,
@@ -127,7 +131,7 @@ logic [2:0] next_cycle;
 
 logic [15:0] z80_reg_ip;
 
-logic [2:0] state;
+logic [4:0] state;
 
 //
 // Next state variables
@@ -138,16 +142,19 @@ logic next_done;
 
 logic [15:0] next_z80_reg_ip;
 
-logic [2:0] next_state;
+logic [4:0] next_state;
 
 logic [15:0] next_addr;
 logic [7:0] _bus_wdata;
+
+logic do_action;
+assign do_action = mcycle_done || extra_tcycle;
 
 registers registers(
     .reset(reset),
     .clk(clk),
 
-    .write_en(reg_wr && mcycle_done),
+    .write_en(reg_wr && do_action),
     .dest(reg_wnum),
     .in(reg_wdata),
 
@@ -159,15 +166,15 @@ registers registers(
 
     .reg_f(_z80_reg_f),
     .f_in(f_wdata),
-    .f_wr(f_wr && mcycle_done),
+    .f_wr(f_wr && do_action),
 
-    .block_inc(block_inc && mcycle_done),
-    .block_dec(block_dec && mcycle_done),
-    .block_compare(block_compare && mcycle_done),
+    .block_inc(block_inc && do_action),
+    .block_dec(block_dec && do_action),
+    .block_compare(block_compare && do_action),
 
-    .ex_de_hl(ex_de_hl && mcycle_done),
-    .ex_af_af2(ex_af_af2 && mcycle_done),
-    .exx(exx && mcycle_done)
+    .ex_de_hl(ex_de_hl && do_action),
+    .ex_af_af2(ex_af_af2 && do_action),
+    .exx(exx && do_action)
 
 `ifdef Z80_FORMAL
     ,
@@ -179,17 +186,17 @@ ir_registers ir_registers(
     .reset(reset),
     .clk(clk),
 
-    .i_wr(i_wr && mcycle_done),
+    .i_wr(i_wr && do_action),
     .i_in(i_wdata),
-    .r_wr(r_wr && mcycle_done),
+    .r_wr(r_wr && do_action),
     .r_in(r_wdata),
 
     .reg_i(z80_reg_i),
     .reg_r(z80_reg_r),
-    .enable_interrupts(enable_interrupts && mcycle_done),
-    .disable_interrupts(disable_interrupts && mcycle_done),
-    .accept_nmi(accept_nmi && mcycle_done),
-    .ret_from_nmi(ret_from_nmi && mcycle_done),
+    .enable_interrupts(enable_interrupts && do_action),
+    .disable_interrupts(disable_interrupts && do_action),
+    .accept_nmi(accept_nmi && do_action),
+    .ret_from_nmi(ret_from_nmi && do_action),
     .next_insn_done(next_done),
 
     .iff1(z80_reg_iff1),
@@ -422,7 +429,7 @@ always @(posedge clk) begin
             latched_add_to_store_data <= 0;
             latched_add_to_op <= 0;
 
-        end else if (done && mcycle_done) begin // instruction is complete
+        end else if (done && do_action) begin // instruction is complete
             insn <= 0;
             insn_len <= 0;
             op_len <= 0;
@@ -441,7 +448,7 @@ always @(posedge clk) begin
             z80_reg_ip <= next_z80_reg_ip;
             addr <= next_z80_reg_ip;
 
-        end else if (mcycle_done) begin // instruction not complete, cycle complete
+        end else if (do_action) begin // instruction not complete, cycle complete
             z80_reg_im <= next_z80_reg_im;
             z80_reg_ip <= next_z80_reg_ip;
             state <= next_state;
@@ -467,7 +474,7 @@ always @(posedge clk) begin
         end
 
         `ifdef Z80_FORMAL
-        if (mcycle_done) begin
+        if (do_action) begin
             if (!latched_add_to_insn && latched_mem_rd && mcycle == `CYCLE_RDWR_MEM) begin
                 if (!z80fi_mem_rd) begin
                     z80fi_mem_rd <= 1;
@@ -506,36 +513,40 @@ always @(posedge clk) begin
                 z80fi_insn_len <= sequencer_insn_len;
             end
 
-            if (z80fi_mcycle_type1 == `CYCLE_NONE) begin
-                z80fi_mcycle_type1 <= mcycle;
-                z80fi_tcycles1 <= tcycles;
-            end else if (z80fi_mcycle_type2 == `CYCLE_NONE) begin
-                z80fi_mcycle_type2 <= mcycle;
-                z80fi_tcycles2 <= tcycles;
-            end else if (z80fi_mcycle_type3 == `CYCLE_NONE) begin
-                z80fi_mcycle_type3 <= mcycle;
-                z80fi_tcycles3 <= tcycles;
-            end else if (z80fi_mcycle_type4 == `CYCLE_NONE) begin
-                z80fi_mcycle_type4 <= mcycle;
-                z80fi_tcycles4 <= tcycles;
-            end else if (z80fi_mcycle_type5 == `CYCLE_NONE) begin
-                z80fi_mcycle_type5 <= mcycle;
-                z80fi_tcycles5 <= tcycles;
-            end else if (z80fi_mcycle_type6 == `CYCLE_NONE) begin
-                z80fi_mcycle_type6 <= mcycle;
-                z80fi_tcycles6 <= tcycles;
-            end else if (z80fi_mcycle_type7 == `CYCLE_NONE) begin
-                z80fi_mcycle_type7 <= mcycle;
-                z80fi_tcycles7 <= tcycles;
-            end else if (z80fi_mcycle_type8 == `CYCLE_NONE) begin
-                z80fi_mcycle_type8 <= mcycle;
-                z80fi_tcycles8 <= tcycles;
-            end else begin
-                z80fi_mcycle_type9 <= mcycle;
-                z80fi_tcycles9 <= tcycles;
+            if (mcycle_done) begin
+                if (z80fi_mcycle_type1 == `CYCLE_NONE) begin
+                    z80fi_mcycle_type1 <= mcycle;
+                    z80fi_tcycles1 <= tcycles;
+                end else if (z80fi_mcycle_type2 == `CYCLE_NONE) begin
+                    z80fi_mcycle_type2 <= mcycle;
+                    z80fi_tcycles2 <= tcycles;
+                end else if (z80fi_mcycle_type3 == `CYCLE_NONE) begin
+                    z80fi_mcycle_type3 <= mcycle;
+                    z80fi_tcycles3 <= tcycles;
+                end else if (z80fi_mcycle_type4 == `CYCLE_NONE) begin
+                    z80fi_mcycle_type4 <= mcycle;
+                    z80fi_tcycles4 <= tcycles;
+                end else if (z80fi_mcycle_type5 == `CYCLE_NONE) begin
+                    z80fi_mcycle_type5 <= mcycle;
+                    z80fi_tcycles5 <= tcycles;
+                end else if (z80fi_mcycle_type6 == `CYCLE_NONE) begin
+                    z80fi_mcycle_type6 <= mcycle;
+                    z80fi_tcycles6 <= tcycles;
+                end else if (z80fi_mcycle_type7 == `CYCLE_NONE) begin
+                    z80fi_mcycle_type7 <= mcycle;
+                    z80fi_tcycles7 <= tcycles;
+                end else if (z80fi_mcycle_type8 == `CYCLE_NONE) begin
+                    z80fi_mcycle_type8 <= mcycle;
+                    z80fi_tcycles8 <= tcycles;
+                end else begin
+                    z80fi_mcycle_type9 <= mcycle;
+                    z80fi_tcycles9 <= tcycles;
+                end
             end
-            tcycles <= 1;
-        end else tcycles <= tcycles + 1;
+        end
+
+        if (mcycle_done) tcycles <= 1;
+        else tcycles <= tcycles + 1;
 
         // We just finished an instruction and haven't yet
         // started executing the instruction to be read during
