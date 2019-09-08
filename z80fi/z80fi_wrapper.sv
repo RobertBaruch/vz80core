@@ -6,6 +6,8 @@
 module z80fi_wrapper(
     input clk,
 	input reset,
+    input wwait,
+    input bus_req,
 	`Z80FI_OUTPUTS
 );
 
@@ -21,15 +23,13 @@ logic nmreq;
 logic niorq;
 logic nm1;
 logic nrfsh;
-
+logic nbusak;
 
 z80 uut(
     .CLK(clk),
     .nRESET(!reset),
-    // We don't test wait, so that we can test timing. Also, including
-    // this (without testing timing) causes verification time to increase
-    // by a factor of 10!
-    .nWAIT(1'b1),
+    .nWAIT(!wwait),
+    .nBUSRQ(!bus_req),
     .READ_D(bus_rdata),
 
     .A(bus_addr),
@@ -39,6 +39,7 @@ z80 uut(
     .nRD(bus_nread),
     .nM1(nm1),
     .nRFSH(nrfsh),
+    .nBUSAK(nbusak),
     .WRITE_D(bus_wdata),
 
     `Z80FI_CONN

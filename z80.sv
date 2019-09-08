@@ -10,19 +10,21 @@
 
 // The z80. We've only implemented the basic signals so far.
 module z80(
-    input CLK,
-    input nRESET,
-    input nWAIT,
-    input [7:0] READ_D,
+    input logic CLK,
+    input logic nRESET,
+    input logic nWAIT,
+    input logic [7:0] READ_D,
+    input logic nBUSRQ,
 
-    output nMREQ,
-    output nIORQ,
-    output nRD,
-    output nWR,
-    output nM1,
-    output nRFSH,
-    output [15:0] A,
-    output [7:0] WRITE_D
+    output logic nMREQ,
+    output logic nIORQ,
+    output logic nRD,
+    output logic nWR,
+    output logic nM1,
+    output logic nRFSH,
+    output logic nBUSAK,
+    output logic [15:0] A,
+    output logic [7:0] WRITE_D
 
 `ifdef Z80_FORMAL
     ,
@@ -33,16 +35,36 @@ module z80(
 logic reset;
 assign reset = !nRESET;
 
+logic latched_busreq;
+logic stall_cycle;
+
+logic next_busreq;
+assign next_busreq = mcycle_done && latched_busreq;
+assign stall_cycle = !reset && (next_busreq || !nBUSAK);
+
+always @(posedge CLK) begin
+    if (reset) begin
+        nBUSAK <= 1;
+        latched_busreq <= 0;
+
+    end else begin
+        latched_busreq <= !nBUSRQ;
+        if (next_busreq) nBUSAK <= 0;
+        else if (!latched_busreq && !nBUSAK) nBUSAK <= 1;
+    end
+end
+
 logic mcycle_done;
 logic [2:0] _mcycle;
 logic [2:0] tcycle;
 logic extra_tcycle;
+logic waitstated;
 logic mem_wr;
 logic mem_rd;
 logic io_wr;
 logic io_rd;
 logic extend_cycle;
-logic [2:0] internal_cycle;
+logic internal_cycle;
 logic opcode_fetch;
 logic data_out_en;
 logic done;
@@ -64,6 +86,8 @@ sequencer sequencer(
     .mcycle(_mcycle),
     .tcycle(tcycle),
     .extra_tcycle(extra_tcycle),
+    .stall_cycle(stall_cycle),
+    .waitstated(waitstated),
 
     .addr(seq_addr),
     .mem_wr(mem_wr),
@@ -82,12 +106,10 @@ sequencer sequencer(
 );
 
 logic [2:0] cycle;
-assign cycle = opcode_fetch ? `CYCLE_M1 :
+assign cycle = (opcode_fetch || reset) ? `CYCLE_M1 :
                (mem_wr || mem_rd) ? `CYCLE_RDWR_MEM :
                (io_wr || io_rd) ? `CYCLE_RDWR_IO :
-               internal_cycle == 5 ? `CYCLE_INTERNAL :
-               internal_cycle == 4 ? `CYCLE_INTERNAL4 :
-               internal_cycle == 3 ? `CYCLE_INTERNAL3 :
+               internal_cycle ? `CYCLE_INTERNAL :
                `CYCLE_NONE;
 
 mcycle mcycle(
@@ -116,6 +138,7 @@ mcycle mcycle(
     ._mcycle(_mcycle),
     .tcycle(tcycle),
     .extra_tcycle(extra_tcycle),
+    .waitstated(waitstated),
     .done(mcycle_done)
 );
 

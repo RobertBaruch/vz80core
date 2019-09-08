@@ -396,7 +396,7 @@ endtask
 task task_next_cycle_internal;
 begin
     next_cycle = `CYCLE_INTERNAL;
-    internal_cycle = 5;
+    internal_cycle = 1;
 end
 endtask
 

@@ -26,6 +26,7 @@ module mrd_wr_io(
     output logic data_out_en,
     output logic [7:0] rdata,
     output logic [2:0] tcycle,
+    output logic waitstated,
     output logic done
 );
 
@@ -44,6 +45,7 @@ logic do_rd;
 logic do_wr;
 
 logic latched_nwait;
+assign waitstated = (tcycle == 7) && !latched_nwait;
 
 always @(posedge clk) begin
     if (reset) begin

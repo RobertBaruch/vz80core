@@ -25,6 +25,7 @@ module m1(
     output logic [7:0] rdata,
     output logic [2:0] tcycle,
     output logic extra_tcycle,
+    output logic waitstated,
     output logic done
 );
 
@@ -45,6 +46,7 @@ assign rdata = (tcycle == 3 || tcycle == 4) ? latched_data : D;
 assign extra_tcycle = extend_cycle && (tcycle >= 4);
 
 logic latched_nwait;
+assign waitstated = (tcycle == 2) && !latched_nwait;
 
 always @(posedge clk) begin
     if (reset) begin

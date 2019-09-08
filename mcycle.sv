@@ -41,6 +41,10 @@ module mcycle(
     // the cycle to be extended, this signal goes high at what would have
     // been the end of the mcycle.
     output logic extra_tcycle,
+    // This goes high when a memory or I/O access has been waitstated by
+    // nWAIT. It's only used during formal verification to inhibit counting
+    // of tcycles.
+    output logic waitstated,
     output logic done
 );
 
@@ -133,6 +137,11 @@ assign extra_tcycle = m1_active ? extra_tcycle_m1 :
                 minternal_active ? extra_tcycle_internal :
                 0;
 
+assign waitstated = m1_active ? waitstated_m1 :
+                mrd_wr_mem_active ? waitstated_mrd_wr_mem :
+                mrd_wr_io_active ? waitstated_mrd_wr_io :
+                0;
+
 assign done = !extend_cycle && (m1_active ? done_m1 :
                 mrd_wr_mem_active ? done_mrd_wr_mem :
                 mrd_wr_io_active ? done_mrd_wr_io :
@@ -194,6 +203,7 @@ logic nRFSH_m1;
 logic [7:0] rdata_m1;
 logic [2:0] tcycle_m1;
 logic extra_tcycle_m1;
+logic waitstated_m1;
 logic done_m1;
 
 m1 m1(
@@ -214,6 +224,7 @@ m1 m1(
     .rdata(rdata_m1),
     .tcycle(tcycle_m1),
     .extra_tcycle(extra_tcycle_m1),
+    .waitstated(waitstated_m1),
     .done(done_m1)
 );
 
@@ -226,6 +237,7 @@ logic data_out_en_mrd_wr_mem;
 logic [7:0] rdata_mrd_wr_mem;
 logic [2:0] tcycle_mrd_wr_mem;
 logic extra_tcycle_mrd_wr_mem;
+logic waitstated_mrd_wr_mem;
 logic done_mrd_wr_mem;
 
 mrd_wr_mem mrd_wr_mem(
@@ -249,7 +261,8 @@ mrd_wr_mem mrd_wr_mem(
     .rdata(rdata_mrd_wr_mem),
     .tcycle(tcycle_mrd_wr_mem),
     .done(done_mrd_wr_mem),
-    .extra_tcycle(extra_tcycle_mrd_wr_mem)
+    .extra_tcycle(extra_tcycle_mrd_wr_mem),
+    .waitstated(waitstated_mrd_wr_mem)
 );
 
 logic [15:0] A_mrd_wr_io;
@@ -260,6 +273,7 @@ logic [7:0] D_out_mrd_wr_io;
 logic data_out_en_mrd_wr_io;
 logic [7:0] rdata_mrd_wr_io;
 logic [2:0] tcycle_mrd_wr_io;
+logic waitstated_mrd_wr_io;
 logic done_mrd_wr_io;
 
 mrd_wr_io mrd_wr_io(
@@ -281,6 +295,7 @@ mrd_wr_io mrd_wr_io(
     .data_out_en(data_out_en_mrd_wr_io),
     .rdata(rdata_mrd_wr_io),
     .tcycle(tcycle_mrd_wr_io),
+    .waitstated(waitstated_mrd_wr_io),
     .done(done_mrd_wr_io)
 );
 

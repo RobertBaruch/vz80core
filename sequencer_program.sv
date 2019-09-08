@@ -65,8 +65,8 @@ module sequencer_program(
     output logic io_rd,
     // We want to extend the mcycle by one tcycle.
     output logic extend_cycle,
-    // We want to run an internal cycle of 3, 4, or 5 tcycles.
-    output logic [2:0] internal_cycle,
+    // We want to run an internal cycle.
+    output logic internal_cycle,
     // The register to put on bus 1.
     output logic `reg_select reg1_rnum,
     // The register to put on bus 2.

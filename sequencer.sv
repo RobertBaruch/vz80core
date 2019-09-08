@@ -21,17 +21,37 @@ module sequencer(
     // the cycle to be extended, this signal goes high at what would have
     // been the end of the mcycle.
     input logic extra_tcycle,
+    // at the end of the machine cycle, if stall_cycle is high then we
+    // don't go into the next machine cycle until stall_cycle goes low.
+    input logic stall_cycle,
+    // This just lets us know if we got waitstated due to an nWAIT.
+    // It's only used to inhibit counting of tcycles during formal verification.
+    input logic waitstated,
 
     output logic done,
     output logic [15:0] addr,
+    output logic [7:0] bus_wdata,
+
+    // The following six signals indicate which kind of machine cycle
+    // we want next:
+    //
+    // opcode_fetch: M1
+    // mem_wr/rd: Memory access cycle
+    // io_wr/rd: I/O access cycle
+    // internal_cycle: Cycles with no access
+    //
+    // If none of these are set, then it's as if we requested an
+    // internal cycle, except no actions are taken.
     output logic mem_wr,
     output logic mem_rd,
     output logic io_wr,
     output logic io_rd,
-    output logic extend_cycle,
-    output logic [2:0] internal_cycle,
-    output logic [7:0] bus_wdata,
-    output logic opcode_fetch
+    output logic opcode_fetch,
+    output logic internal_cycle,
+
+    // extend_cycle indicates that we want to extend the current
+    // machine cycle by one T-cycle.
+    output logic extend_cycle
 
 `ifdef Z80_FORMAL
     ,
@@ -148,13 +168,52 @@ logic [15:0] next_addr;
 logic [7:0] _bus_wdata;
 
 logic do_action;
-assign do_action = mcycle_done || extra_tcycle;
+assign do_action = !reset && !stall_cycle && (mcycle_done || extra_tcycle);
+
+// This signal causes the sequencer program's requested action to be carried
+// out at the end of a machine cycle or extra tcycle, unless the machine
+// cycle was NONE.
+logic do_action_without_stall;
+assign do_action_without_stall = !reset && (mcycle != `CYCLE_NONE) && (mcycle_done || extra_tcycle);
+
+logic req_mem_wr;
+logic req_mem_rd;
+logic req_io_wr;
+logic req_io_rd;
+logic req_opcode_fetch;
+logic req_internal_cycle;
+
+logic latched_mem_rd;
+logic latched_mem_wr;
+logic latched_io_rd;
+logic latched_io_wr;
+logic latched_opcode_fetch;
+logic latched_internal_cycle;
+
+assign req_opcode_fetch = mcycle_done && next_cycle == `CYCLE_M1;
+
+// These signals will initiate a machine cycle on the cycle after mcycle_done goes high.
+// If stalling, then we want these to be zero so that we initiate a NONE cycle.
+// If we've just completed a NONE (stall) cycle, then we want these to be based on the
+// latched versions of the requests.
+logic stall_done;
+assign stall_done = mcycle_done && (mcycle == `CYCLE_NONE) && !stall_cycle;
+
+logic nonstall_done;
+assign nonstall_done = mcycle_done && (mcycle != `CYCLE_NONE) && !stall_cycle;
+
+assign mem_wr = (nonstall_done && req_mem_wr) || (stall_done && latched_mem_wr);
+assign mem_rd = (nonstall_done && req_mem_rd) || (stall_done && latched_mem_rd);
+assign io_wr = (nonstall_done && req_io_wr) || (stall_done && latched_io_wr);
+assign io_rd = (nonstall_done && req_io_rd) || (stall_done && latched_io_rd);
+assign opcode_fetch = (nonstall_done && req_opcode_fetch) || (stall_done && latched_opcode_fetch);
+assign internal_cycle = (nonstall_done && req_internal_cycle) || (stall_done && latched_internal_cycle);
 
 registers registers(
     .reset(reset),
     .clk(clk),
 
-    .write_en(reg_wr && do_action),
+    .write_en(reg_wr && do_action_without_stall),
     .dest(reg_wnum),
     .in(reg_wdata),
 
@@ -166,15 +225,15 @@ registers registers(
 
     .reg_f(_z80_reg_f),
     .f_in(f_wdata),
-    .f_wr(f_wr && do_action),
+    .f_wr(f_wr && do_action_without_stall),
 
-    .block_inc(block_inc && do_action),
-    .block_dec(block_dec && do_action),
-    .block_compare(block_compare && do_action),
+    .block_inc(block_inc && do_action_without_stall),
+    .block_dec(block_dec && do_action_without_stall),
+    .block_compare(block_compare && do_action_without_stall),
 
-    .ex_de_hl(ex_de_hl && do_action),
-    .ex_af_af2(ex_af_af2 && do_action),
-    .exx(exx && do_action)
+    .ex_de_hl(ex_de_hl && do_action_without_stall),
+    .ex_af_af2(ex_af_af2 && do_action_without_stall),
+    .exx(exx && do_action_without_stall)
 
 `ifdef Z80_FORMAL
     ,
@@ -186,17 +245,17 @@ ir_registers ir_registers(
     .reset(reset),
     .clk(clk),
 
-    .i_wr(i_wr && do_action),
+    .i_wr(i_wr && do_action_without_stall),
     .i_in(i_wdata),
-    .r_wr(r_wr && do_action),
+    .r_wr(r_wr && do_action_without_stall),
     .r_in(r_wdata),
 
     .reg_i(z80_reg_i),
     .reg_r(z80_reg_r),
-    .enable_interrupts(enable_interrupts && do_action),
-    .disable_interrupts(disable_interrupts && do_action),
-    .accept_nmi(accept_nmi && do_action),
-    .ret_from_nmi(ret_from_nmi && do_action),
+    .enable_interrupts(enable_interrupts && do_action_without_stall),
+    .disable_interrupts(disable_interrupts && do_action_without_stall),
+    .accept_nmi(accept_nmi && do_action_without_stall),
+    .ret_from_nmi(ret_from_nmi && do_action_without_stall),
     .next_insn_done(next_done),
 
     .iff1(z80_reg_iff1),
@@ -275,17 +334,17 @@ sequencer_program sequencer_program(
 
     .bus_wdata(_bus_wdata),
     // We want to write bus_wdata at memory location next_addr.
-    .mem_wr(mem_wr),
+    .mem_wr(req_mem_wr),
     // We want to read bus_rdata at memory location next_addr.
-    .mem_rd(mem_rd),
+    .mem_rd(req_mem_rd),
     // We want to write bus_wdata at I/O location next_addr.
-    .io_wr(io_wr),
+    .io_wr(req_io_wr),
     // We want to read bus_rdata at I/O location next_addr.
-    .io_rd(io_rd),
+    .io_rd(req_io_rd),
     // We want to extend the mcycle by one tcycle.
     .extend_cycle(extend_cycle),
-    // We want to run an internal cycle of 3, 4, or 5 tcycles.
-    .internal_cycle(internal_cycle),
+    // We want to run an internal cycle.
+    .internal_cycle(req_internal_cycle),
     // The register to put on bus 1.
     .reg1_rnum(reg1_rnum),
     // The register to put on bus 2.
@@ -339,7 +398,6 @@ logic latched_add_to_insn;
 logic latched_add_to_store_data;
 logic latched_add_to_op;
 
-assign opcode_fetch = mcycle_done && next_cycle == `CYCLE_M1;
 
 always @(*) begin
     sequencer_insn = insn;
@@ -367,10 +425,6 @@ always @(*) begin
 end
 
 logic latched_reset;
-logic latched_mem_rd;
-logic latched_mem_wr;
-logic latched_io_rd;
-logic latched_io_wr;
 
 `ifdef Z80_FORMAL
 // Keeps track of the number of tcycles in the current mcycle
@@ -401,6 +455,8 @@ always @(posedge clk) begin
         latched_mem_wr <= 0;
         latched_io_rd <= 0;
         latched_io_wr <= 0;
+        latched_opcode_fetch <= 1;
+        latched_internal_cycle <= 0;
 
         bus_wdata <= 0;
 
@@ -429,52 +485,38 @@ always @(posedge clk) begin
             latched_add_to_store_data <= 0;
             latched_add_to_op <= 0;
 
-        end else if (done && do_action) begin // instruction is complete
-            insn <= 0;
-            insn_len <= 0;
-            op_len <= 0;
-            stored_data <= 0;
-            stored_data_len <= 0;
-            state <= 0;
-            latched_add_to_insn <= 0;
-            latched_add_to_store_data <= 0;
-            latched_add_to_op <= 0;
-            latched_mem_rd <= mem_rd;
-            latched_mem_wr <= mem_wr;
-            latched_io_rd <= io_rd;
-            latched_io_wr <= io_wr;
+        end else if (do_action_without_stall) begin // state is complete
+            // done: instruction is complete
+            // mcycle_done: mcycle is complete
+            // extra_tcycle: another state
 
             z80_reg_im <= next_z80_reg_im;
             z80_reg_ip <= next_z80_reg_ip;
-            addr <= next_z80_reg_ip;
+            state <= done ? 0 : next_state;
+            addr <= done ? next_z80_reg_ip : next_addr;
 
-        end else if (do_action) begin // instruction not complete, cycle complete
-            z80_reg_im <= next_z80_reg_im;
-            z80_reg_ip <= next_z80_reg_ip;
-            state <= next_state;
-            addr <= next_addr;
-
-            stored_data <= sequencer_stored_data;
-            stored_data_len <= sequencer_stored_data_len;
-            insn <= sequencer_insn;
-            insn_len <= sequencer_insn_len;
-            op_len <= sequencer_op_len;
+            stored_data <= done ? 0 : sequencer_stored_data;
+            stored_data_len <= done ? 0 : sequencer_stored_data_len;
+            insn <= done ? 0 : sequencer_insn;
+            insn_len <= done ? 0 : sequencer_insn_len;
+            op_len <= done ? 0 : sequencer_op_len;
 
             latched_add_to_insn <= 0;
             latched_add_to_store_data <= 0;
             latched_add_to_op <= 0;
-            latched_mem_rd <= mem_rd;
-            latched_mem_wr <= mem_wr;
-            latched_io_rd <= io_rd;
-            latched_io_wr <= io_wr;
+            latched_mem_rd <= req_mem_rd;
+            latched_mem_wr <= req_mem_wr;
+            latched_io_rd <= req_io_rd;
+            latched_io_wr <= req_io_wr;
+            latched_opcode_fetch <= req_opcode_fetch;
+            latched_internal_cycle <= req_internal_cycle;
 
-            if (mem_wr || io_wr) bus_wdata <= _bus_wdata;
+            if (req_mem_wr || req_io_wr) bus_wdata <= _bus_wdata;
             else bus_wdata <= 0;
-
         end
 
         `ifdef Z80_FORMAL
-        if (do_action) begin
+        if (do_action_without_stall) begin
             if (!latched_add_to_insn && latched_mem_rd && mcycle == `CYCLE_RDWR_MEM) begin
                 if (!z80fi_mem_rd) begin
                     z80fi_mem_rd <= 1;
@@ -546,7 +588,7 @@ always @(posedge clk) begin
         end
 
         if (mcycle_done) tcycles <= 1;
-        else tcycles <= tcycles + 1;
+        else if (!waitstated) tcycles <= tcycles + 1;
 
         // We just finished an instruction and haven't yet
         // started executing the instruction to be read during
